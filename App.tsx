@@ -9,21 +9,97 @@ import {
   Switch,
   View,
   Picker,
+  Clipboard,
 } from 'react-native';
 import Constants from 'expo-constants';
 import * as SecureStore from 'expo-secure-store';
+import PassHashCommon from './passhash-common';
 
+
+const key = siteTag =>
+  'options__' + Array.prototype.map.call(siteTag, ch => ch.charCodeAt()).join('_');
 
 export default function App() {
+  const [siteTagList, onChangeSiteTagList] = React.useState([]);
   const [siteTag, onChangeSiteTag] = React.useState('');
   const [masterKey, onChangeMasterKey] = React.useState('');
-  const [hashWord, onChangeHashWord] = React.useState('');
   const [isDigitRequired, onChangeIsDigitRequired] = React.useState(false);
   const [isPunctuationRequired, onChangeIsPunctuationRequired] = React.useState(false);
   const [isMixedCaseRequired, onChangeIsMixedCaseRequired] = React.useState(false);
   const [digitsOnly, onChangeDigitsOnly] = React.useState(false);
   const [noSpecial, onChangeNoSpecial] = React.useState(false);
   const [size, onChangeSize] = React.useState(16);
+
+  const loadOptions = options => {
+    const {
+      isDigitRequired, isPunctuationRequired,
+      isMixedCaseRequired, digitsOnly, noSpecial, size
+    } = options;
+    onChangeIsDigitRequired(isDigitRequired);
+    onChangeIsPunctuationRequired(isPunctuationRequired);
+    onChangeIsMixedCaseRequired(isMixedCaseRequired);
+    onChangeDigitsOnly(digitsOnly);
+    onChangeNoSpecial(noSpecial);
+    onChangeSize(size);
+  };
+
+  const saveOptions = () => {
+    const options = {
+      isDigitRequired,
+      isPunctuationRequired,
+      isMixedCaseRequired,
+      digitsOnly,
+      noSpecial,
+      size
+    };
+
+    let nextSiteTagList = [...siteTagList];
+    if (!nextSiteTagList.includes(siteTag)) {
+      nextSiteTagList.push(siteTag);
+      onChangeSiteTagList(nextSiteTagList);
+      SecureStore.setItemAsync('siteTagList', JSON.stringify(nextSiteTagList));
+    }
+
+    SecureStore.setItemAsync(key(siteTag), JSON.stringify(options));
+  };
+
+  React.useEffect(() => {
+    const siteTagListPromise = SecureStore.getItemAsync('siteTagList');
+    siteTagListPromise.then(siteTagListJson => {
+      if (siteTagListJson) {
+        const siteTagList = JSON.parse(siteTagListJson);
+        onChangeSiteTagList(siteTagList);
+      }
+    });
+  }, [siteTagList]);
+
+  React.useEffect(() => {
+    if (!siteTag || !siteTagList.length || !siteTagList.includes(siteTag)) {
+      return;
+    }
+    const optionsPromise = SecureStore.getItemAsync(key(siteTag));
+    optionsPromise.then(optionsJson => {
+      if (optionsJson) {
+        const options = JSON.parse(optionsJson);
+        loadOptions(options);
+      }
+    });
+  }, [siteTag]);
+
+  const hashWord = React.useMemo(
+    () => PassHashCommon.generateHashWord(
+      siteTag,
+      masterKey,
+      size,
+      isDigitRequired,
+      isPunctuationRequired,
+      isMixedCaseRequired,
+      noSpecial,
+      digitsOnly,
+    ),
+    [siteTag, masterKey, size, isDigitRequired, isPunctuationRequired, isMixedCaseRequired, noSpecial, digitsOnly]
+  );
+  const sortedSiteTagList = React.useMemo(() => [...siteTagList].sort(), [siteTagList]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -33,14 +109,15 @@ export default function App() {
           selectedValue={siteTag}
           onValueChange={siteTag => onChangeSiteTag(siteTag)}
         >
-          {['gmail.com', 'llamasinspace.net', 'sillyrabbits.org'].map(tag =>
-            <Picker.Item key="tag" label={tag} value={tag} />
+          {sortedSiteTagList.map(tag =>
+            <Picker.Item key={tag} label={tag} value={tag} />
           )}
         </Picker>
 
         <TextInput
           onChangeText={text => onChangeSiteTag(text)}
           value={siteTag}
+          autoCapitalize="none"
           keyboardType="url"
           textContentType="URL"
           placeholder="Site tag"
@@ -55,6 +132,14 @@ export default function App() {
         />
 
         <Text>{hashWord}</Text>
+
+        <Button
+          title="Copy"
+          onPress={() => {
+            Clipboard.setString(hashWord);
+            saveOptions();
+          }}
+        />
 
         <Text>Requirements</Text>
 
@@ -130,10 +215,6 @@ export default function App() {
           )}
         </Picker>
 
-        <Button
-          title="Ok"
-          onPress={() => { onChangeHashWord(`${siteTag} ${masterKey}`) }}
-        />
       </ScrollView>
 
     </SafeAreaView>
