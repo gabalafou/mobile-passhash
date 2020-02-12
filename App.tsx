@@ -120,6 +120,15 @@ export default function App() {
   const sortedSiteTagList = React.useMemo(() => [...siteTagList].sort(), [siteTagList]);
   const siteTagMatches = fuzzy.filter(siteTag, sortedSiteTagList).map(({string}) => string);
 
+  const scrollView = React.useRef();
+
+  React.useEffect(() => {
+    if (shouldShowSizePicker && scrollView.current) {
+      // @ts-ignore
+      scrollView.current.scrollToEnd();
+    }
+  });
+
   return (
     <SafeAreaView style={styles.container}>
 
@@ -142,7 +151,7 @@ export default function App() {
 
       {shouldShowMatches &&
         <View
-          style={{flex: 2}}
+          style={{flex: 1}}
           onStartShouldSetResponderCapture={() => false}
         >
           <FlatList
@@ -180,8 +189,14 @@ export default function App() {
       }
 
       {!shouldShowMatches &&
-        <ScrollView style={styles.scrollView}
-          onTouchStart={() => onChangeShouldShowSizePicker(false)}
+        <ScrollView
+          style={styles.scrollView}
+          ref={(ref: any) => scrollView.current = ref}
+          onTouchEnd={() => {
+            if (shouldShowSizePicker) {
+              onChangeShouldShowSizePicker(false);
+            }
+          }}
         >
 
           <TextInput
@@ -272,9 +287,6 @@ export default function App() {
       {shouldShowSizePicker &&
         <View
           style={{
-            // alignSelf: 'flex-end',
-            // top: 100,
-            flex: 2,
             backgroundColor: '#dde',
           }}
         >
