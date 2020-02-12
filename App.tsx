@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  Platform,
   StyleSheet,
   SafeAreaView,
   Text,
@@ -10,14 +11,24 @@ import {
   View,
   Picker,
   Clipboard,
+  TouchableOpacity,
+  TouchableHighlight,
+  TouchableWithoutFeedback,
+  FlatList,
+  KeyboardAvoidingView,
+  Keyboard,
 } from 'react-native';
+import { SearchBar } from 'react-native-elements';
 import Constants from 'expo-constants';
 import * as SecureStore from 'expo-secure-store';
+import * as fuzzy from 'fuzzy';
 import PassHashCommon from './passhash-common';
 
 
 const key = siteTag =>
   'options__' + Array.prototype.map.call(siteTag, ch => ch.charCodeAt()).join('_');
+
+
 
 export default function App() {
   const [siteTagList, onChangeSiteTagList] = React.useState([]);
@@ -29,6 +40,8 @@ export default function App() {
   const [digitsOnly, onChangeDigitsOnly] = React.useState(false);
   const [noSpecial, onChangeNoSpecial] = React.useState(false);
   const [size, onChangeSize] = React.useState(16);
+  const [shouldShowMatches, onChangeShouldShowMatches] = React.useState(false);
+  const [shouldShowSizePicker, onChangeShouldShowSizePicker] = React.useState(false);
 
   const loadOptions = options => {
     const {
@@ -44,6 +57,10 @@ export default function App() {
   };
 
   const saveOptions = () => {
+    if (!siteTag) {
+      return;
+    }
+
     const options = {
       isDigitRequired,
       isPunctuationRequired,
@@ -99,123 +116,178 @@ export default function App() {
     ),
     [siteTag, masterKey, size, isDigitRequired, isPunctuationRequired, isMixedCaseRequired, noSpecial, digitsOnly]
   );
+
   const sortedSiteTagList = React.useMemo(() => [...siteTagList].sort(), [siteTagList]);
+  const siteTagMatches = fuzzy.filter(siteTag, sortedSiteTagList).map(({string}) => string);
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.scrollView}>
 
-        <Picker
-          selectedValue={siteTag}
-          onValueChange={siteTag => onChangeSiteTag(siteTag)}
+      <SearchBar
+        platform={Platform.OS === 'ios' ? 'ios' : 'android'}
+        placeholder="Site tag"
+        onChangeText={onChangeSiteTag}
+        value={siteTag}
+        autoCapitalize="none"
+        autoCorrect={false}
+        autoCompleteType="off"
+        keyboardType="url"
+        onFocus={() => onChangeShouldShowMatches(true)}
+        onCancel={() => {
+          onChangeShouldShowMatches(false)
+        }}
+        onBlur={() => {/* do nothing */}}
+        onSubmitEditing={() => onChangeShouldShowMatches(false)}
+      />
+
+      {shouldShowMatches &&
+        <View
+          style={{flex: 2}}
+          onStartShouldSetResponderCapture={() => false}
         >
-          {sortedSiteTagList.map(tag =>
-            <Picker.Item key={tag} label={tag} value={tag} />
-          )}
-        </Picker>
+          <FlatList
+            style={{
+              // zIndex: 10,
+              // position: 'absolute',
+              flex: 1,
+              // alignItems: 'stretch',
+              backgroundColor: 'white',
+              // top: 66,
+              height: '100%',
+              width: '100%',
+              marginBottom: 30,
+              borderBottomColor: '#ccc',
+              borderBottomWidth: 1,
+            }}
+            keyboardShouldPersistTaps="always"
+            data={siteTagMatches.concat(['','','','',''])}
+            renderItem={({ item }) =>
+              <TouchableHighlight
+                onPress={() => {
+                  onChangeSiteTag(item);
+                  onChangeShouldShowMatches(false);
+                }}
+                style={styles.siteTagSuggestion}
+                disabled={!item}
+                underlayColor="#ccc"
+              >
+                <Text style={{ fontSize: 18 }}>{item}</Text>
+              </TouchableHighlight>
+            }
+            keyExtractor={(item, index) => item || String(index)}
+          />
+        </View>
+      }
 
-        <TextInput
-          onChangeText={text => onChangeSiteTag(text)}
-          value={siteTag}
-          autoCapitalize="none"
-          keyboardType="url"
-          textContentType="URL"
-          placeholder="Site tag"
-        />
+      {!shouldShowMatches &&
+        <ScrollView style={styles.scrollView}
+          onTouchStart={() => onChangeShouldShowSizePicker(false)}
+        >
 
-        <TextInput
-          onChangeText={text => onChangeMasterKey(text)}
-          value={masterKey}
-          autoCompleteType="password"
-          secureTextEntry={true}
-          placeholder="Master key"
-        />
+          <TextInput
+            onChangeText={text => onChangeMasterKey(text)}
+            value={masterKey}
+            autoCompleteType="off"
+            secureTextEntry={true}
+            placeholder="Master key"
+          />
 
-        <Text>{hashWord}</Text>
+          <Text>{hashWord}</Text>
 
-        <Button
-          title="Copy"
-          onPress={() => {
-            Clipboard.setString(hashWord);
-            saveOptions();
-          }}
-        />
+          <Button
+            title="Copy"
+            onPress={() => {
+              Clipboard.setString(hashWord);
+              saveOptions();
+            }}
+          />
 
-        <Text>Requirements</Text>
+          <Text>Requirements</Text>
 
+          <View
+            style={styles.setting}
+          >
+            <Text>Digit</Text>
+            <Switch
+              onValueChange={isRequired => onChangeIsDigitRequired(isRequired)}
+              value={isDigitRequired}
+            />
+          </View>
+
+          <View style={styles.setting}>
+            <Text>Punctuation</Text>
+            <Switch
+              onValueChange={isRequired => onChangeIsPunctuationRequired(isRequired)}
+              value={isPunctuationRequired && !noSpecial && !digitsOnly}
+            />
+          </View>
+
+          <View style={styles.setting}>
+            <Text>Mixed case</Text>
+            <Switch
+              onValueChange={isRequired => onChangeIsMixedCaseRequired(isRequired)}
+              value={isMixedCaseRequired && !digitsOnly}
+            />
+          </View>
+
+          <Text>Restrictions</Text>
+
+          <View style={styles.setting}>
+            <Text>No special</Text>
+            <Switch
+              onValueChange={noSpecial => onChangeNoSpecial(noSpecial)}
+              value={noSpecial}
+            />
+          </View>
+
+          <View style={styles.setting}>
+            <Text>Digits only</Text>
+            <Switch
+              onValueChange={digitsOnly => onChangeDigitsOnly(digitsOnly)}
+              value={digitsOnly}
+            />
+          </View>
+
+          <View style={styles.setting}>
+            <Text>Size</Text>
+            <TouchableWithoutFeedback
+              onPress={() => {
+                onChangeShouldShowSizePicker(true);
+              }}
+            >
+              <View style={{
+                paddingHorizontal: 20,
+                paddingVertical: 10,
+                right: -15,
+                zIndex: 10,
+              }}>
+                <Text>{size}</Text>
+              </View>
+            </TouchableWithoutFeedback>
+          </View>
+
+        </ScrollView>
+      }
+
+      {shouldShowSizePicker &&
         <View
           style={{
-            flexDirection: 'row',
+            // alignSelf: 'flex-end',
+            // top: 100,
+            flex: 2,
+            backgroundColor: '#dde',
           }}
         >
-          <Switch
-            onValueChange={isRequired => onChangeIsDigitRequired(isRequired)}
-            value={isDigitRequired}
-          />
-          <Text>Digit</Text>
+          <Picker
+            selectedValue={size}
+            onValueChange={size => onChangeSize(size)}
+          >
+            {[2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26].map(size =>
+              <Picker.Item key={size} label={String(size)} value={size} />
+            )}
+          </Picker>
         </View>
-
-        <View
-          style={{
-            flexDirection: 'row',
-          }}
-        >
-          <Switch
-            onValueChange={isRequired => onChangeIsPunctuationRequired(isRequired)}
-            value={isPunctuationRequired}
-          />
-          <Text>Punctuation</Text>
-        </View>
-
-        <View
-          style={{
-            flexDirection: 'row',
-          }}
-        >
-          <Switch
-            onValueChange={isRequired => onChangeIsMixedCaseRequired(isRequired)}
-            value={isMixedCaseRequired}
-          />
-          <Text>Mixed case</Text>
-        </View>
-
-        <Text>Restrictions</Text>
-
-        <View
-          style={{
-            flexDirection: 'row',
-          }}
-        >
-          <Switch
-            onValueChange={noSpecial => onChangeNoSpecial(noSpecial)}
-            value={noSpecial}
-          />
-          <Text>No special</Text>
-        </View>
-
-        <View
-          style={{
-            flexDirection: 'row',
-          }}
-        >
-          <Switch
-            onValueChange={digitsOnly => onChangeDigitsOnly(digitsOnly)}
-            value={digitsOnly}
-          />
-          <Text>Digits only</Text>
-        </View>
-
-        <Text>Size</Text>
-        <Picker
-          selectedValue={size}
-          onValueChange={size => onChangeSize(size)}
-        >
-          {[2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26].map(size =>
-            <Picker.Item key={size} label={String(size)} value={size} />
-          )}
-        </Picker>
-
-      </ScrollView>
+      }
 
     </SafeAreaView>
   );
@@ -225,10 +297,22 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     marginTop: Constants.statusBarHeight,
+    alignContent: 'stretch',
+    backgroundColor: 'gray',
   },
   scrollView: {
     backgroundColor: 'pink',
     marginHorizontal: 20,
+    flex: 1,
+  },
+  siteTagSuggestion: {
+    borderStyle: 'solid',
+    borderColor: '#ccc',
+    borderTopWidth: 1,
+    height: 50,
+    padding: 4,
+    justifyContent: 'center',
+    zIndex: 20,
   },
   text: {
     fontSize: 20,
@@ -236,5 +320,14 @@ const styles = StyleSheet.create({
   bottomOverlay: {
     // position: 'absolute',
     // bottom: 300,
+  },
+  setting: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: 'white',
+    paddingHorizontal: 20,
+    height: 50,
   },
 });
