@@ -6,7 +6,6 @@ import {
   Text,
   ScrollView,
   TextInput,
-  Button,
   Switch,
   View,
   Picker,
@@ -18,7 +17,7 @@ import {
   KeyboardAvoidingView,
   Keyboard,
 } from 'react-native';
-import { SearchBar } from 'react-native-elements';
+import { Button, SearchBar, Input } from 'react-native-elements';
 import Constants from 'expo-constants';
 import * as SecureStore from 'expo-secure-store';
 import * as fuzzy from 'fuzzy';
@@ -143,7 +142,7 @@ export default function App() {
         keyboardType="url"
         onFocus={() => onChangeShouldShowMatches(true)}
         onCancel={() => {
-          onChangeShouldShowMatches(false)
+          onChangeShouldShowMatches(false);
         }}
         onBlur={() => {/* do nothing */}}
         onSubmitEditing={() => onChangeShouldShowMatches(false)}
@@ -156,14 +155,8 @@ export default function App() {
         >
           <FlatList
             style={{
-              // zIndex: 10,
-              // position: 'absolute',
               flex: 1,
-              // alignItems: 'stretch',
               backgroundColor: 'white',
-              // top: 66,
-              height: '100%',
-              width: '100%',
               marginBottom: 30,
               borderBottomColor: '#ccc',
               borderBottomWidth: 1,
@@ -173,11 +166,12 @@ export default function App() {
             renderItem={({ item }) =>
               <TouchableHighlight
                 onPress={() => {
-                  onChangeSiteTag(item);
+                  if (item) {
+                    onChangeSiteTag(item);
+                  }
                   onChangeShouldShowMatches(false);
                 }}
                 style={styles.siteTagSuggestion}
-                disabled={!item}
                 underlayColor="#ccc"
               >
                 <Text style={{ fontSize: 18 }}>{item}</Text>
@@ -199,7 +193,7 @@ export default function App() {
           }}
         >
 
-          <TextInput
+          <Input
             onChangeText={text => onChangeMasterKey(text)}
             value={masterKey}
             autoCompleteType="off"
@@ -207,15 +201,25 @@ export default function App() {
             placeholder="Master key"
           />
 
-          <Text>{hashWord}</Text>
+          <Input
+            placeholder="Generated password"
+            value={masterKey && hashWord}
+            secureTextEntry={true}
+            disabled={true}
+          />
 
           <Button
             title="Copy"
+            style={styles.copyButton}
             onPress={() => {
               Clipboard.setString(hashWord);
               saveOptions();
             }}
           />
+
+          <Text style={styles.settingsHeader}>
+            Settings
+          </Text>
 
           <Text>Requirements</Text>
 
@@ -310,10 +314,9 @@ const styles = StyleSheet.create({
     flex: 1,
     marginTop: Constants.statusBarHeight,
     alignContent: 'stretch',
-    backgroundColor: 'gray',
+    backgroundColor: 'white',
   },
   scrollView: {
-    backgroundColor: 'pink',
     marginHorizontal: 20,
     flex: 1,
   },
@@ -326,19 +329,21 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     zIndex: 20,
   },
+  copyButton: {
+    marginVertical: 20,
+  },
+  settingsHeader: {
+    fontSize: 28,
+    marginBottom: 10,
+  },
   text: {
     fontSize: 20,
-  },
-  bottomOverlay: {
-    // position: 'absolute',
-    // bottom: 300,
   },
   setting: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: 'white',
     paddingHorizontal: 20,
     height: 50,
   },
