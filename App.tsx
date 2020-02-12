@@ -228,23 +228,39 @@ export default function App() {
           >
             <Text>Digit</Text>
             <Switch
-              onValueChange={isRequired => onChangeIsDigitRequired(isRequired)}
-              value={isDigitRequired}
+              onValueChange={isRequired => {
+                onChangeIsDigitRequired(isRequired);
+                if (!isRequired) {
+                  onChangeDigitsOnly(false);
+                }
+              }}
+              value={isDigitRequired || digitsOnly}
             />
           </View>
 
           <View style={styles.setting}>
             <Text>Punctuation</Text>
             <Switch
-              onValueChange={isRequired => onChangeIsPunctuationRequired(isRequired)}
-              value={isPunctuationRequired && !noSpecial && !digitsOnly}
+              onValueChange={isRequired => {
+                onChangeIsPunctuationRequired(isRequired);
+                if (isRequired) {
+                  onChangeNoSpecial(false);
+                  onChangeDigitsOnly(false);
+                }
+              }}
+              value={isPunctuationRequired}
             />
           </View>
 
           <View style={styles.setting}>
             <Text>Mixed case</Text>
             <Switch
-              onValueChange={isRequired => onChangeIsMixedCaseRequired(isRequired)}
+              onValueChange={isRequired => {
+                onChangeIsMixedCaseRequired(isRequired);
+                if (isRequired) {
+                  onChangeDigitsOnly(false);
+                }
+              }}
               value={isMixedCaseRequired && !digitsOnly}
             />
           </View>
@@ -254,15 +270,30 @@ export default function App() {
           <View style={styles.setting}>
             <Text>No special</Text>
             <Switch
-              onValueChange={noSpecial => onChangeNoSpecial(noSpecial)}
-              value={noSpecial}
+              onValueChange={noSpecial => {
+                onChangeNoSpecial(noSpecial);
+                if (noSpecial) {
+                  onChangeIsPunctuationRequired(false);
+                } else {
+                  onChangeDigitsOnly(false);
+                }
+              }}
+              value={noSpecial || digitsOnly}
             />
           </View>
 
           <View style={styles.setting}>
             <Text>Digits only</Text>
             <Switch
-              onValueChange={digitsOnly => onChangeDigitsOnly(digitsOnly)}
+              onValueChange={digitsOnly => {
+                onChangeDigitsOnly(digitsOnly);
+                if (digitsOnly) {
+                  onChangeIsDigitRequired(true);
+                  onChangeIsPunctuationRequired(false);
+                  onChangeIsMixedCaseRequired(false);
+                  onChangeNoSpecial(true);
+                }
+              }}
               value={digitsOnly}
             />
           </View>
