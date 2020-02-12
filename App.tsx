@@ -119,12 +119,11 @@ export default function App() {
   const sortedSiteTagList = React.useMemo(() => [...siteTagList].sort(), [siteTagList]);
   const siteTagMatches = fuzzy.filter(siteTag, sortedSiteTagList).map(({string}) => string);
 
-  const scrollView = React.useRef();
+  const scrollView = React.useRef(null);
 
   React.useEffect(() => {
     if (shouldShowSizePicker && scrollView.current) {
-      // @ts-ignore
-      scrollView.current.scrollToEnd();
+      scrollView.current.scrollToEnd({animated: false});
     }
   });
 
@@ -185,7 +184,7 @@ export default function App() {
       {!shouldShowMatches &&
         <ScrollView
           style={styles.scrollView}
-          ref={(ref: any) => scrollView.current = ref}
+          ref={scrollView}
           onTouchEnd={() => {
             if (shouldShowSizePicker) {
               onChangeShouldShowSizePicker(false);
@@ -194,22 +193,25 @@ export default function App() {
         >
 
           <Input
+            placeholder="Master key"
             onChangeText={text => onChangeMasterKey(text)}
             value={masterKey}
             autoCompleteType="off"
             secureTextEntry={true}
-            placeholder="Master key"
+            containerStyle={styles.masterKey}
           />
 
           <Input
+            style={styles.generatedPassword}
             placeholder="Generated password"
             value={masterKey && hashWord}
             secureTextEntry={true}
             disabled={true}
+            containerStyle={styles.generatedPassword}
           />
 
           <Button
-            title="Copy"
+            title="Copy generated password"
             style={styles.copyButton}
             onPress={() => {
               Clipboard.setString(hashWord);
@@ -221,99 +223,111 @@ export default function App() {
             Settings
           </Text>
 
-          <Text>Requirements</Text>
 
-          <View
-            style={styles.setting}
-          >
-            <Text>Digit</Text>
-            <Switch
-              onValueChange={isRequired => {
-                onChangeIsDigitRequired(isRequired);
-                if (!isRequired) {
-                  onChangeDigitsOnly(false);
-                }
-              }}
-              value={isDigitRequired || digitsOnly}
-            />
-          </View>
-
-          <View style={styles.setting}>
-            <Text>Punctuation</Text>
-            <Switch
-              onValueChange={isRequired => {
-                onChangeIsPunctuationRequired(isRequired);
-                if (isRequired) {
-                  onChangeNoSpecial(false);
-                  onChangeDigitsOnly(false);
-                }
-              }}
-              value={isPunctuationRequired}
-            />
-          </View>
-
-          <View style={styles.setting}>
-            <Text>Mixed case</Text>
-            <Switch
-              onValueChange={isRequired => {
-                onChangeIsMixedCaseRequired(isRequired);
-                if (isRequired) {
-                  onChangeDigitsOnly(false);
-                }
-              }}
-              value={isMixedCaseRequired && !digitsOnly}
-            />
-          </View>
-
-          <Text>Restrictions</Text>
-
-          <View style={styles.setting}>
-            <Text>No special</Text>
-            <Switch
-              onValueChange={noSpecial => {
-                onChangeNoSpecial(noSpecial);
-                if (noSpecial) {
-                  onChangeIsPunctuationRequired(false);
-                } else {
-                  onChangeDigitsOnly(false);
-                }
-              }}
-              value={noSpecial || digitsOnly}
-            />
-          </View>
-
-          <View style={styles.setting}>
-            <Text>Digits only</Text>
-            <Switch
-              onValueChange={digitsOnly => {
-                onChangeDigitsOnly(digitsOnly);
-                if (digitsOnly) {
-                  onChangeIsDigitRequired(true);
-                  onChangeIsPunctuationRequired(false);
-                  onChangeIsMixedCaseRequired(false);
-                  onChangeNoSpecial(true);
-                }
-              }}
-              value={digitsOnly}
-            />
-          </View>
-
-          <View style={styles.setting}>
-            <Text>Size</Text>
-            <TouchableWithoutFeedback
-              onPress={() => {
-                onChangeShouldShowSizePicker(true);
-              }}
-            >
-              <View style={{
-                paddingHorizontal: 20,
-                paddingVertical: 10,
-                right: -15,
-                zIndex: 10,
-              }}>
-                <Text>{size}</Text>
+          <View style={styles.settingSection}>
+            <Text style={styles.settingSectionLabel}>Requirements</Text>
+            <View style={styles.settingRowGroup}>
+              <View
+                style={styles.setting}
+              >
+                <Text style={styles.text}>Digit</Text>
+                <Switch
+                  onValueChange={isRequired => {
+                    onChangeIsDigitRequired(isRequired);
+                    if (!isRequired && digitsOnly) {
+                      onChangeDigitsOnly(false);
+                    }
+                  }}
+                  value={isDigitRequired || digitsOnly}
+                />
               </View>
-            </TouchableWithoutFeedback>
+
+              <View style={styles.setting}>
+                <Text style={styles.text}>Punctuation</Text>
+                <Switch
+                  onValueChange={isRequired => {
+                    onChangeIsPunctuationRequired(isRequired);
+                    if (isRequired) {
+                      onChangeNoSpecial(false);
+                      onChangeDigitsOnly(false);
+                    }
+                  }}
+                  value={isPunctuationRequired}
+                />
+              </View>
+
+              <View style={styles.settingLastRow}>
+                <Text style={styles.text}>Mixed case</Text>
+                <Switch
+                  onValueChange={isRequired => {
+                    onChangeIsMixedCaseRequired(isRequired);
+                    if (isRequired) {
+                      onChangeDigitsOnly(false);
+                    }
+                  }}
+                  value={isMixedCaseRequired && !digitsOnly}
+                />
+              </View>
+            </View>
+          </View>
+
+
+          <View style={styles.settingSection}>
+            <Text style={styles.settingSectionLabel}>Restrictions</Text>
+            <View style={styles.settingRowGroup}>
+              <View style={styles.setting}>
+                <Text style={styles.text}>No special</Text>
+                <Switch
+                  onValueChange={noSpecial => {
+                    onChangeNoSpecial(noSpecial);
+                    if (noSpecial) {
+                      onChangeIsPunctuationRequired(false);
+                    } else {
+                      onChangeDigitsOnly(false);
+                    }
+                  }}
+                  value={noSpecial || digitsOnly}
+                />
+              </View>
+
+              <View style={styles.settingLastRow}>
+                <Text style={styles.text}>Digits only</Text>
+                <Switch
+                  onValueChange={digitsOnly => {
+                    onChangeDigitsOnly(digitsOnly);
+                    if (digitsOnly) {
+                      onChangeIsDigitRequired(true);
+                      onChangeIsPunctuationRequired(false);
+                      onChangeIsMixedCaseRequired(false);
+                      onChangeNoSpecial(true);
+                    }
+                  }}
+                  value={digitsOnly}
+                />
+              </View>
+            </View>
+          </View>
+
+          <View style={styles.settingSection}>
+            <View style={styles.settingRowGroup}>
+              <View style={styles.settingLastRow}>
+                <Text style={styles.text}>Size</Text>
+                <TouchableWithoutFeedback
+                  onPress={() => {
+                    onChangeShouldShowSizePicker(true);
+                  }}
+                >
+                  <View style={{
+                    paddingLeft: 50,
+                    paddingRight: 20,
+                    paddingVertical: 10,
+                    right: -20,
+                  }}>
+                    <Text style={styles.settingValueText}>{size}</Text>
+                  </View>
+                </TouchableWithoutFeedback>
+              </View>
+            </View>
           </View>
 
         </ScrollView>
@@ -340,15 +354,28 @@ export default function App() {
   );
 }
 
+const gutterWidth = 12;
+
+const settingStyles: any = {
+  flex: 1,
+  flexDirection: 'row',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  backgroundColor: '#fff',
+  borderBottomColor: '#ccc',
+  borderBottomWidth: 0.5,
+  paddingRight: gutterWidth,
+  minHeight: 40,
+};
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     marginTop: Constants.statusBarHeight,
     alignContent: 'stretch',
-    backgroundColor: 'white',
+    backgroundColor: 'rgb(245, 245, 252)',
   },
   scrollView: {
-    marginHorizontal: 20,
     flex: 1,
   },
   siteTagSuggestion: {
@@ -360,22 +387,54 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     zIndex: 20,
   },
+  masterKey: {
+    paddingHorizontal: gutterWidth,
+    marginTop: gutterWidth,
+  },
+  generatedPassword: {
+    paddingHorizontal: gutterWidth,
+    marginTop: gutterWidth,
+  },
   copyButton: {
+    marginHorizontal: gutterWidth,
     marginVertical: 20,
   },
   settingsHeader: {
     fontSize: 28,
+    marginTop: 20,
     marginBottom: 10,
+    marginLeft: gutterWidth,
+  },
+  settingSectionLabel: {
+    color: '#888',
+    fontSize: 13,
+    textTransform: "uppercase",
+    marginLeft: gutterWidth,
+    marginBottom: 6,
   },
   text: {
-    fontSize: 20,
+    fontSize: 18,
+  },
+  settingValueText: {
+    fontSize: 18,
+    color: '#999',
+  },
+  settingSection: {
+    marginVertical: 20,
+  },
+  settingRowGroup: {
+    borderTopColor: '#ccc',
+    borderTopWidth: 0.5,
+    borderBottomColor: '#ccc',
+    borderBottomWidth: 0.5,
+    backgroundColor: 'white',
+    paddingLeft: gutterWidth,
   },
   setting: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    height: 50,
+    ...settingStyles,
+  },
+  settingLastRow: {
+    ...settingStyles,
+    borderBottomWidth: 0,
   },
 });
