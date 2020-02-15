@@ -233,42 +233,45 @@ export default function App() {
           />
 
 
-
-          <Input
+          <View
             style={styles.generatedPassword}
-            placeholder="Generated password"
-            value={masterKey && hashWord}
-            secureTextEntry={!shouldRevealPassword}
-            keyboardType={shouldRevealPassword ?
-              Platform.OS === 'android' ? 'visible-password' : 'ascii-capable'
-              : 'default'
-            }
-            disabled={true}
-            containerStyle={styles.generatedPassword}
-            rightIcon={
-              <Button
-                icon={
-                  <Icon
-                    name={shouldRevealPassword ? 'eye' : 'eye-with-line'}
-                    type="entypo"
-                    size={15}
-                    color="#ccc"
-                  />
-                }
-                onPress={() => toggleShouldRevealPassword()}
-                type="clear"
-              />
-            }
-          />
+          >
+            <Button
+              containerStyle={{
+                flex: 1,
+                paddingRight: 5,
+              }}
+              buttonStyle={{
+                backgroundColor: '#444',
+                borderRadius: 0,
+                borderColor: '#222',
+                borderWidth: 1.5,
+              }}
+              onPress={() => {
+                Clipboard.setString(hashWord);
+                saveOptions();
+              }}
+              title={
+                shouldRevealPassword ?
+                  hashWord
+                  : hashWord.replace(/./g, '•')
+              }
+            />
+            <Button
+              icon={
+                <Icon
+                  name={shouldRevealPassword ? 'eye' : 'eye-with-line'}
+                  type="entypo"
+                  size={15}
+                  color="#bbb"
+                />
+              }
+              onPress={() => toggleShouldRevealPassword()}
+              type="clear"
+            />
+          </View>
+          <Text style={{ marginLeft: 14 }}>Generated password: tap to copy</Text>
 
-          <Button
-            title="Copy generated password"
-            style={styles.copyButton}
-            onPress={() => {
-              Clipboard.setString(hashWord);
-              saveOptions();
-            }}
-          />
 
           <Text style={styles.settingsHeader}>
             Settings
@@ -443,8 +446,13 @@ const styles = StyleSheet.create({
     marginTop: gutterWidth,
   },
   generatedPassword: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: gutterWidth,
     marginTop: gutterWidth,
+    borderBottomWidth: 0,
+    borderWidth: 0,
   },
   copyButton: {
     marginHorizontal: gutterWidth,
