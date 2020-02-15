@@ -242,20 +242,26 @@ export default function App() {
                 paddingRight: 5,
               }}
               buttonStyle={{
-                backgroundColor: '#444',
+                backgroundColor: '#ccc',
                 borderRadius: 0,
-                borderColor: '#222',
+                borderColor: '#aaa',
                 borderWidth: 1.5,
+                minHeight: 44,
               }}
               onPress={() => {
                 Clipboard.setString(hashWord);
                 saveOptions();
               }}
               title={
-                shouldRevealPassword ?
-                  hashWord
-                  : hashWord.replace(/./g, '•')
+                !masterKey.length ?
+                  ''
+                  : shouldRevealPassword ?
+                     hashWord
+                     : hashWord.replace(/./g, '•')
               }
+              titleStyle={{
+                color: '#666'
+              }}
             />
             <Button
               icon={
@@ -450,7 +456,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: gutterWidth,
-    marginTop: gutterWidth,
+    marginTop: 2 * gutterWidth,
     borderBottomWidth: 0,
     borderWidth: 0,
   },
@@ -460,7 +466,7 @@ const styles = StyleSheet.create({
   },
   settingsHeader: {
     fontSize: 28,
-    marginTop: 20,
+    marginTop: 26,
     marginBottom: 10,
     marginLeft: gutterWidth,
   },
