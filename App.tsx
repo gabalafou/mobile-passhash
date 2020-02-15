@@ -16,6 +16,7 @@ import {
   FlatList,
   KeyboardAvoidingView,
   Keyboard,
+  Modal,
 } from 'react-native';
 import { Button, Icon, SearchBar, Input } from 'react-native-elements';
 import Constants from 'expo-constants';
@@ -140,24 +141,31 @@ export default function App() {
   return (
     <SafeAreaView style={styles.container}>
 
-      <SearchBar
-        platform={Platform.OS === 'ios' ? 'ios' : 'android'}
-        placeholder="Site tag"
-        onChangeText={onChangeSiteTag}
-        value={siteTag}
-        autoCapitalize="none"
-        autoCorrect={false}
-        autoCompleteType="off"
-        keyboardType="url"
-        onFocus={() => onChangeShouldShowMatches(true)}
-        onCancel={() => {
-          onChangeShouldShowMatches(false);
-        }}
-        onBlur={() => {/* do nothing */}}
-        onSubmitEditing={() => onChangeShouldShowMatches(false)}
-      />
-
-      {shouldShowMatches &&
+      <Modal
+        animationType="slide"
+        transparent={false}
+        visible={shouldShowMatches}
+      >
+        <SearchBar
+          platform={Platform.OS === 'ios' ? 'ios' : 'android'}
+          placeholder="Site tag"
+          onChangeText={onChangeSiteTag}
+          value={siteTag}
+          autoCapitalize="none"
+          autoCorrect={false}
+          autoCompleteType="off"
+          autoFocus={true}
+          keyboardType="url"
+          onFocus={() => onChangeShouldShowMatches(true)}
+          onCancel={() => {
+            onChangeShouldShowMatches(false);
+          }}
+          onBlur={() => {/* do nothing */}}
+          onSubmitEditing={() => onChangeShouldShowMatches(false)}
+          containerStyle={{
+            marginTop: Constants.statusBarHeight,
+          }}
+        />
         <View
           style={{flex: 1}}
           onStartShouldSetResponderCapture={() => false}
@@ -189,209 +197,219 @@ export default function App() {
             keyExtractor={(item, index) => item || String(index)}
           />
         </View>
-      }
+      </Modal>
 
-      {!shouldShowMatches &&
-        <ScrollView
-          style={styles.scrollView}
-          keyboardDismissMode="on-drag"
-          keyboardShouldPersistTaps="handled"
-          ref={scrollView}
+      <ScrollView
+        style={styles.scrollView}
+        keyboardDismissMode="on-drag"
+        keyboardShouldPersistTaps="handled"
+        ref={scrollView}
+        onTouchEnd={() => {
+          if (shouldShowSizePicker) {
+            onChangeShouldShowSizePicker(false);
+          }
+        }}
+      >
+
+        <Input
+          placeholder="Site tag"
+          onChangeText={text => onChangeMasterKey(text)}
+          value={siteTag}
+          autoCapitalize="none"
+          autoCompleteType="off"
+          keyboardType="url"
+          containerStyle={[styles.masterKey, {marginTop: 40}]}
           onTouchEnd={() => {
-            if (shouldShowSizePicker) {
-              onChangeShouldShowSizePicker(false);
-            }
+            onChangeShouldShowMatches(true);
           }}
-        >
+        />
 
-
-          <Input
-            placeholder="Master key"
-            onChangeText={text => onChangeMasterKey(text)}
-            value={masterKey}
-            autoCompleteType="off"
-            secureTextEntry={!shouldRevealMasterKey}
-            keyboardType={shouldRevealMasterKey ?
-              Platform.OS === 'android' ? 'visible-password' : 'ascii-capable'
-              : 'default'
-            }
-            containerStyle={styles.masterKey}
-            rightIcon={
-              <Button
-                icon={
-                  <Icon
-                    name={shouldRevealMasterKey ? 'eye' : 'eye-with-line'}
-                    type="entypo"
-                    size={15}
-                    color="#bbb"
-                  />
-                }
-                onPress={() => toggleShouldRevealMasterKey()}
-                type="clear"
-              />
-            }
-          />
-
-
-          <View
-            style={styles.generatedPassword}
-          >
-            <Button
-              containerStyle={{
-                flex: 1,
-                paddingRight: 5,
-              }}
-              buttonStyle={{
-                backgroundColor: '#ccc',
-                borderRadius: 0,
-                borderColor: '#aaa',
-                borderWidth: 1.5,
-                minHeight: 44,
-              }}
-              onPress={() => {
-                Clipboard.setString(hashWord);
-                saveOptions();
-              }}
-              title={
-                !masterKey.length ?
-                  ''
-                  : shouldRevealPassword ?
-                     hashWord
-                     : hashWord.replace(/./g, '•')
-              }
-              titleStyle={{
-                color: '#666'
-              }}
-            />
+        <Input
+          placeholder="Master key"
+          onChangeText={text => onChangeMasterKey(text)}
+          value={masterKey}
+          autoCompleteType="off"
+          secureTextEntry={!shouldRevealMasterKey}
+          keyboardType={shouldRevealMasterKey ?
+            Platform.OS === 'android' ? 'visible-password' : 'ascii-capable'
+            : 'default'
+          }
+          containerStyle={styles.masterKey}
+          rightIcon={
             <Button
               icon={
                 <Icon
-                  name={shouldRevealPassword ? 'eye' : 'eye-with-line'}
+                  name={shouldRevealMasterKey ? 'eye' : 'eye-with-line'}
                   type="entypo"
                   size={15}
                   color="#bbb"
                 />
               }
-              onPress={() => toggleShouldRevealPassword()}
+              onPress={() => toggleShouldRevealMasterKey()}
               type="clear"
             />
+          }
+        />
+
+
+        <View
+          style={styles.generatedPassword}
+        >
+          <Button
+            containerStyle={{
+              flex: 1,
+              paddingRight: 5,
+            }}
+            buttonStyle={{
+              backgroundColor: '#ccc',
+              borderRadius: 0,
+              borderColor: '#aaa',
+              borderWidth: 1.5,
+              minHeight: 44,
+            }}
+            onPress={() => {
+              Clipboard.setString(hashWord);
+              saveOptions();
+            }}
+            title={
+              !masterKey.length ?
+                ''
+                : shouldRevealPassword ?
+                    hashWord
+                    : hashWord.replace(/./g, '•')
+            }
+            titleStyle={{
+              color: '#666'
+            }}
+          />
+          <Button
+            icon={
+              <Icon
+                name={shouldRevealPassword ? 'eye' : 'eye-with-line'}
+                type="entypo"
+                size={15}
+                color="#bbb"
+              />
+            }
+            onPress={() => toggleShouldRevealPassword()}
+            type="clear"
+          />
+        </View>
+        <Text style={{ marginLeft: 14 }}>Generated password: tap to copy</Text>
+
+
+        <Text style={styles.settingsHeader}>
+          Settings
+        </Text>
+
+
+        <View style={styles.settingSection}>
+          <Text style={styles.settingSectionLabel}>Requirements</Text>
+          <View style={styles.settingRowGroup}>
+            <View
+              style={styles.setting}
+            >
+              <Text style={styles.text}>Digit</Text>
+              <Switch
+                onValueChange={isRequired => {
+                  onChangeIsDigitRequired(isRequired);
+                  if (!isRequired && digitsOnly) {
+                    onChangeDigitsOnly(false);
+                  }
+                }}
+                value={isDigitRequired || digitsOnly}
+              />
+            </View>
+
+            <View style={styles.setting}>
+              <Text style={styles.text}>Punctuation</Text>
+              <Switch
+                onValueChange={isRequired => {
+                  onChangeIsPunctuationRequired(isRequired);
+                  if (isRequired) {
+                    onChangeNoSpecial(false);
+                    onChangeDigitsOnly(false);
+                  }
+                }}
+                value={isPunctuationRequired}
+              />
+            </View>
+
+            <View style={styles.settingLastRow}>
+              <Text style={styles.text}>Mixed case</Text>
+              <Switch
+                onValueChange={isRequired => {
+                  onChangeIsMixedCaseRequired(isRequired);
+                  if (isRequired) {
+                    onChangeDigitsOnly(false);
+                  }
+                }}
+                value={isMixedCaseRequired && !digitsOnly}
+              />
+            </View>
           </View>
-          <Text style={{ marginLeft: 14 }}>Generated password: tap to copy</Text>
+        </View>
 
 
-          <Text style={styles.settingsHeader}>
-            Settings
-          </Text>
+        <View style={styles.settingSection}>
+          <Text style={styles.settingSectionLabel}>Restrictions</Text>
+          <View style={styles.settingRowGroup}>
+            <View style={styles.setting}>
+              <Text style={styles.text}>No special</Text>
+              <Switch
+                onValueChange={noSpecial => {
+                  onChangeNoSpecial(noSpecial);
+                  if (noSpecial) {
+                    onChangeIsPunctuationRequired(false);
+                  } else {
+                    onChangeDigitsOnly(false);
+                  }
+                }}
+                value={noSpecial || digitsOnly}
+              />
+            </View>
 
+            <View style={styles.settingLastRow}>
+              <Text style={styles.text}>Digits only</Text>
+              <Switch
+                onValueChange={digitsOnly => {
+                  onChangeDigitsOnly(digitsOnly);
+                  if (digitsOnly) {
+                    onChangeIsDigitRequired(true);
+                    onChangeIsPunctuationRequired(false);
+                    onChangeIsMixedCaseRequired(false);
+                    onChangeNoSpecial(true);
+                  }
+                }}
+                value={digitsOnly}
+              />
+            </View>
+          </View>
+        </View>
 
-          <View style={styles.settingSection}>
-            <Text style={styles.settingSectionLabel}>Requirements</Text>
-            <View style={styles.settingRowGroup}>
-              <View
-                style={styles.setting}
+        <View style={styles.settingSection}>
+          <View style={styles.settingRowGroup}>
+            <View style={styles.settingLastRow}>
+              <Text style={styles.text}>Size</Text>
+              <TouchableWithoutFeedback
+                onPress={() => {
+                  onChangeShouldShowSizePicker(true);
+                }}
               >
-                <Text style={styles.text}>Digit</Text>
-                <Switch
-                  onValueChange={isRequired => {
-                    onChangeIsDigitRequired(isRequired);
-                    if (!isRequired && digitsOnly) {
-                      onChangeDigitsOnly(false);
-                    }
-                  }}
-                  value={isDigitRequired || digitsOnly}
-                />
-              </View>
-
-              <View style={styles.setting}>
-                <Text style={styles.text}>Punctuation</Text>
-                <Switch
-                  onValueChange={isRequired => {
-                    onChangeIsPunctuationRequired(isRequired);
-                    if (isRequired) {
-                      onChangeNoSpecial(false);
-                      onChangeDigitsOnly(false);
-                    }
-                  }}
-                  value={isPunctuationRequired}
-                />
-              </View>
-
-              <View style={styles.settingLastRow}>
-                <Text style={styles.text}>Mixed case</Text>
-                <Switch
-                  onValueChange={isRequired => {
-                    onChangeIsMixedCaseRequired(isRequired);
-                    if (isRequired) {
-                      onChangeDigitsOnly(false);
-                    }
-                  }}
-                  value={isMixedCaseRequired && !digitsOnly}
-                />
-              </View>
+                <View style={{
+                  paddingLeft: 50,
+                  paddingRight: 20,
+                  paddingVertical: 10,
+                  right: -20,
+                }}>
+                  <Text style={styles.settingValueText}>{size}</Text>
+                </View>
+              </TouchableWithoutFeedback>
             </View>
           </View>
+        </View>
 
-
-          <View style={styles.settingSection}>
-            <Text style={styles.settingSectionLabel}>Restrictions</Text>
-            <View style={styles.settingRowGroup}>
-              <View style={styles.setting}>
-                <Text style={styles.text}>No special</Text>
-                <Switch
-                  onValueChange={noSpecial => {
-                    onChangeNoSpecial(noSpecial);
-                    if (noSpecial) {
-                      onChangeIsPunctuationRequired(false);
-                    } else {
-                      onChangeDigitsOnly(false);
-                    }
-                  }}
-                  value={noSpecial || digitsOnly}
-                />
-              </View>
-
-              <View style={styles.settingLastRow}>
-                <Text style={styles.text}>Digits only</Text>
-                <Switch
-                  onValueChange={digitsOnly => {
-                    onChangeDigitsOnly(digitsOnly);
-                    if (digitsOnly) {
-                      onChangeIsDigitRequired(true);
-                      onChangeIsPunctuationRequired(false);
-                      onChangeIsMixedCaseRequired(false);
-                      onChangeNoSpecial(true);
-                    }
-                  }}
-                  value={digitsOnly}
-                />
-              </View>
-            </View>
-          </View>
-
-          <View style={styles.settingSection}>
-            <View style={styles.settingRowGroup}>
-              <View style={styles.settingLastRow}>
-                <Text style={styles.text}>Size</Text>
-                <TouchableWithoutFeedback
-                  onPress={() => {
-                    onChangeShouldShowSizePicker(true);
-                  }}
-                >
-                  <View style={{
-                    paddingLeft: 50,
-                    paddingRight: 20,
-                    paddingVertical: 10,
-                    right: -20,
-                  }}>
-                    <Text style={styles.settingValueText}>{size}</Text>
-                  </View>
-                </TouchableWithoutFeedback>
-              </View>
-            </View>
-          </View>
-
-        </ScrollView>
-      }
+      </ScrollView>
 
       {shouldShowSizePicker &&
         <View
