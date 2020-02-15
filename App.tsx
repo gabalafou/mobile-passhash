@@ -17,7 +17,7 @@ import {
   KeyboardAvoidingView,
   Keyboard,
 } from 'react-native';
-import { Button, SearchBar, Input } from 'react-native-elements';
+import { Button, Icon, SearchBar, Input } from 'react-native-elements';
 import Constants from 'expo-constants';
 import * as SecureStore from 'expo-secure-store';
 import * as fuzzy from 'fuzzy';
@@ -41,6 +41,16 @@ export default function App() {
   const [size, onChangeSize] = React.useState(16);
   const [shouldShowMatches, onChangeShouldShowMatches] = React.useState(false);
   const [shouldShowSizePicker, onChangeShouldShowSizePicker] = React.useState(false);
+  const [shouldRevealMasterKey, onChangeShouldRevealMasterKey] = React.useState(false);
+  const [shouldRevealPassword, onChangeShouldRevealPassword] = React.useState(false);
+
+  const toggleShouldRevealMasterKey = () => {
+    onChangeShouldRevealMasterKey(!shouldRevealMasterKey);
+  };
+
+  const toggleShouldRevealPassword = () => {
+    onChangeShouldRevealPassword(!shouldRevealPassword);
+  };
 
   const loadOptions = options => {
     const {
@@ -184,6 +194,8 @@ export default function App() {
       {!shouldShowMatches &&
         <ScrollView
           style={styles.scrollView}
+          keyboardDismissMode="on-drag"
+          keyboardShouldPersistTaps="handled"
           ref={scrollView}
           onTouchEnd={() => {
             if (shouldShowSizePicker) {
@@ -192,22 +204,61 @@ export default function App() {
           }}
         >
 
+
           <Input
             placeholder="Master key"
             onChangeText={text => onChangeMasterKey(text)}
             value={masterKey}
             autoCompleteType="off"
-            secureTextEntry={true}
+            secureTextEntry={!shouldRevealMasterKey}
+            keyboardType={shouldRevealMasterKey ?
+              Platform.OS === 'android' ? 'visible-password' : 'ascii-capable'
+              : 'default'
+            }
             containerStyle={styles.masterKey}
+            rightIcon={
+              <Button
+                icon={
+                  <Icon
+                    name={shouldRevealMasterKey ? 'eye' : 'eye-with-line'}
+                    type="entypo"
+                    size={15}
+                    color="#bbb"
+                  />
+                }
+                onPress={() => toggleShouldRevealMasterKey()}
+                type="clear"
+              />
+            }
           />
+
+
 
           <Input
             style={styles.generatedPassword}
             placeholder="Generated password"
             value={masterKey && hashWord}
-            secureTextEntry={true}
+            secureTextEntry={!shouldRevealPassword}
+            keyboardType={shouldRevealPassword ?
+              Platform.OS === 'android' ? 'visible-password' : 'ascii-capable'
+              : 'default'
+            }
             disabled={true}
             containerStyle={styles.generatedPassword}
+            rightIcon={
+              <Button
+                icon={
+                  <Icon
+                    name={shouldRevealPassword ? 'eye' : 'eye-with-line'}
+                    type="entypo"
+                    size={15}
+                    color="#ccc"
+                  />
+                }
+                onPress={() => toggleShouldRevealPassword()}
+                type="clear"
+              />
+            }
           />
 
           <Button
