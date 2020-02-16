@@ -157,7 +157,6 @@ export default function App() {
           autoCompleteType="off"
           autoFocus={true}
           keyboardType="url"
-          onFocus={() => onChangeShouldShowMatches(true)}
           onCancel={() => {
             onChangeShouldShowMatches(false);
           }}
@@ -227,7 +226,7 @@ export default function App() {
           autoCapitalize="none"
           autoCompleteType="off"
           keyboardType="url"
-          textContentType="none"
+          textContentType="URL"
           disabled={true}
           disabledInputStyle={{
             opacity: 1,
@@ -243,12 +242,15 @@ export default function App() {
           placeholder="Master key"
           onChangeText={text => onChangeMasterKey(text)}
           value={masterKey}
+          autoCapitalize="none"
           autoCompleteType="off"
+          autoCorrect={false}
           secureTextEntry={!shouldRevealMasterKey}
           keyboardType={shouldRevealMasterKey ?
             Platform.OS === 'android' ? 'visible-password' : 'ascii-capable'
             : 'default'
           }
+          textContentType="password"
           containerStyle={styles.masterKey}
           rightIcon={
             <Button
