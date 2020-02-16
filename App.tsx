@@ -218,6 +218,7 @@ export default function App() {
           }
         }}
       >
+        <Text style={styles.title}>Password Generator</Text>
 
         <Input
           placeholder="Site tag"
@@ -231,7 +232,7 @@ export default function App() {
           disabledInputStyle={{
             opacity: 1,
           }}
-          containerStyle={[styles.masterKey, {marginTop: 40}]}
+          containerStyle={styles.siteTag}
           onTouchEnd={() => {
             onChangeShouldShowMatches(true);
           }}
@@ -461,6 +462,11 @@ const settingStyles: any = {
 };
 
 const styles = StyleSheet.create({
+  title: {
+    margin: gutterWidth,
+    fontSize: 28,
+    fontWeight: 'bold',
+  },
   container: {
     flex: 1,
     marginTop: Constants.statusBarHeight,
@@ -478,6 +484,9 @@ const styles = StyleSheet.create({
     padding: 4,
     justifyContent: 'center',
     zIndex: 20,
+  },
+  siteTag: {
+    paddingHorizontal: gutterWidth,
   },
   masterKey: {
     paddingHorizontal: gutterWidth,
