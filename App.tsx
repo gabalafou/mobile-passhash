@@ -131,6 +131,7 @@ export default function App() {
   const siteTagMatches = fuzzy.filter(siteTag, sortedSiteTagList).map(({string}) => string);
 
   const scrollView = React.useRef(null);
+  const masterKeyInput = React.useRef(null);
 
   React.useEffect(() => {
     if (shouldShowSizePicker && scrollView.current) {
@@ -160,8 +161,12 @@ export default function App() {
           onCancel={() => {
             onChangeShouldShowMatches(false);
           }}
-          onBlur={() => {/* do nothing */}}
-          onSubmitEditing={() => onChangeShouldShowMatches(false)}
+          onSubmitEditing={() => {
+            onChangeShouldShowMatches(false);
+            setTimeout(() => {
+              masterKeyInput.current?.focus();
+            }, 10)
+          }}
           containerStyle={{
             marginTop: Constants.statusBarHeight,
           }}
@@ -186,6 +191,9 @@ export default function App() {
                   if (item) {
                     onChangeSiteTag(item);
                   }
+                  setTimeout(() => {
+                    masterKeyInput.current?.focus();
+                  }, 10)
                   onChangeShouldShowMatches(false);
                 }}
                 style={styles.siteTagSuggestion}
@@ -225,6 +233,7 @@ export default function App() {
         />
 
         <Input
+          ref={masterKeyInput}
           placeholder="Master key"
           onChangeText={text => onChangeMasterKey(text)}
           value={masterKey}
