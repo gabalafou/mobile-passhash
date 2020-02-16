@@ -507,7 +507,7 @@ const styles = StyleSheet.create({
   },
   settingsHeader: {
     fontSize: 28,
-    marginTop: 26,
+    marginTop: 44,
     marginBottom: 10,
     marginLeft: gutterWidth,
   },
