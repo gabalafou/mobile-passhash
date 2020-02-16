@@ -98,7 +98,7 @@ export default function App() {
         onChangeSiteTagList(siteTagList);
       }
     });
-  }, [siteTagList]);
+  }, [siteTagList.length]);
 
   React.useEffect(() => {
     if (!siteTag || !siteTagList.length || !siteTagList.includes(siteTag)) {
