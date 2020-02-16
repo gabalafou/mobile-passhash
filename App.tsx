@@ -226,6 +226,11 @@ export default function App() {
           autoCapitalize="none"
           autoCompleteType="off"
           keyboardType="url"
+          textContentType="none"
+          disabled={true}
+          disabledInputStyle={{
+            opacity: 1,
+          }}
           containerStyle={[styles.masterKey, {marginTop: 40}]}
           onTouchEnd={() => {
             onChangeShouldShowMatches(true);
