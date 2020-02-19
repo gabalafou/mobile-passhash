@@ -17,6 +17,7 @@ import {
   KeyboardAvoidingView,
   Keyboard,
   Modal,
+  Dimensions,
 } from 'react-native';
 import { Button, Icon, SearchBar, Input } from 'react-native-elements';
 import Constants from 'expo-constants';
@@ -44,6 +45,9 @@ export default function App() {
   const [shouldShowSizePicker, onChangeShouldShowSizePicker] = React.useState(false);
   const [shouldRevealMasterKey, onChangeShouldRevealMasterKey] = React.useState(false);
   const [shouldRevealPassword, onChangeShouldRevealPassword] = React.useState(false);
+  const [availableHeight, onChangeAvailableHeight] = React.useState(
+    Dimensions.get('window').height
+  );
 
   const toggleShouldRevealMasterKey = () => {
     onChangeShouldRevealMasterKey(!shouldRevealMasterKey);
@@ -130,6 +134,37 @@ export default function App() {
   const sortedSiteTagList = React.useMemo(() => [...siteTagList].sort(), [siteTagList]);
   const siteTagMatches = fuzzy.filter(siteTag, sortedSiteTagList).map(({string}) => string);
 
+  if (siteTag && !siteTagMatches.includes(siteTag)) {
+    siteTagMatches.unshift(siteTag);
+  }
+
+  // Push several blank matches for display purposes, i.e. make
+  // the results list look like a ruled page, with lines going all
+  // the way down the page
+  const searchBarHeight = 40;
+  const suggestionListHeight = availableHeight - searchBarHeight - Constants.statusBarHeight;
+  const suggestionHeight = 50;
+  const numSuggestionsThatCover = Math.ceil(suggestionListHeight / suggestionHeight);
+  const suggestionGap = numSuggestionsThatCover - siteTagMatches.length;
+  if (suggestionGap > 0) {
+    siteTagMatches.push(...new Array(suggestionGap).fill(''));
+  }
+
+  React.useEffect(() => {
+    const onShow = event => {
+      onChangeAvailableHeight(Dimensions.get('window').height - event.endCoordinates.height);
+    };
+    const onHide = () => {
+      onChangeAvailableHeight(Dimensions.get('window').height);
+    };
+    Keyboard.addListener('keyboardDidShow', onShow);
+    Keyboard.addListener('keyboardDidHide', onHide);
+    return () => {
+      Keyboard.removeListener('keyboardDidShow', onShow);
+      Keyboard.removeListener('keyboardDidHide', onHide);
+    }
+  });
+
   const scrollView = React.useRef(null);
   const masterKeyInput = React.useRef(null);
 
@@ -183,23 +218,31 @@ export default function App() {
               borderBottomWidth: 1,
             }}
             keyboardShouldPersistTaps="always"
-            data={siteTagMatches.concat(['','','','',''])}
+            data={siteTagMatches}
             renderItem={({ item }) =>
-              <TouchableHighlight
-                onPress={() => {
-                  if (item) {
-                    onChangeSiteTag(item);
-                  }
-                  setTimeout(() => {
-                    masterKeyInput.current?.focus();
-                  }, 10)
-                  onChangeShouldShowMatches(false);
-                }}
-                style={styles.siteTagSuggestion}
-                underlayColor="#ccc"
-              >
-                <Text style={{ fontSize: 18 }}>{item}</Text>
-              </TouchableHighlight>
+              item !== '' ?
+                <TouchableHighlight
+                  onPress={() => {
+                    if (item) {
+                      onChangeSiteTag(item);
+                    }
+                    setTimeout(() => {
+                      masterKeyInput.current?.focus();
+                    }, 10)
+                    onChangeShouldShowMatches(false);
+                  }}
+                  style={styles.siteTagSuggestion}
+                  underlayColor="#ccc"
+                >
+                  <Text style={{ fontSize: 18 }}>{item}</Text>
+                </TouchableHighlight>
+                : <TouchableWithoutFeedback
+                    onPress={() => {
+                      onChangeShouldShowMatches(false);
+                    }}
+                  >
+                    <View style={styles.siteTagSuggestion} />
+                  </TouchableWithoutFeedback>
             }
             keyExtractor={(item, index) => item || String(index)}
           />
@@ -484,7 +527,7 @@ const styles = StyleSheet.create({
     borderColor: '#ccc',
     borderTopWidth: 1,
     height: 50,
-    padding: 4,
+    padding: gutterWidth,
     justifyContent: 'center',
     zIndex: 20,
   },
