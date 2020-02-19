@@ -279,11 +279,12 @@ export default function App() {
             }}
             buttonStyle={{
               backgroundColor: '#ccc',
-              borderRadius: 0,
-              borderColor: '#aaa',
-              borderWidth: 1.5,
+              borderRadius: 5,
+              borderColor: '#bbb',
+              borderWidth: 1,
               minHeight: 44,
             }}
+            disabled={!masterKey.length}
             onPress={() => {
               Clipboard.setString(hashWord);
               saveOptions();
