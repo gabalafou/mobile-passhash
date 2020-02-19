@@ -472,9 +472,9 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    marginTop: Constants.statusBarHeight,
+    paddingTop: Constants.statusBarHeight,
     alignContent: 'stretch',
-    backgroundColor: 'rgb(245, 245, 252)',
+    backgroundColor: 'rgb(242, 242, 247)',
   },
   scrollView: {
     flex: 1,
