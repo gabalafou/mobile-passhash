@@ -2,7 +2,7 @@ import { StyleSheet } from 'react-native';
 import Constants from 'expo-constants';
 
 
-const gutterWidth = 12;
+export const gutterWidth = 12;
 
 const settingStyles: any = {
   flex: 1,
@@ -30,15 +30,6 @@ export default StyleSheet.create({
   },
   scrollView: {
     flex: 1,
-  },
-  siteTagSuggestion: {
-    borderStyle: 'solid',
-    borderColor: '#ccc',
-    borderTopWidth: 1,
-    height: 50,
-    padding: gutterWidth,
-    justifyContent: 'center',
-    zIndex: 20,
   },
   siteTag: {
     paddingHorizontal: gutterWidth,

@@ -25,6 +25,7 @@ import * as SecureStore from 'expo-secure-store';
 import * as fuzzy from 'fuzzy';
 import PassHashCommon from './passhash-common';
 import styles from './styles';
+import SearchView from './components/SearchView';
 
 
 const key = siteTag =>
@@ -135,37 +136,6 @@ export default function App() {
   const sortedSiteTagList = React.useMemo(() => [...siteTagList].sort(), [siteTagList]);
   const siteTagMatches = fuzzy.filter(siteTag, sortedSiteTagList).map(({string}) => string);
 
-  if (siteTag && !siteTagMatches.includes(siteTag)) {
-    siteTagMatches.unshift(siteTag);
-  }
-
-  // Push several blank matches for display purposes, i.e. make
-  // the results list look like a ruled page, with lines going all
-  // the way down the page
-  const searchBarHeight = 40;
-  const suggestionListHeight = availableHeight - searchBarHeight - Constants.statusBarHeight;
-  const suggestionHeight = 50;
-  const numSuggestionsThatCover = Math.ceil(suggestionListHeight / suggestionHeight);
-  const suggestionGap = numSuggestionsThatCover - siteTagMatches.length;
-  if (suggestionGap > 0) {
-    siteTagMatches.push(...new Array(suggestionGap).fill(''));
-  }
-
-  React.useEffect(() => {
-    const onShow = event => {
-      onChangeAvailableHeight(Dimensions.get('window').height - event.endCoordinates.height);
-    };
-    const onHide = () => {
-      onChangeAvailableHeight(Dimensions.get('window').height);
-    };
-    Keyboard.addListener('keyboardDidShow', onShow);
-    Keyboard.addListener('keyboardDidHide', onHide);
-    return () => {
-      Keyboard.removeListener('keyboardDidShow', onShow);
-      Keyboard.removeListener('keyboardDidHide', onHide);
-    }
-  });
-
   const scrollView = React.useRef(null);
   const masterKeyInput = React.useRef(null);
 
@@ -183,71 +153,21 @@ export default function App() {
         transparent={false}
         visible={shouldShowMatches}
       >
-        <SearchBar
-          platform={Platform.OS === 'ios' ? 'ios' : 'android'}
-          placeholder="Site tag"
-          onChangeText={onChangeSiteTag}
-          value={siteTag}
-          autoCapitalize="none"
-          autoCorrect={false}
-          autoCompleteType="off"
-          autoFocus={true}
-          keyboardType="url"
-          onCancel={() => {
-            onChangeShouldShowMatches(false);
-          }}
-          onSubmitEditing={() => {
+        <SearchView
+          query={siteTag}
+          onChangeQuery={onChangeSiteTag}
+          results={siteTagMatches}
+          onCancel={() => onChangeShouldShowMatches(false)}
+          onSubmit={nextSiteTag => {
+            if (nextSiteTag && nextSiteTag !== siteTag) {
+              onChangeSiteTag(nextSiteTag);
+            }
             onChangeShouldShowMatches(false);
             setTimeout(() => {
               masterKeyInput.current?.focus();
             }, 10)
           }}
-          containerStyle={{
-            marginTop: Constants.statusBarHeight,
-          }}
         />
-        <View
-          style={{flex: 1}}
-          onStartShouldSetResponderCapture={() => false}
-        >
-          <FlatList
-            style={{
-              flex: 1,
-              backgroundColor: 'white',
-              marginBottom: 30,
-              borderBottomColor: '#ccc',
-              borderBottomWidth: 1,
-            }}
-            keyboardShouldPersistTaps="always"
-            data={siteTagMatches}
-            renderItem={({ item }) =>
-              item !== '' ?
-                <TouchableHighlight
-                  onPress={() => {
-                    if (item) {
-                      onChangeSiteTag(item);
-                    }
-                    setTimeout(() => {
-                      masterKeyInput.current?.focus();
-                    }, 10)
-                    onChangeShouldShowMatches(false);
-                  }}
-                  style={styles.siteTagSuggestion}
-                  underlayColor="#ccc"
-                >
-                  <Text style={{ fontSize: 18 }}>{item}</Text>
-                </TouchableHighlight>
-                : <TouchableWithoutFeedback
-                    onPress={() => {
-                      onChangeShouldShowMatches(false);
-                    }}
-                  >
-                    <View style={styles.siteTagSuggestion} />
-                  </TouchableWithoutFeedback>
-            }
-            keyExtractor={(item, index) => item || String(index)}
-          />
-        </View>
       </Modal>
 
       <ScrollView
