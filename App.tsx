@@ -47,9 +47,6 @@ export default function App() {
   const [shouldShowSizePicker, onChangeShouldShowSizePicker] = React.useState(false);
   const [shouldRevealMasterKey, onChangeShouldRevealMasterKey] = React.useState(false);
   const [shouldRevealPassword, onChangeShouldRevealPassword] = React.useState(false);
-  const [availableHeight, onChangeAvailableHeight] = React.useState(
-    Dimensions.get('window').height
-  );
 
   const toggleShouldRevealMasterKey = () => {
     onChangeShouldRevealMasterKey(!shouldRevealMasterKey);
@@ -163,6 +160,7 @@ export default function App() {
               onChangeSiteTag(nextSiteTag);
             }
             onChangeShouldShowMatches(false);
+            // Focus next input
             setTimeout(() => {
               masterKeyInput.current?.focus();
             }, 10)
@@ -183,9 +181,12 @@ export default function App() {
       >
         <Text style={styles.title}>Password Generator</Text>
 
+        {/*
+          This site tag "input" isn't actually used for input.
+          It's just opens site tag search and displays result.
+        */}
         <Input
           placeholder="Site tag"
-          onChangeText={text => onChangeMasterKey(text)}
           value={siteTag}
           autoCapitalize="none"
           autoCompleteType="off"
