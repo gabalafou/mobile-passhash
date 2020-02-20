@@ -73,7 +73,6 @@ export default function SearchView(props: Props) {
 
       <View
         style={styles.resultListContainer}
-        onStartShouldSetResponderCapture={() => false}
         onLayout={event => {
           setResultListY(event.nativeEvent.layout.y);
         }}
