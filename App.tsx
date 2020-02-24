@@ -26,27 +26,31 @@ import * as fuzzy from 'fuzzy';
 import PassHashCommon from './passhash-common';
 import styles from './styles';
 import SearchView from './components/SearchView';
+import PasswordOptions, { PasswordOptionsFooter } from './components/PasswordOptions';
 
 
 const key = siteTag =>
   'options__' + Array.prototype.map.call(siteTag, ch => ch.charCodeAt()).join('_');
 
-
+const defaultPasswordOptions = {
+  isDigitRequired: true,
+  isPunctuationRequired: true,
+  isMixedCaseRequired: true,
+  noSpecial: false,
+  digitsOnly: false,
+  size: 16,
+};
 
 export default function App() {
   const [siteTagList, onChangeSiteTagList] = React.useState([]);
   const [siteTag, onChangeSiteTag] = React.useState('');
   const [masterKey, onChangeMasterKey] = React.useState('');
-  const [isDigitRequired, onChangeIsDigitRequired] = React.useState(false);
-  const [isPunctuationRequired, onChangeIsPunctuationRequired] = React.useState(false);
-  const [isMixedCaseRequired, onChangeIsMixedCaseRequired] = React.useState(false);
-  const [digitsOnly, onChangeDigitsOnly] = React.useState(false);
-  const [noSpecial, onChangeNoSpecial] = React.useState(false);
-  const [size, onChangeSize] = React.useState(16);
+  const [options, setOptions] = React.useState(defaultPasswordOptions);
   const [shouldShowMatches, onChangeShouldShowMatches] = React.useState(false);
   const [shouldShowSizePicker, onChangeShouldShowSizePicker] = React.useState(false);
   const [shouldRevealMasterKey, onChangeShouldRevealMasterKey] = React.useState(false);
   const [shouldRevealPassword, onChangeShouldRevealPassword] = React.useState(false);
+  const [footer, setFooter] = React.useState(null);
 
   const toggleShouldRevealMasterKey = () => {
     onChangeShouldRevealMasterKey(!shouldRevealMasterKey);
@@ -56,32 +60,10 @@ export default function App() {
     onChangeShouldRevealPassword(!shouldRevealPassword);
   };
 
-  const loadOptions = options => {
-    const {
-      isDigitRequired, isPunctuationRequired,
-      isMixedCaseRequired, digitsOnly, noSpecial, size
-    } = options;
-    onChangeIsDigitRequired(isDigitRequired);
-    onChangeIsPunctuationRequired(isPunctuationRequired);
-    onChangeIsMixedCaseRequired(isMixedCaseRequired);
-    onChangeDigitsOnly(digitsOnly);
-    onChangeNoSpecial(noSpecial);
-    onChangeSize(size);
-  };
-
   const saveOptions = () => {
     if (!siteTag) {
       return;
     }
-
-    const options = {
-      isDigitRequired,
-      isPunctuationRequired,
-      isMixedCaseRequired,
-      digitsOnly,
-      noSpecial,
-      size
-    };
 
     let nextSiteTagList = [...siteTagList];
     if (!nextSiteTagList.includes(siteTag)) {
@@ -111,7 +93,7 @@ export default function App() {
     optionsPromise.then(optionsJson => {
       if (optionsJson) {
         const options = JSON.parse(optionsJson);
-        loadOptions(options);
+        setOptions(options);
       }
     });
   }, [siteTag]);
@@ -120,14 +102,14 @@ export default function App() {
     () => PassHashCommon.generateHashWord(
       siteTag,
       masterKey,
-      size,
-      isDigitRequired,
-      isPunctuationRequired,
-      isMixedCaseRequired,
-      noSpecial,
-      digitsOnly,
+      options.size,
+      options.isDigitRequired,
+      options.isPunctuationRequired,
+      options.isMixedCaseRequired,
+      options.noSpecial,
+      options.digitsOnly,
     ),
-    [siteTag, masterKey, size, isDigitRequired, isPunctuationRequired, isMixedCaseRequired, noSpecial, digitsOnly]
+    [siteTag, masterKey, options]
   );
 
   const sortedSiteTagList = React.useMemo(() => [...siteTagList].sort(), [siteTagList]);
@@ -137,7 +119,7 @@ export default function App() {
   const masterKeyInput = React.useRef(null);
 
   React.useEffect(() => {
-    if (shouldShowSizePicker && scrollView.current) {
+    if (footer && scrollView.current) {
       scrollView.current.scrollToEnd({animated: false});
     }
   });
@@ -174,8 +156,8 @@ export default function App() {
         keyboardShouldPersistTaps="handled"
         ref={scrollView}
         onTouchEnd={() => {
-          if (shouldShowSizePicker) {
-            onChangeShouldShowSizePicker(false);
+          if (footer) {
+            setFooter(null);
           }
         }}
       >
@@ -282,133 +264,18 @@ export default function App() {
 
 
         <Text style={styles.settingsHeader}>
-          Settings
+          Password Options
         </Text>
 
-
-        <View style={styles.settingSection}>
-          <Text style={styles.settingSectionLabel}>Requirements</Text>
-          <View style={styles.settingRowGroup}>
-            <View
-              style={styles.setting}
-            >
-              <Text style={styles.text}>Digit</Text>
-              <Switch
-                onValueChange={isRequired => {
-                  onChangeIsDigitRequired(isRequired);
-                  if (!isRequired && digitsOnly) {
-                    onChangeDigitsOnly(false);
-                  }
-                }}
-                value={isDigitRequired || digitsOnly}
-              />
-            </View>
-
-            <View style={styles.setting}>
-              <Text style={styles.text}>Punctuation</Text>
-              <Switch
-                onValueChange={isRequired => {
-                  onChangeIsPunctuationRequired(isRequired);
-                  if (isRequired) {
-                    onChangeNoSpecial(false);
-                    onChangeDigitsOnly(false);
-                  }
-                }}
-                value={isPunctuationRequired}
-              />
-            </View>
-
-            <View style={styles.settingLastRow}>
-              <Text style={styles.text}>Mixed case</Text>
-              <Switch
-                onValueChange={isRequired => {
-                  onChangeIsMixedCaseRequired(isRequired);
-                  if (isRequired) {
-                    onChangeDigitsOnly(false);
-                  }
-                }}
-                value={isMixedCaseRequired && !digitsOnly}
-              />
-            </View>
-          </View>
-        </View>
-
-
-        <View style={styles.settingSection}>
-          <Text style={styles.settingSectionLabel}>Restrictions</Text>
-          <View style={styles.settingRowGroup}>
-            <View style={styles.setting}>
-              <Text style={styles.text}>No special</Text>
-              <Switch
-                onValueChange={noSpecial => {
-                  onChangeNoSpecial(noSpecial);
-                  if (noSpecial) {
-                    onChangeIsPunctuationRequired(false);
-                  } else {
-                    onChangeDigitsOnly(false);
-                  }
-                }}
-                value={noSpecial || digitsOnly}
-              />
-            </View>
-
-            <View style={styles.settingLastRow}>
-              <Text style={styles.text}>Digits only</Text>
-              <Switch
-                onValueChange={digitsOnly => {
-                  onChangeDigitsOnly(digitsOnly);
-                  if (digitsOnly) {
-                    onChangeIsDigitRequired(true);
-                    onChangeIsPunctuationRequired(false);
-                    onChangeIsMixedCaseRequired(false);
-                    onChangeNoSpecial(true);
-                  }
-                }}
-                value={digitsOnly}
-              />
-            </View>
-          </View>
-        </View>
-
-        <View style={styles.settingSection}>
-          <View style={styles.settingRowGroup}>
-            <View style={styles.settingLastRow}>
-              <Text style={styles.text}>Size</Text>
-              <TouchableWithoutFeedback
-                onPress={() => {
-                  onChangeShouldShowSizePicker(true);
-                }}
-              >
-                <View style={{
-                  paddingLeft: 50,
-                  paddingRight: 20,
-                  paddingVertical: 10,
-                  right: -20,
-                }}>
-                  <Text style={styles.settingValueText}>{size}</Text>
-                </View>
-              </TouchableWithoutFeedback>
-            </View>
-          </View>
-        </View>
-
+        <PasswordOptions
+          options={options}
+          onChangeOptions={setOptions}
+          setFooter={setFooter}
+        />
       </ScrollView>
 
-      {shouldShowSizePicker &&
-        <View
-          style={{
-            backgroundColor: '#dde',
-          }}
-        >
-          <Picker
-            selectedValue={size}
-            onValueChange={size => onChangeSize(size)}
-          >
-            {[2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26].map(size =>
-              <Picker.Item key={size} label={String(size)} value={size} />
-            )}
-          </Picker>
-        </View>
+      {footer === PasswordOptionsFooter &&
+        <PasswordOptionsFooter options={options} onChangeOptions={setOptions} />
       }
 
     </SafeAreaView>
