@@ -26,6 +26,7 @@ import * as fuzzy from 'fuzzy';
 import PassHashCommon from './passhash-common';
 import styles from './styles';
 import SearchView from './components/SearchView';
+import GeneratedPassword from './components/GeneratedPassword';
 import MasterPassword from './components/MasterPassword';
 import PasswordOptions, { PasswordOptionsFooter } from './components/PasswordOptions';
 
@@ -49,13 +50,7 @@ export default function App() {
   const [options, setOptions] = React.useState(defaultPasswordOptions);
   const [shouldShowMatches, onChangeShouldShowMatches] = React.useState(false);
   const [shouldShowSizePicker, onChangeShouldShowSizePicker] = React.useState(false);
-  const [shouldRevealPassword, onChangeShouldRevealPassword] = React.useState(false);
   const [footer, setFooter] = React.useState(null);
-
-
-  const toggleShouldRevealPassword = () => {
-    onChangeShouldRevealPassword(!shouldRevealPassword);
-  };
 
   const saveOptions = () => {
     if (!siteTag) {
@@ -95,7 +90,7 @@ export default function App() {
     });
   }, [siteTag]);
 
-  const hashWord = React.useMemo(
+  const generatedPassword = React.useMemo(
     () => PassHashCommon.generateHashWord(
       siteTag,
       masterPassword,
@@ -187,50 +182,13 @@ export default function App() {
           onChange={setMasterPassword}
         />
 
-        <View
-          style={styles.generatedPassword}
-        >
-          <Button
-            containerStyle={{
-              flex: 1,
-              paddingRight: 5,
-            }}
-            buttonStyle={{
-              backgroundColor: '#ccc',
-              borderRadius: 5,
-              borderColor: '#bbb',
-              borderWidth: 1,
-              minHeight: 44,
-            }}
-            disabled={!masterPassword.length}
-            onPress={() => {
-              Clipboard.setString(hashWord);
-              saveOptions();
-            }}
-            title={
-              !masterPassword.length ?
-                ''
-                : shouldRevealPassword ?
-                    hashWord
-                    : hashWord.replace(/./g, '•')
-            }
-            titleStyle={{
-              color: '#666'
-            }}
-          />
-          <Button
-            icon={
-              <Icon
-                name={shouldRevealPassword ? 'eye' : 'eye-with-line'}
-                type="entypo"
-                size={15}
-                color="#bbb"
-              />
-            }
-            onPress={() => toggleShouldRevealPassword()}
-            type="clear"
-          />
-        </View>
+        <GeneratedPassword
+          password={generatedPassword}
+          masterPassword={masterPassword}
+          onClick={() => {
+            saveOptions();
+          }}
+        />
         <Text style={{ marginLeft: 14 }}>Generated password: tap to copy</Text>
 
 
