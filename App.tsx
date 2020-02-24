@@ -26,6 +26,7 @@ import * as fuzzy from 'fuzzy';
 import PassHashCommon from './passhash-common';
 import styles from './styles';
 import SearchView from './components/SearchView';
+import MasterPassword from './components/MasterPassword';
 import PasswordOptions, { PasswordOptionsFooter } from './components/PasswordOptions';
 
 
@@ -44,17 +45,13 @@ const defaultPasswordOptions = {
 export default function App() {
   const [siteTagList, onChangeSiteTagList] = React.useState([]);
   const [siteTag, onChangeSiteTag] = React.useState('');
-  const [masterKey, onChangeMasterKey] = React.useState('');
+  const [masterPassword, setMasterPassword] = React.useState('');
   const [options, setOptions] = React.useState(defaultPasswordOptions);
   const [shouldShowMatches, onChangeShouldShowMatches] = React.useState(false);
   const [shouldShowSizePicker, onChangeShouldShowSizePicker] = React.useState(false);
-  const [shouldRevealMasterKey, onChangeShouldRevealMasterKey] = React.useState(false);
   const [shouldRevealPassword, onChangeShouldRevealPassword] = React.useState(false);
   const [footer, setFooter] = React.useState(null);
 
-  const toggleShouldRevealMasterKey = () => {
-    onChangeShouldRevealMasterKey(!shouldRevealMasterKey);
-  };
 
   const toggleShouldRevealPassword = () => {
     onChangeShouldRevealPassword(!shouldRevealPassword);
@@ -101,7 +98,7 @@ export default function App() {
   const hashWord = React.useMemo(
     () => PassHashCommon.generateHashWord(
       siteTag,
-      masterKey,
+      masterPassword,
       options.size,
       options.isDigitRequired,
       options.isPunctuationRequired,
@@ -109,14 +106,14 @@ export default function App() {
       options.noSpecial,
       options.digitsOnly,
     ),
-    [siteTag, masterKey, options]
+    [siteTag, masterPassword, options]
   );
 
   const sortedSiteTagList = React.useMemo(() => [...siteTagList].sort(), [siteTagList]);
   const siteTagMatches = fuzzy.filter(siteTag, sortedSiteTagList).map(({string}) => string);
 
   const scrollView = React.useRef(null);
-  const masterKeyInput = React.useRef(null);
+  const masterPasswordInput = React.useRef(null);
 
   React.useEffect(() => {
     if (footer && scrollView.current) {
@@ -144,7 +141,7 @@ export default function App() {
             onChangeShouldShowMatches(false);
             // Focus next input
             setTimeout(() => {
-              masterKeyInput.current?.focus();
+              masterPasswordInput.current?.focus();
             }, 10)
           }}
         />
@@ -184,37 +181,11 @@ export default function App() {
           }}
         />
 
-        <Input
-          ref={masterKeyInput}
-          placeholder="Master key"
-          onChangeText={text => onChangeMasterKey(text)}
-          value={masterKey}
-          autoCapitalize="none"
-          autoCompleteType="off"
-          autoCorrect={false}
-          secureTextEntry={!shouldRevealMasterKey}
-          keyboardType={shouldRevealMasterKey ?
-            Platform.OS === 'android' ? 'visible-password' : 'ascii-capable'
-            : 'default'
-          }
-          textContentType="password"
-          containerStyle={styles.masterKey}
-          rightIcon={
-            <Button
-              icon={
-                <Icon
-                  name={shouldRevealMasterKey ? 'eye' : 'eye-with-line'}
-                  type="entypo"
-                  size={15}
-                  color="#bbb"
-                />
-              }
-              onPress={() => toggleShouldRevealMasterKey()}
-              type="clear"
-            />
-          }
+        <MasterPassword
+          ref={masterPasswordInput}
+          value={masterPassword}
+          onChange={setMasterPassword}
         />
-
 
         <View
           style={styles.generatedPassword}
@@ -231,13 +202,13 @@ export default function App() {
               borderWidth: 1,
               minHeight: 44,
             }}
-            disabled={!masterKey.length}
+            disabled={!masterPassword.length}
             onPress={() => {
               Clipboard.setString(hashWord);
               saveOptions();
             }}
             title={
-              !masterKey.length ?
+              !masterPassword.length ?
                 ''
                 : shouldRevealPassword ?
                     hashWord
