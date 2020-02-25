@@ -36,6 +36,7 @@ export default function App() {
   const [ModalComponent, setModal] = React.useState(null);
   const [FooterComponent, setFooter] = React.useState(null);
 
+  // Save options for site tag and save site tag to list if not already saved
   const saveOptions = () => {
     if (!siteTag) {
       return;
@@ -51,6 +52,7 @@ export default function App() {
     SecureStore.setItemAsync(key(siteTag), JSON.stringify(options));
   };
 
+  // Load all site tags from storage
   React.useEffect(() => {
     const siteTagListPromise = SecureStore.getItemAsync('siteTagList');
     siteTagListPromise.then(siteTagListJson => {
@@ -61,6 +63,7 @@ export default function App() {
     });
   }, [siteTagList.length]);
 
+  // Load options for current site tag (if stored)
   React.useEffect(() => {
     if (!siteTag || !siteTagList.length || !siteTagList.includes(siteTag)) {
       return;
@@ -74,6 +77,8 @@ export default function App() {
     });
   }, [siteTag]);
 
+  // When the user has entered a site tag and master password, we
+  // use the hashing function to generate a password.
   const generatedPassword = React.useMemo(
     () => siteTag && masterPassword && PassHashCommon.generateHashWord(
       siteTag,
@@ -97,6 +102,9 @@ export default function App() {
   const scrollView = React.useRef(null);
   const masterPasswordInput = React.useRef(null);
 
+  // When user clicks "size" option, the Picker component renders
+  // in the footer. We scroll the ScrollView to the bottom so that
+  // the size option appears directly above the Picker.
   React.useEffect(() => {
     if (FooterComponent && scrollView.current) {
       scrollView.current.scrollToEnd({animated: false});
