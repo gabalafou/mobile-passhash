@@ -1,34 +1,19 @@
 import React from 'react';
 import {
-  Platform,
-  StyleSheet,
   SafeAreaView,
   Text,
   ScrollView,
-  TextInput,
-  Switch,
-  View,
-  Picker,
-  Clipboard,
-  TouchableOpacity,
-  TouchableHighlight,
-  TouchableWithoutFeedback,
-  FlatList,
-  KeyboardAvoidingView,
-  Keyboard,
   Modal,
-  Dimensions,
 } from 'react-native';
-import { Button, Icon, SearchBar, Input } from 'react-native-elements';
-import Constants from 'expo-constants';
+import { Input } from 'react-native-elements';
 import * as SecureStore from 'expo-secure-store';
 import * as fuzzy from 'fuzzy';
-import PassHashCommon from './passhash-common';
-import styles from './styles';
-import SearchView from './components/SearchView';
 import GeneratedPassword from './components/GeneratedPassword';
 import MasterPassword from './components/MasterPassword';
 import PasswordOptions, { PasswordOptionsFooter } from './components/PasswordOptions';
+import SearchView from './components/SearchView';
+import PassHashCommon from './passhash-common';
+import styles from './styles';
 
 
 const key = siteTag =>
@@ -44,23 +29,22 @@ const defaultPasswordOptions = {
 };
 
 export default function App() {
-  const [siteTagList, onChangeSiteTagList] = React.useState([]);
-  const [siteTag, onChangeSiteTag] = React.useState('');
+  const [siteTagList, setSiteTagList] = React.useState([]);
+  const [siteTag, setSiteTag] = React.useState('');
   const [masterPassword, setMasterPassword] = React.useState('');
   const [options, setOptions] = React.useState(defaultPasswordOptions);
-  const [shouldShowMatches, onChangeShouldShowMatches] = React.useState(false);
-  const [shouldShowSizePicker, onChangeShouldShowSizePicker] = React.useState(false);
-  const [footer, setFooter] = React.useState(null);
+  const [ModalComponent, setModal] = React.useState(null);
+  const [FooterComponent, setFooter] = React.useState(null);
 
   const saveOptions = () => {
     if (!siteTag) {
       return;
     }
 
-    let nextSiteTagList = [...siteTagList];
-    if (!nextSiteTagList.includes(siteTag)) {
+    if (!siteTagList.includes(siteTag)) {
+      const nextSiteTagList = [...siteTagList];
       nextSiteTagList.push(siteTag);
-      onChangeSiteTagList(nextSiteTagList);
+      setSiteTagList(nextSiteTagList);
       SecureStore.setItemAsync('siteTagList', JSON.stringify(nextSiteTagList));
     }
 
@@ -72,7 +56,7 @@ export default function App() {
     siteTagListPromise.then(siteTagListJson => {
       if (siteTagListJson) {
         const siteTagList = JSON.parse(siteTagListJson);
-        onChangeSiteTagList(siteTagList);
+        setSiteTagList(siteTagList);
       }
     });
   }, [siteTagList.length]);
@@ -91,7 +75,7 @@ export default function App() {
   }, [siteTag]);
 
   const generatedPassword = React.useMemo(
-    () => PassHashCommon.generateHashWord(
+    () => siteTag && masterPassword && PassHashCommon.generateHashWord(
       siteTag,
       masterPassword,
       options.size,
@@ -105,16 +89,49 @@ export default function App() {
   );
 
   const sortedSiteTagList = React.useMemo(() => [...siteTagList].sort(), [siteTagList]);
-  const siteTagMatches = fuzzy.filter(siteTag, sortedSiteTagList).map(({string}) => string);
+  const siteTagMatches = React.useMemo(() =>
+    fuzzy.filter(siteTag, sortedSiteTagList).map(({string}) => string),
+    [sortedSiteTagList]
+  );
 
   const scrollView = React.useRef(null);
   const masterPasswordInput = React.useRef(null);
 
   React.useEffect(() => {
-    if (footer && scrollView.current) {
+    if (FooterComponent && scrollView.current) {
       scrollView.current.scrollToEnd({animated: false});
     }
   });
+
+  let modalProps = {};
+  switch (ModalComponent) {
+    case SearchView: {
+      modalProps = {
+        query: siteTag,
+        onChangeQuery: setSiteTag,
+        results: siteTagMatches,
+        onCancel: () => setModal(null),
+        onSubmit: nextSiteTag => {
+          if (nextSiteTag && nextSiteTag !== siteTag) {
+            setSiteTag(nextSiteTag);
+          }
+          setModal(null);
+          // Focus next input
+          setTimeout(() => {
+            masterPasswordInput.current?.focus();
+          }, 10)
+        }
+      }
+      break;
+    }
+  }
+
+  let footerProps = {};
+  switch (FooterComponent) {
+    case PasswordOptionsFooter:
+      footerProps = { options, onChangeOptions: setOptions };
+      break;
+  }
 
   return (
     <SafeAreaView style={styles.container}>
@@ -122,24 +139,9 @@ export default function App() {
       <Modal
         animationType="slide"
         transparent={false}
-        visible={shouldShowMatches}
+        visible={Boolean(ModalComponent)}
       >
-        <SearchView
-          query={siteTag}
-          onChangeQuery={onChangeSiteTag}
-          results={siteTagMatches}
-          onCancel={() => onChangeShouldShowMatches(false)}
-          onSubmit={nextSiteTag => {
-            if (nextSiteTag && nextSiteTag !== siteTag) {
-              onChangeSiteTag(nextSiteTag);
-            }
-            onChangeShouldShowMatches(false);
-            // Focus next input
-            setTimeout(() => {
-              masterPasswordInput.current?.focus();
-            }, 10)
-          }}
-        />
+        {ModalComponent && <ModalComponent {...modalProps} />}
       </Modal>
 
       <ScrollView
@@ -148,16 +150,17 @@ export default function App() {
         keyboardShouldPersistTaps="handled"
         ref={scrollView}
         onTouchEnd={() => {
-          if (footer) {
+          if (FooterComponent) {
             setFooter(null);
           }
         }}
       >
         <Text style={styles.title}>Password Generator</Text>
 
+
         {/*
           This site tag "input" isn't actually used for input.
-          It's just opens site tag search and displays result.
+          It just opens search, and then displays the result from search.
         */}
         <Input
           placeholder="Site tag"
@@ -172,7 +175,7 @@ export default function App() {
           }}
           containerStyle={styles.siteTag}
           onTouchEnd={() => {
-            onChangeShouldShowMatches(true);
+            setModal(() => SearchView);
           }}
         />
 
@@ -195,7 +198,6 @@ export default function App() {
         <Text style={styles.settingsHeader}>
           Password Options
         </Text>
-
         <PasswordOptions
           options={options}
           onChangeOptions={setOptions}
@@ -203,9 +205,8 @@ export default function App() {
         />
       </ScrollView>
 
-      {footer === PasswordOptionsFooter &&
-        <PasswordOptionsFooter options={options} onChangeOptions={setOptions} />
-      }
+
+      {FooterComponent && <FooterComponent {...footerProps} />}
 
     </SafeAreaView>
   );
