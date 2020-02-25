@@ -70,7 +70,7 @@ export default function PasswordOptions(props: Props) {
                 onChangeOptions({
                   ...options,
                   isMixedCaseRequired,
-                  digitsOnly: !isMixedCaseRequired || options.digitsOnly,
+                  digitsOnly: !isMixedCaseRequired && options.digitsOnly,
                 })
               }}
               // value={isMixedCaseRequired && !digitsOnly}
