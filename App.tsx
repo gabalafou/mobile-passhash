@@ -192,10 +192,10 @@ export default function App() {
             saveOptions();
           }}
         />
-        <Text style={{ marginLeft: 14 }}>Generated password: tap to copy</Text>
+        <Text style={styles.generatedPasswordLabel}>Generated password: tap to copy</Text>
 
 
-        <Text style={styles.settingsHeader}>
+        <Text style={styles.passwordOptionsHeader}>
           Password Options
         </Text>
         <PasswordOptions
