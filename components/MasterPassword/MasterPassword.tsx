@@ -1,6 +1,7 @@
 import React from 'react';
 import { Platform } from 'react-native';
 import { Input, Button, Icon } from 'react-native-elements';
+import RevealPasswordIcon from '../RevealPasswordIcon';
 import styles from './styles';
 
 
@@ -34,14 +35,7 @@ function MasterPassword(props: Props, ref) {
       textContentType="password"
       rightIcon={
         <Button
-          icon={
-            <Icon
-              name={shouldReveal ? 'eye' : 'eye-with-line'}
-              type="entypo"
-              size={15}
-              color="#bbb"
-            />
-          }
+          icon={<RevealPasswordIcon shouldReveal={shouldReveal} />}
           onPress={() => toggleShouldReveal()}
           type="clear"
         />

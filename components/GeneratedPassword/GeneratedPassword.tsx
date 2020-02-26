@@ -1,6 +1,7 @@
 import React from 'react';
 import { Clipboard, View } from 'react-native';
 import { Button, Icon } from 'react-native-elements';
+import RevealPasswordIcon from '../RevealPasswordIcon';
 import styles from './styles';
 
 
@@ -43,14 +44,7 @@ export default function GeneratedPassword(props: Props) {
         titleStyle={styles.buttonTitleStyle}
       />
       <Button
-        icon={
-          <Icon
-            name={shouldReveal ? 'eye' : 'eye-with-line'}
-            type="entypo"
-            size={15}
-            color="#bbb"
-          />
-        }
+        icon={<RevealPasswordIcon shouldReveal={shouldReveal} />}
         onPress={() => toggleShouldReveal()}
         type="clear"
       />
