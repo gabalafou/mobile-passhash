@@ -8,13 +8,13 @@ import {
   View,
 } from 'react-native';
 import { Input } from 'react-native-elements';
-import * as SecureStore from 'expo-secure-store';
 import * as fuzzy from 'fuzzy';
 import GeneratedPassword from './components/GeneratedPassword';
 import MasterPassword from './components/MasterPassword';
 import PasswordOptions, { PasswordOptionsFooter } from './components/PasswordOptions';
 import SearchView from './components/SearchView';
 import PassHashCommon from './passhash-common';
+import * as Storage from './storage';
 import styles from './styles';
 
 
@@ -179,14 +179,10 @@ export default function App() {
   );
 }
 
-const key = siteTag =>
-  'options__' + Array.prototype.map.call(siteTag, ch => ch.charCodeAt()).join('_');
-
 function loadSiteTags(setSiteTagList) {
-  const siteTagListPromise = SecureStore.getItemAsync('siteTagList');
-  siteTagListPromise.then(siteTagListJson => {
-    if (siteTagListJson) {
-      const siteTagList = JSON.parse(siteTagListJson);
+  const siteTagListPromise = Storage.getItemAsync('siteTagList');
+  siteTagListPromise.then(siteTagList => {
+    if (siteTagList) {
       setSiteTagList(siteTagList);
     }
   });
@@ -196,10 +192,9 @@ function loadOptions(siteTag, siteTagList, setOptions) {
   if (!siteTag || !siteTagList.length || !siteTagList.includes(siteTag)) {
     return;
   }
-  const optionsPromise = SecureStore.getItemAsync(key(siteTag));
-  optionsPromise.then(optionsJson => {
-    if (optionsJson) {
-      const options = JSON.parse(optionsJson);
+  const optionsPromise = Storage.getItemAsync('options__' + siteTag);
+  optionsPromise.then(options => {
+    if (options) {
       setOptions(options);
     }
   });
@@ -212,13 +207,13 @@ function saveOptions(options, siteTag, siteTagList, setSiteTagList) {
   }
 
   // Save options for site tag
-  SecureStore.setItemAsync(key(siteTag), JSON.stringify(options));
+  Storage.setItemAsync('options__' + siteTag, options);
 
   // Save site tag to list if not already saved
   if (!siteTagList.includes(siteTag)) {
     const nextSiteTagList = [...siteTagList, siteTag];
     setSiteTagList(nextSiteTagList);
-    SecureStore.setItemAsync('siteTagList', JSON.stringify(nextSiteTagList));
+    Storage.setItemAsync('siteTagList', nextSiteTagList);
   }
 }
 
