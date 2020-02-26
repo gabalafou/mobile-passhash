@@ -101,7 +101,7 @@ export default function App() {
       <ScrollView
         style={styles.scrollView}
         // "on-drag" - keyboard should disappear when user drags/scrolls
-        // Note: not working on Android
+        // TODO: not working on Android
         keyboardDismissMode="on-drag"
         // "handled" - allows user to click hide/show password while virtual keyboard is open
         keyboardShouldPersistTaps="handled"
