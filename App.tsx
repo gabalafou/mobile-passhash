@@ -154,38 +154,49 @@ export default function App() {
 
       <ScrollView
         style={styles.scrollView}
+        // "on-drag" - keyboard should disappear when user drags/scrolls
+        // Note: not working on Android
         keyboardDismissMode="on-drag"
+        // "handled" - allows user to click hide/show password while virtual keyboard is open
         keyboardShouldPersistTaps="handled"
         ref={scrollView}
         onTouchEnd={() => {
+          // Dismiss footer if user clicks outside of footer
           if (FooterComponent) {
             setFooter(null);
           }
         }}
       >
+
+
         <Text style={styles.title}>Password Generator</Text>
 
 
-        {/*
-          This site tag "input" isn't actually used for input.
-          It just opens search, and then displays the result from search.
-        */}
-        <Input
-          placeholder="Site tag"
-          value={siteTag}
-          autoCapitalize="none"
-          autoCompleteType="off"
-          keyboardType="url"
-          textContentType="URL"
-          disabled={true}
-          disabledInputStyle={{
-            opacity: 1,
-          }}
-          containerStyle={styles.siteTag}
-          onTouchEnd={() => {
-            setModal(() => SearchView);
-          }}
-        />
+        <TouchableWithoutFeedback
+          onPress={() => setModal(() => SearchView)}
+        >
+          <View>
+            {/*
+              This site tag "input" isn't actually used for input.
+              It just opens search, and then displays the result from search.
+              Must wrap in Touchable > View in order to make click work
+              on Android with disabled = true.
+            */}
+            <Input
+              placeholder="Site tag"
+              value={siteTag}
+              autoCapitalize="none"
+              autoCompleteType="off"
+              keyboardType="url"
+              textContentType="URL"
+              disabled={true}
+              disabledInputStyle={{
+                opacity: 1,
+              }}
+              containerStyle={styles.siteTag}
+            />
+          </View>
+        </TouchableWithoutFeedback>
 
         <MasterPassword
           ref={masterPasswordInput}
