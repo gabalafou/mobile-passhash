@@ -21,7 +21,7 @@ type Options = {
 type Props = {
   options: Options,
   onChangeOptions: (options: Options) => void,
-  setFooter: (footer: () => JSX.Element) => void,
+  setFooter: (fn: () => typeof PasswordOptionsFooter) => void,
 };
 
 export default function PasswordOptions(props: Props) {

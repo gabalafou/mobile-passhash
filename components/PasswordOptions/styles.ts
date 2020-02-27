@@ -1,9 +1,8 @@
-import { StyleSheet } from 'react-native';
-import Constants from 'expo-constants';
+import { StyleSheet, ViewStyle } from 'react-native';
 import { gutterWidth } from '../../styles';
 
 
-const settingStyles: any = {
+const rowStyles: ViewStyle = {
   flex: 1,
   flexDirection: 'row',
   alignItems: 'center',
@@ -16,12 +15,6 @@ const settingStyles: any = {
 };
 
 export default StyleSheet.create({
-  settingsHeader: {
-    fontSize: 28,
-    marginTop: 44,
-    marginBottom: 10,
-    marginLeft: gutterWidth,
-  },
   sectionLabel: {
     color: '#888',
     fontSize: 13,
@@ -48,10 +41,10 @@ export default StyleSheet.create({
     paddingLeft: gutterWidth,
   },
   row: {
-    ...settingStyles,
+    ...rowStyles,
   },
   lastRow: {
-    ...settingStyles,
+    ...rowStyles,
     borderBottomWidth: 0,
   },
   clickableValue: {
