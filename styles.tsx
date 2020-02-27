@@ -19,9 +19,6 @@ export default StyleSheet.create({
     fontWeight: 'bold',
     margin: gutterWidth,
   },
-  siteTag: {
-    paddingHorizontal: gutterWidth,
-  },
   generatedPasswordLabel: {
     marginLeft: 14,
   },

@@ -4,15 +4,13 @@ import {
   SafeAreaView,
   ScrollView,
   Text,
-  TouchableWithoutFeedback,
-  View,
 } from 'react-native';
-import { Input } from 'react-native-elements';
 import * as fuzzy from 'fuzzy';
 import GeneratedPassword from './components/GeneratedPassword';
 import MasterPassword from './components/MasterPassword';
 import PasswordOptions, { PasswordOptionsFooter } from './components/PasswordOptions';
 import SearchView from './components/SearchView';
+import SiteTag from './components/SiteTag';
 import PassHashCommon from './passhash-common';
 import * as Storage from './storage';
 import styles from './styles';
@@ -118,31 +116,10 @@ export default function App() {
         <Text style={styles.title}>Password Generator</Text>
 
 
-        <TouchableWithoutFeedback
+        <SiteTag
           onPress={() => setModal(() => SearchView)}
-        >
-          <View>
-            {/*
-              This site tag "input" isn't actually used for input.
-              It just opens search, and then displays the result from search.
-              Must wrap in Touchable > View in order to make click work
-              on Android with disabled = true.
-            */}
-            <Input
-              placeholder="Site tag"
-              value={siteTag}
-              autoCapitalize="none"
-              autoCompleteType="off"
-              keyboardType="url"
-              textContentType="URL"
-              disabled={true}
-              disabledInputStyle={{
-                opacity: 1,
-              }}
-              containerStyle={styles.siteTag}
-            />
-          </View>
-        </TouchableWithoutFeedback>
+          value={siteTag}
+        />
 
         <MasterPassword
           ref={masterPasswordInput}
