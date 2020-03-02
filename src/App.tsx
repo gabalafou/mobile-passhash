@@ -16,14 +16,14 @@ import * as Storage from './storage';
 import styles from './styles';
 
 
-const defaultPasswordOptions = {
+export const defaultPasswordOptions = Object.freeze({
   isDigitRequired: true,
   isPunctuationRequired: true,
   isMixedCaseRequired: true,
   noSpecial: false,
   digitsOnly: false,
   size: 16,
-};
+});
 
 export default function App() {
   const [siteTagList, setSiteTagList] = React.useState([]);
