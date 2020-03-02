@@ -1,5 +1,12 @@
 import * as SecureStore from 'expo-secure-store';
 
+// NOTE:
+// TODO:
+// Expo Secure Store has a limit of 2048 bytes. Right now,
+// we're storing all the site tags under a single key, "siteTagList".
+// Assuming that a site tag is about 20 characters and each character
+// is 1 byte, that allows for storing roughly 100 site tags. Need to
+// develop a more flexible solution soon.
 
 // The easiest way I could think of to ensure that any key
 // is safe for Expo SecureStore is just to convert each character
