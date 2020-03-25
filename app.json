@@ -13,5 +13,6 @@
       "android",
       "web"
     ]
-  }
+  },
+  "icon": "src/icon.png"
 }
