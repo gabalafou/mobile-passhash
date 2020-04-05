@@ -78,29 +78,44 @@ export default function SearchView(props: Props) {
         }}
       >
         <FlatList
+          // TODO: Use getItemLayout optimization
           style={styles.resultList}
           data={paddedResults}
           keyboardShouldPersistTaps="always"
           keyExtractor={(item, index) => item || String(index)}
           renderItem={({ item }) =>
-            item !== '' ? (
-              <TouchableHighlight
-                onPress={() => onSubmit(item)}
-                style={styles.resultItem}
-                underlayColor="#ccc"
-              >
-                <Text style={styles.resultItemText}>{item}</Text>
-              </TouchableHighlight>
-            ) : (
-              <TouchableWithoutFeedback
-                onPress={() => onCancel()}
-              >
-                <View style={styles.resultItem} />
-              </TouchableWithoutFeedback>
-            )
+            <Item item={item} onSubmit={onSubmit} onCancel={onCancel} />
           }
         />
       </View>
     </>
   );
 };
+
+
+type ItemProps = {
+  item: string,
+  onSubmit: (item: string) => void,
+  onCancel: () => void,
+};
+class Item extends React.PureComponent<ItemProps> {
+  render() {
+    const { item, onSubmit, onCancel } = this.props;
+    return item !== '' ? (
+      <TouchableHighlight
+        onPress={() => onSubmit(item)}
+        style={styles.resultItem}
+        underlayColor="#ccc"
+      >
+        <Text style={styles.resultItemText}>{item}</Text>
+      </TouchableHighlight>
+    ) : (
+      // For blank lines
+      <TouchableWithoutFeedback
+        onPress={() => onCancel()}
+      >
+        <View style={styles.resultItem} />
+      </TouchableWithoutFeedback>
+    );
+  }
+}
