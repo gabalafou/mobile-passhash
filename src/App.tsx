@@ -6,6 +6,7 @@ import {
   Text,
 } from 'react-native';
 import * as fuzzy from 'fuzzy';
+import naturalSort from 'natural-sort';
 import GeneratedPassword from './components/GeneratedPassword';
 import MasterPassword from './components/MasterPassword';
 import PasswordOptions, { PasswordOptionsFooter } from './components/PasswordOptions';
@@ -61,7 +62,7 @@ export default function App() {
   );
 
   // Search existing site tags for matches
-  const sortedSiteTagList = React.useMemo(() => [...siteTagList].sort(), [siteTagList]);
+  const sortedSiteTagList = React.useMemo(() => [...siteTagList].sort(naturalSort()), [siteTagList]);
   const siteTagMatches = React.useMemo(() =>
     fuzzy.filter(siteTag, sortedSiteTagList).map(({string}) => string),
     [sortedSiteTagList, siteTag]
