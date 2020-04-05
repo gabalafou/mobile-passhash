@@ -72,7 +72,7 @@ export default function SearchView(props: Props) {
       />
 
       <View
-        style={styles.resultListContainer}
+        style={[styles.resultListContainer, {paddingBottom: keyboardHeight}]}
         onLayout={event => {
           setResultListY(event.nativeEvent.layout.y);
         }}

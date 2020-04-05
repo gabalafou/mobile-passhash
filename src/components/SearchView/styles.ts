@@ -16,7 +16,6 @@ export default StyleSheet.create({
     backgroundColor: 'white',
     borderBottomColor: '#ccc',
     borderBottomWidth: 1,
-    marginBottom: 30,
   },
   resultItem: {
     borderStyle: 'solid',
