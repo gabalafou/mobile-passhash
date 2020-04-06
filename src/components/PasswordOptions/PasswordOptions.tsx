@@ -10,9 +10,9 @@ import styles from './styles';
 
 
 type Options = {
-  isDigitRequired: boolean,
-  isPunctuationRequired: boolean,
-  isMixedCaseRequired: boolean,
+  requireDigit: boolean,
+  requirePunctuation: boolean,
+  requireMixedCase: boolean,
   noSpecial: boolean,
   digitsOnly: boolean,
   size: number,
@@ -36,45 +36,33 @@ export default function PasswordOptions(props: Props) {
           >
             <Text style={styles.text}>Digit</Text>
             <Switch
-              onValueChange={isDigitRequired => {
-                onChangeOptions({
-                  ...options,
-                  isDigitRequired,
-                  digitsOnly: isDigitRequired && options.digitsOnly,
-                });
+              onValueChange={requireDigit => {
+                const updatedOptions = updateOptions(options, 'requireDigit', requireDigit);
+                onChangeOptions(updatedOptions);
               }}
-              // value={isDigitRequired || digitsOnly}
-              value={options.isDigitRequired}
+              value={options.requireDigit}
             />
           </View>
 
           <View style={styles.row}>
             <Text style={styles.text}>Punctuation</Text>
             <Switch
-              onValueChange={isPunctuationRequired => {
-                onChangeOptions({
-                  ...options,
-                  isPunctuationRequired,
-                  noSpecial: !isPunctuationRequired && options.noSpecial,
-                  digitsOnly: !isPunctuationRequired && options.digitsOnly,
-                });
+              onValueChange={requirePunctuation => {
+                const updatedOptions = updateOptions(options, 'requirePunctuation', requirePunctuation);
+                onChangeOptions(updatedOptions);
               }}
-              value={options.isPunctuationRequired}
+              value={options.requirePunctuation}
             />
           </View>
 
           <View style={styles.lastRow}>
             <Text style={styles.text}>Mixed case</Text>
             <Switch
-              onValueChange={isMixedCaseRequired => {
-                onChangeOptions({
-                  ...options,
-                  isMixedCaseRequired,
-                  digitsOnly: !isMixedCaseRequired && options.digitsOnly,
-                })
+              onValueChange={requireMixedCase => {
+                const updatedOptions = updateOptions(options, 'requireMixedCase', requireMixedCase);
+                onChangeOptions(updatedOptions);
               }}
-              // value={isMixedCaseRequired && !digitsOnly}
-              value={options.isMixedCaseRequired}
+              value={options.requireMixedCase}
             />
           </View>
         </View>
@@ -88,14 +76,9 @@ export default function PasswordOptions(props: Props) {
             <Text style={styles.text}>No special</Text>
             <Switch
               onValueChange={noSpecial => {
-                onChangeOptions({
-                  ...options,
-                  noSpecial,
-                  isPunctuationRequired: !noSpecial && options.isPunctuationRequired,
-                  digitsOnly: noSpecial && options.digitsOnly,
-                })
+                const updatedOptions = updateOptions(options, 'noSpecial', noSpecial);
+                onChangeOptions(updatedOptions)
               }}
-              // value={noSpecial || digitsOnly}
               value={options.noSpecial}
             />
           </View>
@@ -104,14 +87,8 @@ export default function PasswordOptions(props: Props) {
             <Text style={styles.text}>Digits only</Text>
             <Switch
               onValueChange={digitsOnly => {
-                onChangeOptions({
-                  ...options,
-                  digitsOnly,
-                  isDigitRequired: digitsOnly || options.isDigitRequired,
-                  isPunctuationRequired: !digitsOnly && options.isPunctuationRequired,
-                  isMixedCaseRequired: !digitsOnly && options.isMixedCaseRequired,
-                  noSpecial: digitsOnly || options.noSpecial,
-                });
+                const updatedOptions = updateOptions(options, 'digitsOnly', digitsOnly)
+                onChangeOptions(updatedOptions);
               }}
               value={options.digitsOnly}
             />
@@ -137,6 +114,55 @@ export default function PasswordOptions(props: Props) {
       </View>
     </>
   );
+}
+
+// Change the value of a single option and update the options object as a whole
+export function updateOptions(options: Options, optionName: string, value: boolean) {
+  const copy = { ...options };
+  copy[optionName] = value;
+  switch (optionName) {
+    case 'requireDigit':
+      // if we say digits are not required, then we cannot say digits only
+      if (!value) {
+        copy.digitsOnly = false;
+      }
+      return copy;
+    case 'requirePunctuation':
+      // if we require punctuation, then we cannot obey noSpecial, nor digitsOnly
+      if (value) {
+        copy.noSpecial = false;
+        copy.digitsOnly = false;
+      }
+      return copy;
+    case 'requireMixedCase':
+      // if we require mixed case, then we must turn off digits only
+      if (value) {
+        copy.digitsOnly = false;
+      }
+      return copy;
+    case 'noSpecial':
+      // if we do not allow special characters, then we must turn off punctuation
+      if (value) {
+        copy.requirePunctuation = false;
+      } else {
+        // digitsOnly on strictly implies noSpecial, so if we turn off noSpecial, we should not
+        // leave digitsOnly on
+        copy.digitsOnly = false;
+      }
+      return copy;
+    case 'digitsOnly':
+      // digitsOnly implies noSpecial and requireDigit, so we turn them on too
+      // also, if we turn on digits only, we must turn off mixed case and punctuation
+      if (value) {
+        copy.requireDigit = true;
+        copy.noSpecial = true;
+        copy.requirePunctuation = false;
+        copy.requireMixedCase = false;
+      }
+      return copy;
+    default:
+      return copy;
+  }
 }
 
 export function PasswordOptionsFooter(props) {

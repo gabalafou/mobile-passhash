@@ -18,9 +18,9 @@ import styles from './styles';
 
 
 export const defaultPasswordOptions = Object.freeze({
-  isDigitRequired: true,
-  isPunctuationRequired: true,
-  isMixedCaseRequired: true,
+  requireDigit: true,
+  requirePunctuation: true,
+  requireMixedCase: true,
   noSpecial: false,
   digitsOnly: false,
   size: 16,
@@ -52,9 +52,9 @@ export default function App() {
       siteTag,
       masterPassword,
       options.size,
-      options.isDigitRequired,
-      options.isPunctuationRequired,
-      options.isMixedCaseRequired,
+      options.requireDigit,
+      options.requirePunctuation,
+      options.requireMixedCase,
       options.noSpecial,
       options.digitsOnly,
     ),
