@@ -33,9 +33,17 @@ export default function SearchView(props: Props) {
 
   let paddedResults = results;
 
-  if (query && !results.includes(query)) {
+  const queryNotInResults = query && !results.includes(query);
+  if (queryNotInResults) {
     paddedResults = [query, ...paddedResults];
   }
+
+  const resultListRef = React.createRef();
+  React.useEffect(() => {
+    if (queryNotInResults && resultListRef.current) {
+      resultListRef.current.scrollToOffset({offset: 0});
+    }
+  }, [query, results]);
 
   const windowHeight = Dimensions.get('window').height;
   const [resultListY, setResultListY] = React.useState(
@@ -83,6 +91,7 @@ export default function SearchView(props: Props) {
           data={paddedResults}
           keyboardShouldPersistTaps="always"
           keyExtractor={(item, index) => item || String(index)}
+          ref={resultListRef}
           renderItem={({ item }) =>
             <Item item={item} onSubmit={onSubmit} onCancel={onCancel} />
           }
