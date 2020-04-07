@@ -86,9 +86,11 @@ export default function SearchView(props: Props) {
         }}
       >
         <FlatList
-          // TODO: Use getItemLayout optimization
           style={styles.resultList}
           data={paddedResults}
+          getItemLayout={(_, index) => ({
+            index, length: resultItemHeight, offset: resultItemHeight * index,
+          })}
           keyboardShouldPersistTaps="always"
           keyExtractor={(item, index) => item || String(index)}
           ref={resultListRef}
