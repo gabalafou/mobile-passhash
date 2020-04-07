@@ -2,6 +2,7 @@ import React from 'react';
 import {
   Modal,
   SafeAreaView,
+  StatusBar,
   ScrollView,
   Text,
 } from 'react-native';
@@ -82,6 +83,8 @@ export default function App() {
 
   return (
     <SafeAreaView style={styles.container}>
+
+      <StatusBar barStyle="dark-content" />
 
       <Modal
         animationType="slide"
