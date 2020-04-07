@@ -1,9 +1,9 @@
 {
-  "name": "passhash",
-  "displayName": "Easy password security",
   "expo": {
-    "name": "passhash",
-    "slug": "expo-template-bare",
+    "name": "Mobile Passhash",
+    "description": "Simple, effective password security",
+    "icon": "src/icon.png",
+    "slug": "mobile-passhash",
     "privacy": "unlisted",
     "sdkVersion": "36.0.0",
     "version": "1.0.0",
@@ -13,6 +13,5 @@
       "android",
       "web"
     ]
-  },
-  "icon": "src/icon.png"
+  }
 }
