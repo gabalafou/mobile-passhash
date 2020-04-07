@@ -5,7 +5,6 @@ import {
   Platform,
   Text,
   TouchableHighlight,
-  TouchableWithoutFeedback,
   View,
 } from 'react-native';
 import { SearchBar } from 'react-native-elements';
@@ -25,41 +24,40 @@ type Props = {
 export default function SearchView(props: Props) {
   const {
     query,
-    results,
     onChangeQuery,
     onCancel,
     onSubmit,
   } = props;
 
-  let paddedResults = results;
+  let paddedResults = [...props.results];
 
-  const queryNotInResults = query && !results.includes(query);
+  const queryNotInResults = query && !paddedResults.includes(query);
   if (queryNotInResults) {
-    paddedResults = [query, ...paddedResults];
+    paddedResults.unshift(query);
   }
 
-  const resultListRef = React.createRef();
+  // Whenever the search query changes, scroll to the top of the
+  const resultListRef: React.RefObject<FlatList<string>> = React.createRef();
   React.useEffect(() => {
-    if (queryNotInResults && resultListRef.current) {
+    if (resultListRef.current) {
       resultListRef.current.scrollToOffset({offset: 0});
     }
-  }, [query, results]);
+  }, [query]);
 
-  const windowHeight = Dimensions.get('window').height;
-  const [resultListY, setResultListY] = React.useState(
+  const [resultListTopY, setResultListTopY] = React.useState(
     Constants.statusBarHeight + 40 // search bar height is 40
   );
   const keyboardHeight = useKeyboardHeight();
 
-  const availableHeightForResults = (windowHeight - resultListY) - keyboardHeight;
-
   // Push several blanks for display purposes, i.e. make
   // the results list look like a ruled page, with lines going all
   // the way down to the top edge of the onscreen keyboard
+  const windowHeight = Dimensions.get('window').height;
+  const availableHeightForResults = (windowHeight - resultListTopY) - keyboardHeight;
   const numResultsThatCover = Math.ceil(availableHeightForResults / resultItemHeight);
-  const gap = numResultsThatCover - results.length;
+  const gap = numResultsThatCover - paddedResults.length;
   if (gap > 0) {
-    paddedResults = [...paddedResults, ...new Array(gap).fill('')];
+    paddedResults.push(...new Array(gap).fill(''));
   }
 
   return (
@@ -80,9 +78,11 @@ export default function SearchView(props: Props) {
       />
 
       <View
-        style={[styles.resultListContainer, {paddingBottom: keyboardHeight}]}
+        style={[styles.resultListContainer, {
+          paddingBottom: Platform.OS === 'ios' ? keyboardHeight : 0
+        }]}
         onLayout={event => {
-          setResultListY(event.nativeEvent.layout.y);
+          setResultListTopY(event.nativeEvent.layout.y);
         }}
       >
         <FlatList
@@ -95,7 +95,7 @@ export default function SearchView(props: Props) {
           keyExtractor={(item, index) => item || String(index)}
           ref={resultListRef}
           renderItem={({ item }) =>
-            <Item item={item} onSubmit={onSubmit} onCancel={onCancel} />
+            <Item item={item} onSubmit={onSubmit} />
           }
         />
       </View>
@@ -107,11 +107,10 @@ export default function SearchView(props: Props) {
 type ItemProps = {
   item: string,
   onSubmit: (item: string) => void,
-  onCancel: () => void,
 };
 class Item extends React.PureComponent<ItemProps> {
   render() {
-    const { item, onSubmit, onCancel } = this.props;
+    const { item, onSubmit } = this.props;
     return item !== '' ? (
       <TouchableHighlight
         onPress={() => onSubmit(item)}
@@ -122,11 +121,7 @@ class Item extends React.PureComponent<ItemProps> {
       </TouchableHighlight>
     ) : (
       // For blank lines
-      <TouchableWithoutFeedback
-        onPress={() => onCancel()}
-      >
-        <View style={styles.resultItem} />
-      </TouchableWithoutFeedback>
+      <View style={styles.resultItem} />
     );
   }
 }

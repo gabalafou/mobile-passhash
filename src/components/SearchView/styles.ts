@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 import Constants from 'expo-constants';
 import { gutterWidth } from '../../styles';
 
@@ -6,7 +6,7 @@ export const resultItemHeight = 50;
 
 export default StyleSheet.create({
   searchBarContainer: {
-    marginTop: Constants.statusBarHeight,
+    marginTop: Platform.OS === 'ios' ? Constants.statusBarHeight : 0,
   },
   resultListContainer: {
     flex: 1,
