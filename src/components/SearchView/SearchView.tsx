@@ -61,7 +61,7 @@ export default function SearchView(props: Props) {
   }
 
   return (
-    <>
+    <View style={styles.container}>
       <SearchBar
         placeholder="Site tag"
         value={query}
@@ -99,7 +99,7 @@ export default function SearchView(props: Props) {
           }
         />
       </View>
-    </>
+    </View>
   );
 };
 
