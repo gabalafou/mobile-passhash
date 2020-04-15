@@ -34,7 +34,7 @@
  * ***** END LICENSE BLOCK ***** */
 
 
-import { b64_hmac_sha1 } from './sha1';
+import { b64_hmac_sha1 } from '../paj/sha1';
 
 var PassHashCommon =
 {

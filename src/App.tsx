@@ -13,7 +13,7 @@ import MasterPassword from './components/MasterPassword';
 import PasswordOptions, { PasswordOptionsFooter } from './components/PasswordOptions';
 import SearchView from './components/SearchView';
 import SiteTag from './components/SiteTag';
-import PassHashCommon from './passhash-common';
+import PassHashCommon from './lib/wijjo/passhash-common';
 import * as Storage from './storage';
 import styles from './styles';
 
