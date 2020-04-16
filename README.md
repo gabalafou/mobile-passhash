@@ -10,7 +10,10 @@ My ultimate goal is to distribute these apps on the app stores.
 
 ### Android
 
-For Android, go to [https://expo.io/@gabalafou/mobile-passhash](https://expo.io/@gabalafou/mobile-passhash).
+1. Install [Expo](https://play.google.com/store/apps/details?id=host.exp.exponent&referrer=www) from the Google app store.
+2. Go to [https://expo.io/@gabalafou/mobile-passhash](https://expo.io/@gabalafou/mobile-passhash).
+3. Scan the QR code on that page with the Expo app.
+4. The app should load inside Expo.
 
 ### iOS
 
