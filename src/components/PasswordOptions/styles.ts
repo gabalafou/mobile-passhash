@@ -56,4 +56,7 @@ export default StyleSheet.create({
   pickerContainer: {
     backgroundColor: '#dde',
   },
+  androidPicker: {
+    width: 84,
+  },
 });

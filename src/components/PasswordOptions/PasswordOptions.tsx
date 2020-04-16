@@ -1,6 +1,7 @@
 import React from 'react';
 import {
   Picker,
+  Platform,
   Switch,
   Text,
   TouchableWithoutFeedback,
@@ -100,15 +101,26 @@ export default function PasswordOptions(props: Props) {
         <View style={styles.rowGroup}>
           <View style={styles.lastRow}>
             <Text style={styles.text}>Size</Text>
-            <TouchableWithoutFeedback
-              onPress={() => {
-                setFooter(() => PasswordOptionsFooter);
-              }}
-            >
-              <View style={styles.clickableValue}>
-                <Text style={styles.valueText}>{options.size}</Text>
-              </View>
-            </TouchableWithoutFeedback>
+            {Platform.OS === 'android' ? (
+              <SizePicker
+                value={options.size}
+                onChange={size => {
+                  const nextOptions = { ...options, size };
+                  onChangeOptions(nextOptions);
+                }}
+                style={styles.androidPicker}
+              />
+            ) : (
+              <TouchableWithoutFeedback
+                onPress={() => {
+                  setFooter(() => PasswordOptionsFooter);
+                }}
+              >
+                <View style={styles.clickableValue}>
+                  <Text style={styles.valueText}>{options.size}</Text>
+                </View>
+              </TouchableWithoutFeedback>
+            )}
           </View>
         </View>
       </View>
@@ -171,17 +183,28 @@ export function PasswordOptionsFooter(props) {
     <View
       style={styles.pickerContainer}
     >
-      <Picker
-        selectedValue={options.size}
-        onValueChange={size => {
+      <SizePicker
+        value={options.size}
+        onChange={size => {
           const nextOptions = { ...options, size };
           onChangeOptions(nextOptions);
         }}
-      >
-        {[2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26].map(size =>
-          <Picker.Item key={size} label={String(size)} value={size} />
-        )}
-      </Picker>
+      />
     </View>
+  );
+}
+
+function SizePicker(props) {
+  const { value, onChange, ...rest } = props;
+  return (
+    <Picker
+      selectedValue={value}
+      onValueChange={onChange}
+      {...rest}
+    >
+      {[2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26].map(size =>
+        <Picker.Item key={size} label={String(size)} value={size} />
+      )}
+    </Picker>
   );
 }
