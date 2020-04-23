@@ -1,12 +1,11 @@
 import React from 'react';
-import { Icon } from 'react-native-elements';
+import { Entypo } from '@expo/vector-icons';
 
 
 export default function RevealPasswordIcon(props) {
   return (
-    <Icon
+    <Entypo
       name={props.shouldReveal ? 'eye' : 'eye-with-line'}
-      type="entypo"
       size={15}
       color="#bbb"
     />
