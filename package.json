@@ -17,7 +17,7 @@
     "natural-sort": "^1.0.0",
     "react": "16.9.0",
     "react-dom": "16.9.0",
-    "react-native": "^0.62.2",
+    "react-native": "0.61.4",
     "react-native-elements": "^1.2.7",
     "react-native-gesture-handler": "~1.6.0",
     "react-native-reanimated": "~1.7.0",
