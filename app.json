@@ -14,7 +14,7 @@
     ],
     "ios": {
       "bundleIdentifier": "com.gabalafou.mobilepasshash",
-      "buildNumber": "1.0.0"
+      "buildNumber": "1.0.1"
     },
     "android": {
       "package": "com.gabalafou.mobilepasshash",
