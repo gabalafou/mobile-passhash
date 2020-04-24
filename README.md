@@ -8,14 +8,14 @@ Simple, effective password security... on your phone!
 This app **is still in beta**, and not yet available in either the Google or Apple app stores.
 My ultimate goal is to distribute this app on the app stores.
 
-### Android
+### Install on Android
 
 1. Install [Expo](https://play.google.com/store/apps/details?id=host.exp.exponent&referrer=www) from the Google app store.
 2. Go to [https://expo.io/@gabalafou/mobile-passhash](https://expo.io/@gabalafou/mobile-passhash).
 3. Scan the QR code on that page with the Expo app.
 4. The app should load inside Expo.
 
-### iOS
+### Install on iOS
 
 1. Download Apple [TestFlight](https://apps.apple.com/us/app/testflight/id899247664) from the App Store.
 2. Open this link on your phone: https://testflight.apple.com/join/CECgG47B
