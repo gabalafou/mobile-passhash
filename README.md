@@ -1,11 +1,11 @@
-# Mobile Passhash
+# Mobile Passhash (Beta)
 
 Simple, effective password security... on your phone!
 
 
-## Install
+## Install Beta
 
-This app is still in beta, and not yet available in either the Google or Apple app stores.
+This app **is still in beta**, and not yet available in either the Google or Apple app stores.
 My ultimate goal is to distribute these apps on the app stores.
 
 ### Android
@@ -17,8 +17,8 @@ My ultimate goal is to distribute these apps on the app stores.
 
 ### iOS
 
-For iOS, I'm still working on getting a version up for Apple Test Flight.
-
+1. Download Apple TestFlight from the App Store.
+2. Open this link on your phone: https://testflight.apple.com/join/CECgG47B.
 
 ## Screen shots
 
