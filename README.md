@@ -6,7 +6,7 @@ Simple, effective password security... on your phone!
 ## Install Beta
 
 This app **is still in beta**, and not yet available in either the Google or Apple app stores.
-My ultimate goal is to distribute these apps on the app stores.
+My ultimate goal is to distribute this app on the app stores.
 
 ### Android
 
