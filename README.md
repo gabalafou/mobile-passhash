@@ -18,7 +18,7 @@ My ultimate goal is to distribute this app on the app stores.
 ### iOS
 
 1. Download Apple TestFlight from the App Store.
-2. Open this link on your phone: https://testflight.apple.com/join/CECgG47B.
+2. Open this link on your phone: https://testflight.apple.com/join/CECgG47B
 
 ## Screen shots
 
