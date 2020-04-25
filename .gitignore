@@ -65,3 +65,7 @@ buck-out/
 *.orig.*
 web-build/
 web-report/
+
+# React Native ?
+android/
+ios/
