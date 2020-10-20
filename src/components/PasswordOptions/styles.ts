@@ -2,6 +2,8 @@ import { StyleSheet, ViewStyle } from 'react-native';
 import { gutterWidth } from '../../styles';
 
 
+export const pickerItemColor = '#000';
+
 const rowStyles: ViewStyle = {
   flex: 1,
   flexDirection: 'row',
@@ -27,7 +29,6 @@ export default StyleSheet.create({
   },
   valueText: {
     fontSize: 18,
-    color: '#999',
   },
   section: {
     marginVertical: 20,
@@ -51,12 +52,15 @@ export default StyleSheet.create({
     paddingLeft: 50,
     paddingRight: 20,
     paddingVertical: 10,
-    right: -20,
   },
-  pickerContainer: {
+  iosPicker: {
+    color: pickerItemColor,
     backgroundColor: '#dde',
   },
   androidPicker: {
-    width: 84,
-  },
+    color: pickerItemColor,
+    // This width allows Android picker to display eg "555" and "999"
+    // without ellipsis, ie NOT "55..." or "99..."
+    width: 92,
+  }
 });
