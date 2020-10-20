@@ -45,7 +45,7 @@ export default function App() {
 
   // Load options for current site tag
   React.useEffect(() => {
-    loadOptions(siteTag, siteTagList, setOptions);
+    loadOptions(siteTag, siteTagList, options, setOptions);
   }, [siteTag]);
 
   // When the user has entered a site tag and master password, we
@@ -158,7 +158,10 @@ export default function App() {
         </Text>
         <PasswordOptions
           options={options}
-          onChangeOptions={setOptions}
+          onChangeOptions={options => {
+            setOptions(options);
+            saveOptions(options, siteTag, siteTagList, setSiteTagList);
+          }}
           setBottomOverlayChildren={setBottomOverlayChildren}
         />
 
@@ -185,14 +188,21 @@ function loadSiteTags(setSiteTagList) {
   });
 }
 
-function loadOptions(siteTag, siteTagList, setOptions) {
+function loadOptions(siteTag, siteTagList, options, setOptions) {
   if (!siteTag || !siteTagList.length || !siteTagList.includes(siteTag)) {
-    return;
+    // For new site tags, or when clearing site tag, keep password options UI in
+    // whatever state it's in, except for password bumper. In other words,
+    // the password bumper/increment for new site tags should start at 0.
+    const { newPasswordBumper } = defaultPasswordOptions;
+    setOptions({ ...options, newPasswordBumper: 0 })
   }
+
   const optionsPromise = Storage.getItemAsync('options__' + siteTag);
-  optionsPromise.then(options => {
-    if (options) {
-      setOptions(options);
+  optionsPromise.then(storedOptions => {
+    if (storedOptions) {
+      setOptions({ ...defaultPasswordOptions, ...storedOptions });
+    } else {
+      setOptions({ ...defaultPasswordOptions });
     }
   });
 }
