@@ -1,1 +1,2 @@
-export { default, PasswordOptionsFooter } from './PasswordOptions';
+export * from './PasswordOptions';
+export { default } from './PasswordOptions';

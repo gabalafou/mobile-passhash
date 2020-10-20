@@ -7,10 +7,11 @@ import {
   TouchableWithoutFeedback,
   View,
 } from 'react-native';
-import styles from './styles';
+import styles, { pickerItemColor } from './styles';
 
 
 type Options = {
+  newPasswordBumper: number,
   requireDigit: boolean,
   requirePunctuation: boolean,
   requireMixedCase: boolean,
@@ -22,19 +23,100 @@ type Options = {
 type Props = {
   options: Options,
   onChangeOptions: (options: Options) => void,
-  setFooter: (fn: () => typeof PasswordOptionsFooter) => void,
+  setBottomOverlayChildren: (children: any) => void,
 };
 
 export default function PasswordOptions(props: Props) {
-  const { options, onChangeOptions, setFooter } = props;
+  const { options, onChangeOptions, setBottomOverlayChildren } = props;
+
+  const makeIndexPicker = (value, shouldUpdateOverlayOnChange, extraProps) =>
+    <IndexPicker
+      value={value}
+      onChange={newPasswordBumper => {
+        const nextOptions = { ...options, newPasswordBumper };
+        onChangeOptions(nextOptions);
+        if (shouldUpdateOverlayOnChange) {
+          setBottomOverlayChildren(makeIndexPicker(newPasswordBumper, shouldUpdateOverlayOnChange, extraProps));
+        }
+      }}
+      {...extraProps}
+    />;
+
+  const makeSizePicker = (value, shouldUpdateOverlayOnChange, extraProps) =>
+    <SizePicker
+      value={value}
+      onChange={size => {
+        const nextOptions = { ...options, size };
+        onChangeOptions(nextOptions);
+        if (shouldUpdateOverlayOnChange) {
+          setBottomOverlayChildren(makeSizePicker(size, shouldUpdateOverlayOnChange, extraProps));
+        }
+      }}
+      {...extraProps}
+    />;
+
+
   return (
     <>
+      {/* Generate new password */}
+      <View style={styles.section}>
+        <View style={styles.rowGroup}>
+          <View style={styles.lastRow}>
+            <Text style={styles.text}>Increment for new password</Text>
+            {Platform.OS === 'android' ? (
+              makeIndexPicker(options.newPasswordBumper, false, {
+                style: styles.androidPicker,
+              })
+            ) : (
+              <TouchableWithoutFeedback
+                onPress={() => {
+                  setBottomOverlayChildren(
+                    makeIndexPicker(options.newPasswordBumper, true, {
+                      style: styles.iosPicker
+                    })
+                  );
+                }}
+              >
+                <View style={styles.clickableValue}>
+                  <Text style={styles.valueText}>{options.newPasswordBumper}</Text>
+                </View>
+              </TouchableWithoutFeedback>
+            )}
+          </View>
+        </View>
+      </View>
+
+      {/* Length/Size Option */}
+      <View style={styles.section}>
+        <View style={styles.rowGroup}>
+          <View style={styles.lastRow}>
+            <Text style={styles.text}>Length</Text>
+            {Platform.OS === 'android' ? (
+              makeSizePicker(options.size, false, {
+                style: styles.androidPicker,
+              })
+            ) : (
+              <TouchableWithoutFeedback
+                onPress={() => {
+                  setBottomOverlayChildren(
+                    makeSizePicker(options.size, true, {
+                      style: styles.iosPicker
+                    }));
+                }}
+              >
+                <View style={styles.clickableValue}>
+                  <Text style={styles.valueText}>{options.size}</Text>
+                </View>
+              </TouchableWithoutFeedback>
+            )}
+          </View>
+        </View>
+      </View>
+
       <View style={styles.section}>
         <Text style={styles.sectionLabel}>Requirements</Text>
         <View style={styles.rowGroup}>
-          <View
-            style={styles.row}
-          >
+          <View style={styles.row}>
             <Text style={styles.text}>Digit</Text>
             <Switch
               onValueChange={requireDigit => {
@@ -96,34 +178,6 @@ export default function PasswordOptions(props: Props) {
           </View>
         </View>
       </View>
-
-      <View style={styles.section}>
-        <View style={styles.rowGroup}>
-          <View style={styles.lastRow}>
-            <Text style={styles.text}>Size</Text>
-            {Platform.OS === 'android' ? (
-              <SizePicker
-                value={options.size}
-                onChange={size => {
-                  const nextOptions = { ...options, size };
-                  onChangeOptions(nextOptions);
-                }}
-                style={styles.androidPicker}
-              />
-            ) : (
-              <TouchableWithoutFeedback
-                onPress={() => {
-                  setFooter(() => PasswordOptionsFooter);
-                }}
-              >
-                <View style={styles.clickableValue}>
-                  <Text style={styles.valueText}>{options.size}</Text>
-                </View>
-              </TouchableWithoutFeedback>
-            )}
-          </View>
-        </View>
-      </View>
     </>
   );
 }
@@ -177,24 +231,13 @@ export function updateOptions(options: Options, optionName: string, value: boole
   }
 }
 
-export function PasswordOptionsFooter(props) {
-  const { options, onChangeOptions } = props;
-  return (
-    <View
-      style={styles.pickerContainer}
-    >
-      <SizePicker
-        value={options.size}
-        onChange={size => {
-          const nextOptions = { ...options, size };
-          onChangeOptions(nextOptions);
-        }}
-      />
-    </View>
-  );
+function getPickerItemColor(selectedValue, value) {
+  return Platform.OS === 'android' && selectedValue === value ?
+    '#008275'
+    : pickerItemColor;
 }
 
-function SizePicker(props) {
+export function SizePicker(props) {
   const { value, onChange, ...rest } = props;
   return (
     <Picker
@@ -203,7 +246,39 @@ function SizePicker(props) {
       {...rest}
     >
       {[2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26].map(size =>
-        <Picker.Item key={size} label={String(size)} value={size} />
+        <Picker.Item
+          key={size}
+          label={String(size)}
+          value={size}
+          color={getPickerItemColor(size, value)}
+        />
+      )}
+    </Picker>
+  );
+}
+
+export function IndexPicker(props) {
+  const { value, onChange, ...rest } = props;
+
+  const numItems = value + 400;
+  const items = [];
+  for (let i = 0; i < numItems; i++) {
+    items.push(i);
+  }
+
+  return (
+    <Picker
+      selectedValue={value}
+      onValueChange={onChange}
+      {...rest}
+    >
+      {items.map(item =>
+        <Picker.Item
+          key={item}
+          label={String(item)}
+          value={item}
+          color={getPickerItemColor(item, value)}
+        />
       )}
     </Picker>
   );

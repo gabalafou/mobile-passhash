@@ -5,12 +5,13 @@ import {
   StatusBar,
   ScrollView,
   Text,
+  View,
 } from 'react-native';
 import * as fuzzy from 'fuzzy';
 import naturalSort from 'natural-sort';
 import GeneratedPassword from './components/GeneratedPassword';
 import MasterPassword from './components/MasterPassword';
-import PasswordOptions, { PasswordOptionsFooter } from './components/PasswordOptions';
+import PasswordOptions, { IndexPicker, SizePicker } from './components/PasswordOptions';
 import SearchView from './components/SearchView';
 import SiteTag from './components/SiteTag';
 import PassHashCommon from './lib/wijjo/passhash-common';
@@ -25,6 +26,7 @@ export const defaultPasswordOptions = Object.freeze({
   noSpecial: false,
   digitsOnly: false,
   size: 16,
+  newPasswordBumper: 0,
 });
 
 export default function App() {
@@ -33,7 +35,7 @@ export default function App() {
   const [masterPassword, setMasterPassword] = React.useState('');
   const [options, setOptions] = React.useState(defaultPasswordOptions);
   const [ModalComponent, setModal] = React.useState(null);
-  const [FooterComponent, setFooter] = React.useState(null);
+  const [bottomOverlayChildren, setBottomOverlayChildren] = React.useState(null);
 
   // Load all site tags from storage
   React.useEffect(
@@ -43,14 +45,14 @@ export default function App() {
 
   // Load options for current site tag
   React.useEffect(() => {
-    loadOptions(siteTag, siteTagList, setOptions);
+    loadOptions(siteTag, siteTagList, options, setOptions);
   }, [siteTag]);
 
   // When the user has entered a site tag and master password, we
   // use the hashing function to generate a password.
   const generatedPassword = React.useMemo(
     () => siteTag && masterPassword && PassHashCommon.generateHashWord(
-      siteTag,
+      options.newPasswordBumper ? `${siteTag}:${options.newPasswordBumper}` : siteTag,
       masterPassword,
       options.size,
       options.requireDigit,
@@ -76,7 +78,8 @@ export default function App() {
   // in the footer. We scroll to the bottom so that the size option
   // appears directly above the Picker.
   React.useEffect(() => {
-    if (FooterComponent && scrollView.current) {
+    if (bottomOverlayChildren && scrollView.current) {
+      // TODO: make this smoother, less jarring
       scrollView.current.scrollToEnd({animated: false});
     }
   });
@@ -91,11 +94,22 @@ export default function App() {
         transparent={false}
         visible={Boolean(ModalComponent)}
       >
-        {ModalComponent &&
-          <ModalComponent
-            {...getModalProps(ModalComponent, {
-              siteTag, siteTagMatches, setSiteTag, setModal, masterPasswordInput
-            })}
+        {ModalComponent === SearchView &&
+          <SearchView
+            query={siteTag}
+            onChangeQuery={setSiteTag}
+            results={siteTagMatches}
+            onCancel={() => setModal(null)}
+            onSubmit={nextSiteTag => {
+              if (nextSiteTag && nextSiteTag !== siteTag) {
+                setSiteTag(nextSiteTag);
+              }
+              setModal(null);
+              // Focus next input
+              setTimeout(() => {
+                masterPasswordInput.current?.focus();
+              }, 10)
+            }}
           />
         }
       </Modal>
@@ -110,8 +124,8 @@ export default function App() {
         ref={scrollView}
         onTouchEnd={() => {
           // Dismiss footer if user clicks outside of footer
-          if (FooterComponent) {
-            setFooter(null);
+          if (bottomOverlayChildren) {
+            setBottomOverlayChildren(null);
           }
         }}
       >
@@ -144,16 +158,21 @@ export default function App() {
         </Text>
         <PasswordOptions
           options={options}
-          onChangeOptions={setOptions}
-          setFooter={setFooter}
+          onChangeOptions={options => {
+            setOptions(options);
+            saveOptions(options, siteTag, siteTagList, setSiteTagList);
+          }}
+          setBottomOverlayChildren={setBottomOverlayChildren}
         />
+
       </ScrollView>
 
-
-      {FooterComponent &&
-        <FooterComponent
-          {...getFooterProps(FooterComponent, {options, setOptions})}
-        />
+      {bottomOverlayChildren &&
+        <View
+          style={styles.bottomOverlay}
+        >
+          {bottomOverlayChildren}
+        </View>
       }
 
     </SafeAreaView>
@@ -169,14 +188,21 @@ function loadSiteTags(setSiteTagList) {
   });
 }
 
-function loadOptions(siteTag, siteTagList, setOptions) {
+function loadOptions(siteTag, siteTagList, options, setOptions) {
   if (!siteTag || !siteTagList.length || !siteTagList.includes(siteTag)) {
-    return;
+    // For new site tags, or when clearing site tag, keep password options UI in
+    // whatever state it's in, except for password bumper. In other words,
+    // the password bumper/increment for new site tags should start at 0.
+    const { newPasswordBumper } = defaultPasswordOptions;
+    setOptions({ ...options, newPasswordBumper: 0 })
   }
+
   const optionsPromise = Storage.getItemAsync('options__' + siteTag);
-  optionsPromise.then(options => {
-    if (options) {
-      setOptions(options);
+  optionsPromise.then(storedOptions => {
+    if (storedOptions) {
+      setOptions({ ...defaultPasswordOptions, ...storedOptions });
+    } else {
+      setOptions({ ...defaultPasswordOptions });
     }
   });
 }
@@ -196,44 +222,4 @@ function saveOptions(options, siteTag, siteTagList, setSiteTagList) {
     setSiteTagList(nextSiteTagList);
     Storage.setItemAsync('siteTagList', nextSiteTagList);
   }
-}
-
-function getModalProps(ModalComponent, {
-  siteTag, siteTagMatches, setSiteTag, setModal, masterPasswordInput,
-}) {
-  let modalProps = {};
-  switch (ModalComponent) {
-    case SearchView: {
-      modalProps = {
-        query: siteTag,
-        onChangeQuery: setSiteTag,
-        results: siteTagMatches,
-        onCancel: () => setModal(null),
-        onSubmit: nextSiteTag => {
-          if (nextSiteTag && nextSiteTag !== siteTag) {
-            setSiteTag(nextSiteTag);
-          }
-          setModal(null);
-          // Focus next input
-          setTimeout(() => {
-            masterPasswordInput.current?.focus();
-          }, 10)
-        }
-      }
-      break;
-    }
-  }
-  return modalProps;
-}
-
-function getFooterProps(FooterComponent, {
-  options, setOptions,
-}) {
-  let footerProps = {};
-  switch (FooterComponent) {
-    case PasswordOptionsFooter:
-      footerProps = { options, onChangeOptions: setOptions };
-      break;
-  }
-  return footerProps;
 }
