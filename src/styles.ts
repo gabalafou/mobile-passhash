@@ -23,7 +23,7 @@ export default StyleSheet.create({
   generatedPasswordLabel: {
     marginLeft: 14,
   },
-  passwordOptionsHeader: {
+  header: {
     fontSize: 28,
     marginTop: 44,
     marginBottom: 10,

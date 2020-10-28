@@ -5,6 +5,7 @@ import {
   StatusBar,
   ScrollView,
   Text,
+  TouchableOpacity,
   View,
 } from 'react-native';
 import * as fuzzy from 'fuzzy';
@@ -13,10 +14,12 @@ import GeneratedPassword from './components/GeneratedPassword';
 import MasterPassword from './components/MasterPassword';
 import PasswordOptions from './components/PasswordOptions';
 import SearchView from './components/SearchView';
+import ImportSiteTags from './components/ImportSiteTags';
 import SiteTag from './components/SiteTag';
 import PassHashCommon from './lib/wijjo/passhash-common';
 import * as Storage from './storage';
 import styles from './styles';
+import rowStyles from './components/PasswordOptions/styles';
 
 
 export const defaultPasswordOptions = Object.freeze({
@@ -94,24 +97,13 @@ export default function App() {
         transparent={false}
         visible={Boolean(ModalComponent)}
       >
-        {ModalComponent === SearchView &&
-          <SearchView
-            query={siteTag}
-            onChangeQuery={setSiteTag}
-            results={siteTagMatches}
-            onCancel={() => setModal(null)}
-            onSubmit={nextSiteTag => {
-              if (nextSiteTag && nextSiteTag !== siteTag) {
-                setSiteTag(nextSiteTag);
-              }
-              setModal(null);
-              // Focus next input
-              setTimeout(() => {
-                masterPasswordInput.current?.focus();
-              }, 10)
-            }}
-          />
-        }
+        {renderModalComponent(ModalComponent, {
+          siteTag,
+          setSiteTag,
+          siteTagMatches,
+          setModal,
+          masterPasswordInput
+        })}
       </Modal>
 
       <ScrollView
@@ -153,7 +145,7 @@ export default function App() {
         <Text style={styles.generatedPasswordLabel}>Generated password: tap to copy</Text>
 
 
-        <Text style={styles.passwordOptionsHeader}>
+        <Text style={styles.header}>
           Password Options
         </Text>
         <PasswordOptions
@@ -164,6 +156,23 @@ export default function App() {
           }}
           setBottomOverlayChildren={setBottomOverlayChildren}
         />
+
+        <Text style={styles.header}>
+          Import Site Tags
+        </Text>
+        <View style={rowStyles.section}>
+          <View style={rowStyles.rowGroup}>
+            <View style={rowStyles.lastRow}>
+              <TouchableOpacity
+                onPress={() => {
+                  setModal(() => ImportSiteTags);
+                }}
+              >
+                <Text style={rowStyles.text}>Import Site Tags...</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
 
       </ScrollView>
 
@@ -221,5 +230,46 @@ function saveOptions(options, siteTag, siteTagList, setSiteTagList) {
     const nextSiteTagList = [...siteTagList, siteTag];
     setSiteTagList(nextSiteTagList);
     Storage.setItemAsync('siteTagList', nextSiteTagList);
+  }
+}
+
+function renderModalComponent(ModalComponent, props) {
+  const {
+    siteTag,
+    setSiteTag,
+    siteTagMatches,
+    setModal,
+    masterPasswordInput,
+  } = props;
+
+  switch (ModalComponent) {
+    case SearchView:
+      return (
+        <SearchView
+          query={siteTag}
+          onChangeQuery={setSiteTag}
+          results={siteTagMatches}
+          onCancel={() => setModal(null)}
+          onSubmit={nextSiteTag => {
+            if (nextSiteTag && nextSiteTag !== siteTag) {
+              setSiteTag(nextSiteTag);
+            }
+            setModal(null);
+            // Focus next input
+            setTimeout(() => {
+              masterPasswordInput.current?.focus();
+            }, 10)
+          }}
+        />
+      );
+    case ImportSiteTags:
+      return (
+        <ImportSiteTags
+          onCancel={() => setModal(null)}
+          onSubmit={() => {
+            // set and save site tags
+          }}
+        />
+      );
   }
 }
