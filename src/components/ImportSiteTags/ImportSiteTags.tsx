@@ -14,10 +14,10 @@ export default function ImportSiteTags(props) {
     onSubmit,
   } = props;
 
-  const [siteTags, setSiteTags] = React.useState();
+  const [siteTagOptions, setSiteTagOptions] = React.useState({});
   const [error, setError] = React.useState();
 
-  const numSiteTags = siteTags ? Object.keys(siteTags).length : 0;
+  const numSiteTags = siteTagOptions ? Object.keys(siteTagOptions).length : 0;
 
   return (
     <SafeAreaView>
@@ -38,8 +38,13 @@ export default function ImportSiteTags(props) {
           multiline={true}
           numberOfLines={4}
           textAlignVertical="top"
-          onChangeText={(text) => {
-            // const [errors, siteTags] = parse(text);
+          onChangeText={value => {
+            try {
+              const siteTagOptions = parseSiteTagsAndOptions(value);
+              setSiteTagOptions(siteTagOptions);
+            } catch (err) {
+              // TODO: handle error
+            }
 
             // if (siteTags) {
             //   setSiteTags(siteTags);
@@ -57,10 +62,24 @@ export default function ImportSiteTags(props) {
         {numSiteTags > 0 &&
           <Button
             title={`Import ${numSiteTags} site ${numSiteTags === 1 ? 'tag' : 'tags'}`}
-            onPress={() => onSubmit(siteTags)}
+            onPress={() => onSubmit(siteTagOptions)}
           />
         }
       </View>
     </SafeAreaView>
   );
+}
+
+// <option value="dpmr8">americanexpress.com</option>
+const exportedSiteTagRe = /<option value="(\w+)">(.+)?<\/option>/gi;
+
+// Todo: handle errors
+function parseSiteTagsAndOptions(string) {
+  let siteTagOptions = {};
+  let matches;
+  while (matches = exportedSiteTagRe.exec(string)) {
+    const [_, options, siteTag] = matches;
+    siteTagOptions[siteTag] = options;
+  }
+  return siteTagOptions;
 }
