@@ -100,9 +100,12 @@ export default function App() {
         {renderModalComponent(ModalComponent, {
           siteTag,
           setSiteTag,
+          siteTagList,
+          setSiteTagList,
           siteTagMatches,
           setModal,
-          masterPasswordInput
+          masterPasswordInput,
+          scrollView,
         })}
       </Modal>
 
@@ -237,9 +240,12 @@ function renderModalComponent(ModalComponent, props) {
   const {
     siteTag,
     setSiteTag,
+    siteTagList,
+    setSiteTagList,
     siteTagMatches,
     setModal,
     masterPasswordInput,
+    scrollView,
   } = props;
 
   switch (ModalComponent) {
@@ -265,9 +271,16 @@ function renderModalComponent(ModalComponent, props) {
     case ImportSiteTags:
       return (
         <ImportSiteTags
+          siteTagList={siteTagList}
           onCancel={() => setModal(null)}
-          onSubmit={() => {
-            // set and save site tags
+          onSubmit={siteTagOptions => {
+            Object.keys(siteTagOptions).forEach(siteTag => {
+              saveOptions(siteTagOptions[siteTag], siteTag, siteTagList, setSiteTagList);
+            });
+            setModal(null);
+            if (scrollView.current) {
+              scrollView.current.scrollTo({y: 0});
+            }
           }}
         />
       );
