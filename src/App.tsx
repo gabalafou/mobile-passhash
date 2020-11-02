@@ -17,20 +17,11 @@ import SearchView from './components/SearchView';
 import ImportSiteTags from './components/ImportSiteTags';
 import SiteTag from './components/SiteTag';
 import PassHashCommon from './lib/wijjo/passhash-common';
+import defaultPasswordOptions from './default-password-options';
 import * as Storage from './storage';
 import styles from './styles';
 import rowStyles from './components/PasswordOptions/styles';
 
-
-export const defaultPasswordOptions = Object.freeze({
-  requireDigit: true,
-  requirePunctuation: true,
-  requireMixedCase: true,
-  noSpecial: false,
-  digitsOnly: false,
-  size: 16,
-  newPasswordBumper: 0,
-});
 
 export default function App() {
   const [siteTagList, setSiteTagList] = React.useState([]);

@@ -1,6 +1,6 @@
 import { updateOptions } from '../PasswordOptions';
 import type { Options } from '../PasswordOptions';
-import { defaultPasswordOptions } from '../../App';
+import defaultPasswordOptions from '../../default-password-options';
 
 
 // Exported site tags look like this in the source code of the
@@ -8,7 +8,7 @@ import { defaultPasswordOptions } from '../../App';
 //     <option value="dpmr8">example.com</option>
 // The site tag appears between the `option` tags (example.com),
 // and the password options are encoded in the `value` attribute (dpmr8).
-const exportedSiteTagRe = /<option value="(\w+)">(.+)?<\/option>/gi;
+const exportedSiteTagRe = /<option value=["“]([dpmrg0-9]+)["”]>(.+?)<\/option>/gi;
 
 function parseSiteTagsAndOptions(string) {
   const siteTagOptions = {};
@@ -19,8 +19,13 @@ function parseSiteTagsAndOptions(string) {
 
   let matches;
   while (matches = exportedSiteTagRe.exec(string)) {
-    const options = parseOptions(matches[1]);
-    let siteTag = matches[2];
+    let options, siteTag;
+    try {
+      options = parseOptions(matches[1]);
+      siteTag = matches[2];
+    } catch (err) {
+      continue;
+    }
 
     const bumperMatch = siteTag.match(/:(\d+)$/);
     if (bumperMatch) {
@@ -80,7 +85,11 @@ function parseSiteTagsAndOptions(string) {
 }
 
 function parseOptions(string: string): Options {
-  let options: Options = { ...defaultPasswordOptions };
+  let options: Options = {
+    ...defaultPasswordOptions,
+    // the old default password size was 8
+    size: 8,
+  };
 
   // Use updateOptions() function to ensure that resulting
   // options object is self-consistent, e.g., if `digitsOnly`

@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 
 
 export const borderColor = 'rgb(200, 200, 200)';
@@ -20,5 +20,19 @@ export default StyleSheet.create({
     borderTopWidth: 1,
     borderBottomColor: borderColor,
     borderBottomWidth: 1,
+  },
+  errorMessage: {
+    color: 'red',
+    marginBottom: 28,
+  },
+  zeroSiteTagsMessage: {
+    marginBottom: 28,
+  },
+  codeBlock: {
+    fontFamily: Platform.OS === 'ios' ? 'Courier New' : 'serif',
+    fontSize: 12,
+    backgroundColor: '#eee',
+    marginVertical: 10,
+    padding: 10,
   },
 });
