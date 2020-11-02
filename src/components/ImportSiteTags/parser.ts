@@ -109,8 +109,6 @@ function parseOptions(string: string): Options {
   return options;
 }
 
-// const module =
-
 export default {
   parseSiteTagsAndOptions,
   parseOptions,
