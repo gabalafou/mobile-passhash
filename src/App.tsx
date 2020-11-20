@@ -162,7 +162,7 @@ export default function App() {
                   setModal(() => ImportSiteTags);
                 }}
               >
-                <Text style={rowStyles.text}>Import Site Tags...</Text>
+                <Text style={rowStyles.text}>Import site tags...</Text>
               </TouchableOpacity>
             </View>
           </View>

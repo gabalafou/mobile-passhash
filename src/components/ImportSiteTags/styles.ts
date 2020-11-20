@@ -29,7 +29,7 @@ export default StyleSheet.create({
     marginBottom: 28,
   },
   codeBlock: {
-    fontFamily: Platform.OS === 'ios' ? 'Courier New' : 'serif',
+    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
     fontSize: 12,
     backgroundColor: '#eee',
     marginVertical: 10,
