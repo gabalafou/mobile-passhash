@@ -4,6 +4,23 @@ import { Animated, StyleSheet, Text, View, I18nManager } from 'react-native';
 import { RectButton, Swipeable } from 'react-native-gesture-handler';
 
 export default class AppleStyleSwipeableRow extends Component {
+  renderLeftActions = (progress, dragX) => {
+    const trans = dragX.interpolate({
+      inputRange: [0, 50, 100, 101],
+      outputRange: [-20, 0, 0, 1],
+    });
+    return (
+      <RectButton style={styles.leftAction} onPress={this.close}>
+        <Animated.Text
+          style={[
+            styles.actionText
+          ]}
+        >
+          Archive
+        </Animated.Text>
+      </RectButton>
+    );
+  };
   renderRightAction = (text, color, x, progress) => {
     const trans = progress.interpolate({
       inputRange: [0, 1],
@@ -42,6 +59,7 @@ export default class AppleStyleSwipeableRow extends Component {
         friction={2}
         leftThreshold={30}
         rightThreshold={40}
+        renderLeftActions={this.renderLeftActions}
         renderRightActions={this.renderRightActions}>
         {children}
       </Swipeable>

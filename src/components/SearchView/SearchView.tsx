@@ -3,6 +3,7 @@ import {
   Dimensions,
   FlatList,
   Platform,
+  StyleSheet,
   Text,
   TouchableHighlight,
   View,
@@ -47,7 +48,7 @@ export default function SearchView(props: Props) {
   const resultListRef: React.RefObject<FlatList<string>> = React.createRef();
   React.useEffect(() => {
     if (resultListRef.current) {
-      resultListRef.current.scrollToOffset({offset: 0});
+      resultListRef.current.scrollToOffset({ offset: 0 });
     }
   }, [query]);
 
@@ -83,35 +84,36 @@ export default function SearchView(props: Props) {
         onSubmitEditing={() => onSubmit(query)}
         platform={Platform.OS === 'ios' ? 'ios' : 'android'}
       />
-
-      <View
-        style={[styles.resultListContainer, {
-          paddingBottom: Platform.OS === 'ios' ? keyboardHeight : 0
-        }]}
-        onLayout={event => {
-          setResultListTopY(event.nativeEvent.layout.y);
-        }}
-      >
-        <FlatList
-          style={styles.resultList}
-          data={paddedResults}
-          getItemLayout={(_, index) => ({
-            index, length: resultItemHeight, offset: resultItemHeight * index,
-          })}
-          keyboardShouldPersistTaps="always"
-          keyExtractor={(item, index) => item || String(index)}
-          ref={resultListRef}
-          renderItem={({ item }) =>
-            //<DeletableRow>
+        <View
+          style={[styles.resultListContainer, {
+            paddingBottom: Platform.OS === 'ios' ? keyboardHeight : 0,
+          }]}
+          onLayout={event => {
+            setResultListTopY(event.nativeEvent.layout.y);
+          }}
+        >
+          <FlatList
+            style={styles.resultList}
+            data={paddedResults}
+            getItemLayout={(_, index) => ({
+              index,
+              length: resultItemHeight,
+              offset: (resultItemHeight + 1) * index,
+            })}
+            keyboardShouldPersistTaps="always"
+            keyExtractor={(item, index) => item || String(index)}
+            ref={resultListRef}
+            ItemSeparatorComponent={() => <View style={styles.separator} />}
+            renderItem={({ item }) =>
               <Item item={item} onSubmit={onSubmit} />
-            //</DeletableRow>
-          }
-        />
-      </View>
+            }
+          />
+        </View>
     </View>
   );
 };
 
+// export default React.memo(SearchView);
 
 type ItemProps = {
   item: string,
@@ -120,7 +122,16 @@ type ItemProps = {
 class Item extends React.PureComponent<ItemProps> {
   render() {
     const { item, onSubmit } = this.props;
-    return (
+    return item !== '' ? (
+      <DeletableRow>
+        <RectButton
+          onPress={() => onSubmit(item)}
+          style={styles.resultItem}
+        >
+          <Text style={styles.resultItemText}>{item}</Text>
+        </RectButton>
+      </DeletableRow>
+    ) : (
       // For blank lines
       <View style={styles.resultItem} />
     );
