@@ -25,7 +25,7 @@ export default StyleSheet.create({
   resultItem: {
     borderStyle: 'solid',
     borderColor: '#ccc',
-    borderTopWidth: 1,
+    borderStartWidth: 1,
     height: resultItemHeight,
     justifyContent: 'center',
     padding: gutterWidth,

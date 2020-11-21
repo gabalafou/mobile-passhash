@@ -11,7 +11,14 @@ import { SearchBar } from 'react-native-elements';
 import Constants from 'expo-constants';
 import useKeyboardHeight from '../../use-keyboard-height';
 import styles, { resultItemHeight } from './styles';
+import GmailStyleSwipeableRow from './GmailStyleSwipeableRow';
+import AppleStyleSwipeableRow from './AppleStyleSwipeableRow';
+import { RectButton } from 'react-native-gesture-handler';
 
+
+const DeletableRow = Platform.OS === 'android' ?
+  GmailStyleSwipeableRow :
+  AppleStyleSwipeableRow;
 
 type Props = {
   query: string,
@@ -95,7 +102,9 @@ export default function SearchView(props: Props) {
           keyExtractor={(item, index) => item || String(index)}
           ref={resultListRef}
           renderItem={({ item }) =>
-            <Item item={item} onSubmit={onSubmit} />
+            //<DeletableRow>
+              <Item item={item} onSubmit={onSubmit} />
+            //</DeletableRow>
           }
         />
       </View>
@@ -111,15 +120,7 @@ type ItemProps = {
 class Item extends React.PureComponent<ItemProps> {
   render() {
     const { item, onSubmit } = this.props;
-    return item !== '' ? (
-      <TouchableHighlight
-        onPress={() => onSubmit(item)}
-        style={styles.resultItem}
-        underlayColor="#ccc"
-      >
-        <Text style={styles.resultItemText}>{item}</Text>
-      </TouchableHighlight>
-    ) : (
+    return (
       // For blank lines
       <View style={styles.resultItem} />
     );
