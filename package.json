@@ -8,6 +8,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@react-native-picker/picker": "^1.9.2",
     "expo": "^39.0.0",
     "expo-secure-store": "~9.2.0",
     "fuzzy": "^0.1.3",

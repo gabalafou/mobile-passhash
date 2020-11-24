@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { Platform, StyleSheet } from 'react-native';
 import { gutterWidth } from '../../styles';
 
 
@@ -24,6 +24,7 @@ export default StyleSheet.create({
     paddingRight: 5,
   },
   buttonTitleStyle: {
-    color: '#666'
+    color: '#666',
+    fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
   }
 });

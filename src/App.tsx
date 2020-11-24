@@ -11,7 +11,7 @@ import * as fuzzy from 'fuzzy';
 import naturalSort from 'natural-sort';
 import GeneratedPassword from './components/GeneratedPassword';
 import MasterPassword from './components/MasterPassword';
-import PasswordOptions, { IndexPicker, SizePicker } from './components/PasswordOptions';
+import PasswordOptions from './components/PasswordOptions';
 import SearchView from './components/SearchView';
 import SiteTag from './components/SiteTag';
 import PassHashCommon from './lib/wijjo/passhash-common';
