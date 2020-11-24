@@ -1,12 +1,12 @@
 import React from 'react';
 import {
-  Picker,
   Platform,
+  Pressable,
   Switch,
   Text,
-  TouchableWithoutFeedback,
   View,
 } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 import styles, { pickerItemColor } from './styles';
 
 
@@ -68,7 +68,7 @@ export default function PasswordOptions(props: Props) {
                 style: styles.androidPicker,
               })
             ) : (
-              <TouchableWithoutFeedback
+              <Pressable
                 onPress={() => {
                   setBottomOverlayChildren(
                     makeIndexPicker(options.newPasswordBumper, true, {
@@ -80,7 +80,7 @@ export default function PasswordOptions(props: Props) {
                 <View style={styles.clickableValue}>
                   <Text style={styles.valueText}>{options.newPasswordBumper}</Text>
                 </View>
-              </TouchableWithoutFeedback>
+              </Pressable>
             )}
           </View>
         </View>
@@ -96,7 +96,7 @@ export default function PasswordOptions(props: Props) {
                 style: styles.androidPicker,
               })
             ) : (
-              <TouchableWithoutFeedback
+              <Pressable
                 onPress={() => {
                   setBottomOverlayChildren(
                     makeSizePicker(options.size, true, {
@@ -107,7 +107,7 @@ export default function PasswordOptions(props: Props) {
                 <View style={styles.clickableValue}>
                   <Text style={styles.valueText}>{options.size}</Text>
                 </View>
-              </TouchableWithoutFeedback>
+              </Pressable>
             )}
           </View>
         </View>

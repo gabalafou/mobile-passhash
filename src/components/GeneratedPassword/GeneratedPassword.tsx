@@ -1,6 +1,6 @@
 import React from 'react';
 import { Clipboard, View } from 'react-native';
-import { Button, Icon } from 'react-native-elements';
+import { Button } from 'react-native-elements';
 import RevealPasswordIcon from '../RevealPasswordIcon';
 import styles from './styles';
 
