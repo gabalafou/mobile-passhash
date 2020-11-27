@@ -134,7 +134,10 @@ export default function App() {
         <GeneratedPassword
           password={generatedPassword}
           masterPassword={masterPassword}
-          onClick={() => saveOptions(options, siteTag, siteTagList, setSiteTagList)}
+          onClick={() => {
+            saveOptions(options, siteTag);
+            saveNewSiteTagsToList([siteTag], siteTagList, setSiteTagList);
+          }}
         />
         <Text style={styles.generatedPasswordLabel}>Generated password: tap to copy</Text>
 
@@ -146,7 +149,8 @@ export default function App() {
           options={options}
           onChangeOptions={options => {
             setOptions(options);
-            saveOptions(options, siteTag, siteTagList, setSiteTagList);
+            saveOptions(options, siteTag);
+            saveNewSiteTagsToList([siteTag], siteTagList, setSiteTagList);
           }}
           setBottomOverlayChildren={setBottomOverlayChildren}
         />
@@ -197,7 +201,7 @@ function loadOptions(siteTag, siteTagList, options, setOptions) {
     // whatever state it's in, except for password bumper. In other words,
     // the password bumper/increment for new site tags should start at 0.
     const { newPasswordBumper } = defaultPasswordOptions;
-    setOptions({ ...options, newPasswordBumper: 0 })
+    setOptions({ ...options, newPasswordBumper })
   }
 
   const optionsPromise = Storage.getItemAsync('options__' + siteTag);
@@ -211,21 +215,25 @@ function loadOptions(siteTag, siteTagList, options, setOptions) {
 }
 
 // Save options for site tag and save site tag to list if not already saved
-function saveOptions(options, siteTag, siteTagList, setSiteTagList) {
+function saveOptions(options, siteTag) {
   if (!siteTag) {
     return;
   }
 
   // Save options for site tag
   Storage.setItemAsync('options__' + siteTag, options);
+}
 
-  // Save site tag to list if not already saved
-  if (!siteTagList.includes(siteTag)) {
-    const nextSiteTagList = [...siteTagList, siteTag];
+function saveNewSiteTagsToList(siteTags, siteTagList, setSiteTagList) {
+  const newSiteTags = siteTags.filter(siteTag => !siteTagList.includes(siteTag));
+  if (newSiteTags.length) {
+    const nextSiteTagList = [...siteTagList, ...newSiteTags];
     setSiteTagList(nextSiteTagList);
     Storage.setItemAsync('siteTagList', nextSiteTagList);
   }
 }
+
+
 
 function renderModalComponent(ModalComponent, props) {
   const {
@@ -265,13 +273,14 @@ function renderModalComponent(ModalComponent, props) {
           siteTagList={siteTagList}
           onCancel={() => setModal(null)}
           onSubmit={siteTagOptions => {
-            Object.keys(siteTagOptions).forEach(siteTag => {
-              saveOptions(siteTagOptions[siteTag], siteTag, siteTagList, setSiteTagList);
+            const siteTags = Object.keys(siteTagOptions);
+            siteTags.forEach(siteTag => {
+              const options = siteTagOptions[siteTag];
+              saveOptions(options, siteTag);
             });
+            saveNewSiteTagsToList(siteTags, siteTagList, setSiteTagList);
             setModal(null);
-            if (scrollView.current) {
-              scrollView.current.scrollTo({y: 0});
-            }
+            scrollView.current?.scrollTo({ y: 0 });
           }}
         />
       );
