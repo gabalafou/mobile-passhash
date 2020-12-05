@@ -11,7 +11,7 @@ type Props = {
   onDelete: () => void,
   onSwipeableOpen: (ref: React.RefObject<Swipeable>) => void,
 };
-export default class AppleStyleSwipeableRow extends Component<Props> {
+export default class DeleteableRow extends Component<Props> {
   _swipeableRow: React.RefObject<Swipeable> = React.createRef();
 
   renderRightAction = progress => {

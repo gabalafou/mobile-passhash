@@ -22,22 +22,12 @@ import SiteTag from './components/SiteTag';
 import PassHashCommon from './lib/wijjo/passhash-common';
 import * as Storage from './storage';
 import styles from './styles';
+import { defaultPasswordOptions } from './constants';
 import { setSiteTagList, setPasswordOptions, removeSiteTag, setSiteTag } from './redux/actions';
 
 
-export const defaultPasswordOptions = Object.freeze({
-  requireDigit: true,
-  requirePunctuation: true,
-  requireMixedCase: true,
-  noSpecial: false,
-  digitsOnly: false,
-  size: 16,
-  newPasswordBumper: 0,
-});
-
 const RootStack = createStackNavigator();
 const MainStack = createStackNavigator();
-
 
 export default function App() {
   return (
@@ -52,6 +42,13 @@ export default function App() {
   );
 }
 
+function MainStackScreen() {
+  return (
+    <MainStack.Navigator headerMode="none">
+      <MainStack.Screen name="Home" component={HomeScreen} />
+    </MainStack.Navigator>
+  );
+}
 
 
 function SearchSiteTags(props) {
@@ -95,13 +92,6 @@ function SearchSiteTags(props) {
   );
 }
 
-function MainStackScreen() {
-  return (
-    <MainStack.Navigator headerMode="none">
-      <MainStack.Screen name="Home" component={HomeScreen} />
-    </MainStack.Navigator>
-  );
-}
 
 function HomeScreen(props) {
   const { navigation } = props;

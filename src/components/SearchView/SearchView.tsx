@@ -13,11 +13,9 @@ import { SearchBar } from 'react-native-elements';
 import Constants from 'expo-constants';
 import useKeyboardHeight from '../../use-keyboard-height';
 import styles, { resultItemHeight } from './styles';
-import AppleStyleSwipeableRow from './AppleStyleSwipeableRow';
+import DeletableRow from './DeletableRow';
 import { RectButton } from 'react-native-gesture-handler';
 
-
-const DeletableRow = AppleStyleSwipeableRow;
 
 type Props = {
   query: string,
