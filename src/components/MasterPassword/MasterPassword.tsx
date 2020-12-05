@@ -62,6 +62,7 @@ function MasterPassword(props: Props, ref) {
           type="clear"
         />
       }
+      renderErrorMessage={false}
     />
   );
 }

@@ -9,8 +9,11 @@ export default StyleSheet.create({
     alignItems: 'center',
     borderBottomWidth: 0,
     borderWidth: 0,
-    marginTop: 2 * gutterWidth,
     paddingHorizontal: gutterWidth,
+  },
+  generatedPasswordLabel: {
+    marginLeft: 14,
+    marginBottom: 1,
   },
   buttonStyle: {
     backgroundColor: '#ccc',
@@ -21,10 +24,13 @@ export default StyleSheet.create({
   },
   buttonContainerStyle: {
     flex: 1,
-    paddingRight: 5,
+    marginRight: 5,
   },
   buttonTitleStyle: {
     color: '#666',
     fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
+  },
+  revealButton: {
+    marginRight: 4,
   }
 });

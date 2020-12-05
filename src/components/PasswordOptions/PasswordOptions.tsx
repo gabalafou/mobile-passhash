@@ -58,10 +58,11 @@ export default function PasswordOptions(props: Props) {
 
   return (
     <>
-      {/* Generate new password */}
       <View style={styles.section}>
         <View style={styles.rowGroup}>
-          <View style={styles.lastRow}>
+
+          {/* Generate new password */}
+          <View style={styles.row}>
             <Text style={styles.text}>Increment for new password</Text>
             {Platform.OS === 'android' ? (
               makeIndexPicker(options.newPasswordBumper, false, {
@@ -83,12 +84,8 @@ export default function PasswordOptions(props: Props) {
               </Pressable>
             )}
           </View>
-        </View>
-      </View>
 
-      {/* Length/Size Option */}
-      <View style={styles.section}>
-        <View style={styles.rowGroup}>
+          {/* Length/size option */}
           <View style={styles.lastRow}>
             <Text style={styles.text}>Length</Text>
             {Platform.OS === 'android' ? (
@@ -96,22 +93,24 @@ export default function PasswordOptions(props: Props) {
                 style: styles.androidPicker,
               })
             ) : (
-              <Pressable
-                onPress={() => {
-                  setBottomOverlayChildren(
-                    makeSizePicker(options.size, true, {
-                      style: styles.iosPicker
-                    }));
-                }}
-              >
-                <View style={styles.clickableValue}>
-                  <Text style={styles.valueText}>{options.size}</Text>
-                </View>
-              </Pressable>
-            )}
+                <Pressable
+                  onPress={() => {
+                    setBottomOverlayChildren(
+                      makeSizePicker(options.size, true, {
+                        style: styles.iosPicker
+                      }));
+                  }}
+                >
+                  <View style={styles.clickableValue}>
+                    <Text style={styles.valueText}>{options.size}</Text>
+                  </View>
+                </Pressable>
+              )}
           </View>
         </View>
       </View>
+
+
 
       <View style={styles.section}>
         <Text style={styles.sectionLabel}>Requirements</Text>

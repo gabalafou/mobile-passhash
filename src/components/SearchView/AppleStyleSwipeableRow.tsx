@@ -1,66 +1,66 @@
 import React, { Component } from 'react';
-import { Animated, StyleSheet, Text, View, I18nManager } from 'react-native';
+import { Animated, StyleSheet, Text, View, I18nManager, Platform } from 'react-native';
 
-import { RectButton, Swipeable } from 'react-native-gesture-handler';
+import { RectButton } from 'react-native-gesture-handler';
+import Swipeable from 'react-native-gesture-handler/Swipeable';
 
-export default class AppleStyleSwipeableRow extends Component {
-  renderLeftActions = (progress, dragX) => {
-    const trans = dragX.interpolate({
-      inputRange: [0, 50, 100, 101],
-      outputRange: [-20, 0, 0, 1],
-    });
-    return (
-      <RectButton style={styles.leftAction} onPress={this.close}>
-        <Animated.Text
-          style={[
-            styles.actionText
-          ]}
-        >
-          Archive
-        </Animated.Text>
-      </RectButton>
-    );
-  };
-  renderRightAction = (text, color, x, progress) => {
+import Icon from 'react-native-vector-icons/MaterialIcons';
+
+
+type Props = {
+  onDelete: () => void,
+  onSwipeableOpen: (ref: React.RefObject<Swipeable>) => void,
+};
+export default class AppleStyleSwipeableRow extends Component<Props> {
+  _swipeableRow: React.RefObject<Swipeable> = React.createRef();
+
+  renderRightAction = progress => {
     const trans = progress.interpolate({
       inputRange: [0, 1],
-      outputRange: [x, 0],
+      outputRange: [64, 0],
     });
-    const pressHandler = () => {
-      this.close();
-      alert(text);
-    };
     return (
-      <Animated.View style={{ flex: 1, transform: [{ translateX: 0 }] }}>
+      <Animated.View style={{ flex: 1, transform: [{ translateX: trans }] }}>
         <RectButton
-          style={[styles.rightAction, { backgroundColor: color }]}
-          onPress={pressHandler}>
-          <Text style={styles.actionText}>{text}</Text>
+          style={styles.deleteAction}
+          onPress={this.handlePress}>
+          {Platform.OS === 'ios' ? (
+            <Text style={styles.actionText}>Delete</Text>
+          ) : (
+            <Icon
+              name="delete-forever"
+              size={30}
+              color="#fff"
+              style={[styles.actionIcon]}
+            />
+          )}
         </RectButton>
       </Animated.View>
     );
   };
   renderRightActions = progress => (
-    <View style={{ width: 64, flexDirection: I18nManager.isRTL? 'row-reverse' : 'row' }}>
-      {this.renderRightAction('Delete', '#dd2c00', 64, progress)}
+    <View
+      style={{
+        width: 64,
+        flexDirection: I18nManager.isRTL ? 'row-reverse' : 'row',
+      }}>
+      {this.renderRightAction(progress)}
     </View>
   );
-  updateRef = ref => {
-    this._swipeableRow = ref;
-  };
-  close = () => {
-    this._swipeableRow.close();
+  handlePress = () => {
+    this.props.onDelete();
+    this._swipeableRow.current?.render();
   };
   render() {
-    const { children } = this.props;
+    const { children, onSwipeableOpen } = this.props;
     return (
       <Swipeable
-        ref={this.updateRef}
+        ref={this._swipeableRow}
         friction={2}
-        leftThreshold={30}
         rightThreshold={40}
-        renderLeftActions={this.renderLeftActions}
-        renderRightActions={this.renderRightActions}>
+        renderRightActions={this.renderRightActions}
+        enableTrackpadTwoFingerGesture={true}
+        onSwipeableOpen={() => onSwipeableOpen(this._swipeableRow)}>
         {children}
       </Swipeable>
     );
@@ -68,20 +68,20 @@ export default class AppleStyleSwipeableRow extends Component {
 }
 
 const styles = StyleSheet.create({
-  leftAction: {
-    flex: 1,
-    backgroundColor: '#497AFC',
-    justifyContent: 'center',
-  },
   actionText: {
     color: 'white',
     fontSize: 16,
     backgroundColor: 'transparent',
     padding: 10,
   },
-  rightAction: {
+  deleteAction: {
     alignItems: 'center',
     flex: 1,
     justifyContent: 'center',
+    backgroundColor: '#dd2c00',
+  },
+  actionIcon: {
+    width: 30,
+    marginHorizontal: 10
   },
 });
