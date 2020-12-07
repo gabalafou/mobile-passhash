@@ -111,7 +111,6 @@ export default function PasswordOptions(props: Props) {
       </View>
 
 
-
       <View style={styles.section}>
         <Text style={styles.sectionLabel}>Requirements</Text>
         <View style={styles.rowGroup}>
