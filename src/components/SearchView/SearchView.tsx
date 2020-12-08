@@ -27,7 +27,7 @@ type Props = {
   onDelete: (siteTag: string) => void,
 };
 
-function SearchView(props: Props) {
+export default function SearchView(props: Props) {
   const {
     query,
     placeholder,
@@ -132,8 +132,6 @@ function SearchView(props: Props) {
     </View>
   );
 };
-
-export default SearchView;
 
 
 type ItemProps = {
