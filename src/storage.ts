@@ -102,3 +102,25 @@ export async function setItemAsync(key: string, value: any): Promise<void[] | vo
     return SecureStore.setItemAsync(safeKey(key), json);
   }
 }
+
+export async function deleteItemAsync(key: string) {
+  const json = await SecureStore.getItemAsync(safeKey(key));
+
+  if (json == null) {
+    return null;
+  }
+
+  const value = JSON.parse(json);
+
+  if (isChunkSignifier(value)) {
+    const numChunks = value[1];
+    return Promise.all([
+      SecureStore.deleteItemAsync(safeKey(key)),
+      ...new Array(numChunks).fill('').map((_, i) =>
+        SecureStore.deleteItemAsync(safeKey(chunkKey(key, i)))
+      ),
+    ]);
+  } else {
+    return SecureStore.deleteItemAsync(safeKey(key));
+  }
+}

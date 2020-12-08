@@ -20,9 +20,6 @@ export default StyleSheet.create({
     fontWeight: 'bold',
     margin: gutterWidth,
   },
-  generatedPasswordLabel: {
-    marginLeft: 14,
-  },
   header: {
     fontSize: 28,
     marginTop: 44,

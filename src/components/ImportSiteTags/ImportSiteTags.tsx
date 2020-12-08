@@ -6,16 +6,38 @@ import {
   View,
 } from 'react-native';
 import { Button } from 'react-native-elements';
+import { shallowEqual, useSelector, useDispatch } from 'react-redux'
+import { getSiteTagList } from '../../redux/selectors';
+import { setSiteTagList } from '../../redux/actions';
 import parser from './parser';
 import styles from './styles';
 
+// TODO: fix this circular import
+import { saveOptions, saveNewSiteTagsToList } from '../../app';
+
 
 export default function ImportSiteTags(props) {
-  const {
-    onCancel,
-    onSubmit,
-    siteTagList,
-  } = props;
+  const { navigation } = props;
+
+  const dispatch = useDispatch();
+  const siteTagList = useSelector(getSiteTagList, shallowEqual);
+
+  const onCancel = () => navigation.goBack();
+
+  const onSubmit = siteTagOptions => {
+    const siteTags = Object.keys(siteTagOptions);
+    siteTags.forEach(siteTag => {
+      const options = siteTagOptions[siteTag];
+      saveOptions(options, siteTag);
+    });
+    saveNewSiteTagsToList(siteTags, siteTagList, setSiteTagList, dispatch);
+    // setModal(null);
+    // scrollView.current?.scrollTo({ y: 0 });
+    navigation.navigate('Home', {
+      // try a param if necessary
+      scrollToTop: true,
+    });
+  };
 
   const [siteTagOptions, setSiteTagOptions] = React.useState({});
   const [error, setError] = React.useState('');

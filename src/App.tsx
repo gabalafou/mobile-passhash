@@ -1,6 +1,7 @@
 import React from 'react';
+import { Provider } from 'react-redux';
+import store from './redux/store';
 import {
-  Modal,
   SafeAreaView,
   StatusBar,
   ScrollView,
@@ -8,6 +9,11 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { shallowEqual, useSelector, useDispatch } from 'react-redux'
+import { getSiteTagList, getSiteTag, getPasswordOptions } from './redux/selectors';
+import { setSiteTagList, setPasswordOptions, removeSiteTag, setSiteTag } from './redux/actions';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 import * as fuzzy from 'fuzzy';
 import naturalSort from 'natural-sort';
 import GeneratedPassword from './components/GeneratedPassword';
@@ -17,29 +23,114 @@ import SearchView from './components/SearchView';
 import ImportSiteTags from './components/ImportSiteTags';
 import SiteTag from './components/SiteTag';
 import PassHashCommon from './lib/wijjo/passhash-common';
-import defaultPasswordOptions from './default-password-options';
+import { defaultPasswordOptions } from './constants';
 import * as Storage from './storage';
 import styles from './styles';
 import rowStyles from './components/PasswordOptions/styles';
 
 
+const RootStack = createStackNavigator();
+const MainStack = createStackNavigator();
+
 export default function App() {
-  const [siteTagList, setSiteTagList] = React.useState([]);
-  const [siteTag, setSiteTag] = React.useState('');
+  return (
+    <Provider store={store}>
+      <NavigationContainer>
+        <RootStack.Navigator mode="modal" headerMode="none">
+          <RootStack.Screen name="Main" component={MainStackScreen} />
+          <RootStack.Screen name="SearchSiteTags" component={SearchSiteTags} />
+          <RootStack.Screen name="ImportSiteTags" component={ImportSiteTags} />
+        </RootStack.Navigator>
+      </NavigationContainer>
+    </Provider>
+  );
+}
+
+function MainStackScreen() {
+  return (
+    <MainStack.Navigator headerMode="none">
+      <MainStack.Screen name="Home" component={HomeScreen} />
+    </MainStack.Navigator>
+  );
+}
+
+
+function SearchSiteTags(props) {
+
+  const { navigation, route } = props;
+  const { siteTag } = route.params;
+
+  const dispatch = useDispatch();
+  const siteTagList = useSelector(getSiteTagList, shallowEqual);
+
+  const [ query, setQuery ] = React.useState(siteTag);
+
+  // Search existing site tags for matches
+  const sortedSiteTagList = React.useMemo(() => [...siteTagList].sort(naturalSort()), [siteTagList]);
+  const siteTagMatches = React.useMemo(
+    () => fuzzy.filter(query, sortedSiteTagList).map(({ string }) => string),
+    [sortedSiteTagList, query]
+  );
+
+  return (
+    <SearchView
+      query={query}
+      onChangeQuery={setQuery}
+      results={siteTagMatches}
+      // Note (gab): I think the SearchView should have the same placeholder
+      // as SiteTag as a way to reenforce the connection between the two
+      // fields in the UI
+      placeholder={SiteTag.placeholder}
+      onCancel={() => navigation.navigate('Home')}
+      onSubmit={siteTag => {
+        dispatch(setSiteTag(siteTag));
+        navigation.navigate('Home');
+      }}
+      onDelete={siteTag => {
+        if (siteTag === query) {
+          setQuery('');
+        }
+        deleteSiteTag(siteTag, siteTagList, dispatch);
+      }}
+    />
+  );
+}
+
+
+function HomeScreen(props) {
+  const { navigation } = props;
+
+  const dispatch = useDispatch();
+
+  const siteTag = useSelector(getSiteTag, shallowEqual);
+  const siteTagList = useSelector(getSiteTagList, shallowEqual);
+  const options = useSelector(getPasswordOptions, shallowEqual);
+
   const [masterPassword, setMasterPassword] = React.useState('');
-  const [options, setOptions] = React.useState(defaultPasswordOptions);
-  const [ModalComponent, setModal] = React.useState(null);
   const [bottomOverlayChildren, setBottomOverlayChildren] = React.useState(null);
+
+  // Refs
+  const scrollView = React.useRef(null);
+  const masterPasswordInput = React.useRef(null);
+
+  React.useEffect(() => {
+    // Whenever site tag changes, focus the next input field (password box)
+    setTimeout(() => {
+      if (siteTag) {
+        masterPasswordInput.current?.focus();
+      }
+    }, 10);
+  }, [siteTag])
 
   // Load all site tags from storage
   React.useEffect(
-    () => loadSiteTags(setSiteTagList),
+    () => loadSiteTags(dispatch),
     [] // Do this only once, when the App mounts
   );
 
   // Load options for current site tag
   React.useEffect(() => {
-    loadOptions(siteTag, siteTagList, options, setOptions);
+    loadOptions(siteTag, siteTagList, options, dispatch);
   }, [siteTag]);
 
   // When the user has entered a site tag and master password, we
@@ -58,15 +149,6 @@ export default function App() {
     [siteTag, masterPassword, options]
   );
 
-  // Search existing site tags for matches
-  const sortedSiteTagList = React.useMemo(() => [...siteTagList].sort(naturalSort()), [siteTagList]);
-  const siteTagMatches = React.useMemo(() =>
-    fuzzy.filter(siteTag, sortedSiteTagList).map(({string}) => string),
-    [sortedSiteTagList, siteTag]
-  );
-
-  const scrollView = React.useRef(null);
-  const masterPasswordInput = React.useRef(null);
 
   // When user clicks "size" option, the Picker component renders
   // in the footer. We scroll to the bottom so that the size option
@@ -82,23 +164,6 @@ export default function App() {
     <SafeAreaView style={styles.container}>
 
       <StatusBar barStyle="dark-content" />
-
-      <Modal
-        animationType="slide"
-        transparent={false}
-        visible={Boolean(ModalComponent)}
-      >
-        {renderModalComponent(ModalComponent, {
-          siteTag,
-          setSiteTag,
-          siteTagList,
-          setSiteTagList,
-          siteTagMatches,
-          setModal,
-          masterPasswordInput,
-          scrollView,
-        })}
-      </Modal>
 
       <ScrollView
         style={styles.scrollView}
@@ -121,7 +186,11 @@ export default function App() {
 
 
         <SiteTag
-          onPress={() => setModal(() => SearchView)}
+          onPress={() => {
+            navigation.navigate('SearchSiteTags', {
+              siteTag,
+            });
+          }}
           value={siteTag}
         />
 
@@ -135,12 +204,10 @@ export default function App() {
           password={generatedPassword}
           masterPassword={masterPassword}
           onClick={() => {
-            saveOptions(options, siteTag);
-            saveNewSiteTagsToList([siteTag], siteTagList, setSiteTagList);
+            saveOptions(options, siteTag, dispatch);
+            saveNewSiteTagsToList([siteTag], siteTagList, setSiteTagList, dispatch);
           }}
         />
-        <Text style={styles.generatedPasswordLabel}>Generated password: tap to copy</Text>
-
 
         <Text style={styles.header}>
           Password Options
@@ -148,9 +215,9 @@ export default function App() {
         <PasswordOptions
           options={options}
           onChangeOptions={options => {
-            setOptions(options);
-            saveOptions(options, siteTag);
-            saveNewSiteTagsToList([siteTag], siteTagList, setSiteTagList);
+            dispatch(setPasswordOptions(options));
+            saveOptions(options, siteTag, dispatch);
+            saveNewSiteTagsToList([siteTag], siteTagList, setSiteTagList, dispatch);
           }}
           setBottomOverlayChildren={setBottomOverlayChildren}
         />
@@ -163,7 +230,7 @@ export default function App() {
             <View style={rowStyles.lastRow}>
               <TouchableOpacity
                 onPress={() => {
-                  setModal(() => ImportSiteTags);
+                  navigation.navigate('ImportSiteTags');
                 }}
               >
                 <Text style={rowStyles.text}>Import site tags...</Text>
@@ -186,36 +253,35 @@ export default function App() {
   );
 }
 
-function loadSiteTags(setSiteTagList) {
+function loadSiteTags(dispatch) {
   const siteTagListPromise = Storage.getItemAsync('siteTagList');
   siteTagListPromise.then(siteTagList => {
     if (siteTagList) {
-      setSiteTagList(siteTagList);
+      dispatch(setSiteTagList(siteTagList));
     }
   });
 }
 
-function loadOptions(siteTag, siteTagList, options, setOptions) {
+function loadOptions(siteTag, siteTagList, options, dispatch) {
   if (!siteTag || !siteTagList.length || !siteTagList.includes(siteTag)) {
     // For new site tags, or when clearing site tag, keep password options UI in
     // whatever state it's in, except for password bumper. In other words,
     // the password bumper/increment for new site tags should start at 0.
     const { newPasswordBumper } = defaultPasswordOptions;
-    setOptions({ ...options, newPasswordBumper })
+    dispatch(setPasswordOptions({ ...options, newPasswordBumper }));
   }
 
   const optionsPromise = Storage.getItemAsync('options__' + siteTag);
   optionsPromise.then(storedOptions => {
     if (storedOptions) {
-      setOptions({ ...defaultPasswordOptions, ...storedOptions });
+      dispatch(setPasswordOptions({ ...defaultPasswordOptions, ...storedOptions }));
     } else {
-      setOptions({ ...defaultPasswordOptions });
+      dispatch(setPasswordOptions({ ...defaultPasswordOptions }));
     }
   });
 }
 
-// Save options for site tag and save site tag to list if not already saved
-function saveOptions(options, siteTag) {
+export function saveOptions(options, siteTag) {
   if (!siteTag) {
     return;
   }
@@ -224,65 +290,31 @@ function saveOptions(options, siteTag) {
   Storage.setItemAsync('options__' + siteTag, options);
 }
 
-function saveNewSiteTagsToList(siteTags, siteTagList, setSiteTagList) {
+export function saveNewSiteTagsToList(siteTags, siteTagList, setSiteTagList, dispatch) {
   const newSiteTags = siteTags.filter(siteTag => !siteTagList.includes(siteTag));
   if (newSiteTags.length) {
     const nextSiteTagList = [...siteTagList, ...newSiteTags];
-    setSiteTagList(nextSiteTagList);
+    dispatch(setSiteTagList(nextSiteTagList));
     Storage.setItemAsync('siteTagList', nextSiteTagList);
   }
 }
 
+function deleteSiteTag(siteTag, siteTagList, dispatch) {
+  if (!siteTag) {
+    return;
+  }
 
+  // Delete options for site tag
+  dispatch(removeSiteTag(siteTag));
+  Storage.deleteItemAsync('options__' + siteTag);
 
-function renderModalComponent(ModalComponent, props) {
-  const {
-    siteTag,
-    setSiteTag,
-    siteTagList,
-    setSiteTagList,
-    siteTagMatches,
-    setModal,
-    masterPasswordInput,
-    scrollView,
-  } = props;
-
-  switch (ModalComponent) {
-    case SearchView:
-      return (
-        <SearchView
-          query={siteTag}
-          onChangeQuery={setSiteTag}
-          results={siteTagMatches}
-          onCancel={() => setModal(null)}
-          onSubmit={nextSiteTag => {
-            if (nextSiteTag && nextSiteTag !== siteTag) {
-              setSiteTag(nextSiteTag);
-            }
-            setModal(null);
-            // Focus next input
-            setTimeout(() => {
-              masterPasswordInput.current?.focus();
-            }, 10)
-          }}
-        />
-      );
-    case ImportSiteTags:
-      return (
-        <ImportSiteTags
-          siteTagList={siteTagList}
-          onCancel={() => setModal(null)}
-          onSubmit={siteTagOptions => {
-            const siteTags = Object.keys(siteTagOptions);
-            siteTags.forEach(siteTag => {
-              const options = siteTagOptions[siteTag];
-              saveOptions(options, siteTag);
-            });
-            saveNewSiteTagsToList(siteTags, siteTagList, setSiteTagList);
-            setModal(null);
-            scrollView.current?.scrollTo({ y: 0 });
-          }}
-        />
-      );
+  // Delete site tag from site tag list
+  const siteTagIndex = siteTagList.indexOf(siteTag);
+  if (siteTagIndex > -1) {
+    const nextSiteTagList = [
+      ...siteTagList.slice(0, siteTagIndex),
+      ...siteTagList.slice(siteTagIndex + 1),
+    ];
+    Storage.setItemAsync('siteTagList', nextSiteTagList);
   }
 }

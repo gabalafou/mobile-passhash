@@ -19,13 +19,15 @@ export default StyleSheet.create({
   resultList: {
     flex: 1,
     backgroundColor: 'white',
-    borderBottomColor: '#ccc',
-    borderBottomWidth: 1,
-  },
-  resultItem: {
-    borderStyle: 'solid',
     borderColor: '#ccc',
     borderTopWidth: 1,
+    borderBottomWidth: 1,
+  },
+  separator: {
+    backgroundColor: '#ccc',
+    height: 1,
+  },
+  resultItem: {
     height: resultItemHeight,
     justifyContent: 'center',
     padding: gutterWidth,
