@@ -2,6 +2,8 @@ import React from 'react';
 import { Platform } from 'react-native';
 import { Input, Button } from 'react-native-elements';
 import RevealPasswordIcon from '../RevealPasswordIcon';
+import useTimedResetState from '../../use-timed-reset-state';
+import { passwordRevealTimeLimit } from '../../constants';
 import styles from './styles';
 
 
@@ -10,9 +12,10 @@ type Props = {
   onChange: (value: string) => void,
 };
 
-function MasterPassword(props: Props, ref) {
+function MasterPassword(props: Props, forwardedRef: React.RefObject<Input>) {
+  const ref = forwardedRef || React.useRef(null);
   const { value, onChange } = props;
-  const [shouldReveal, setShouldReveal] = React.useState(false);
+  const [shouldReveal, setShouldReveal] = useTimedResetState(false, passwordRevealTimeLimit);
 
   const toggleShouldReveal = () => {
     setShouldReveal(!shouldReveal);
@@ -23,7 +26,7 @@ function MasterPassword(props: Props, ref) {
     // for why this hack is needed
     if (Platform.OS === 'android' && ref.current) {
       ref.current.setNativeProps({
-        style: {fontFamily: 'sans-serif'}
+        style: { fontFamily: 'sans-serif' }
       });
     }
   });
@@ -58,7 +61,7 @@ function MasterPassword(props: Props, ref) {
       rightIcon={
         <Button
           icon={<RevealPasswordIcon shouldReveal={shouldReveal} />}
-          onPress={() => toggleShouldReveal()}
+          onPress={toggleShouldReveal}
           type="clear"
         />
       }

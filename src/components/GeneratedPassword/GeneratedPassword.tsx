@@ -1,6 +1,8 @@
 import React from 'react';
 import { Clipboard, View } from 'react-native';
 import { Button } from 'react-native-elements';
+import useTimedResetState from '../../use-timed-reset-state';
+import { passwordRevealTimeLimit } from '../../constants';
 import RevealPasswordIcon from '../RevealPasswordIcon';
 import styles from './styles';
 
@@ -13,7 +15,7 @@ type Props = {
 
 export default function GeneratedPassword(props: Props) {
   const { password, masterPassword, onClick } = props;
-  const [shouldReveal, onChangeShouldReveal] = React.useState(false);
+  const [shouldReveal, onChangeShouldReveal] = useTimedResetState(false, passwordRevealTimeLimit);
 
   const toggleShouldReveal = () => {
     onChangeShouldReveal(!shouldReveal);
@@ -45,7 +47,7 @@ export default function GeneratedPassword(props: Props) {
       />
       <Button
         icon={<RevealPasswordIcon shouldReveal={shouldReveal} />}
-        onPress={() => toggleShouldReveal()}
+        onPress={toggleShouldReveal}
         type="clear"
       />
     </View>
