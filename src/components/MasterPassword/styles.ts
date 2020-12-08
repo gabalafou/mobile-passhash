@@ -5,6 +5,6 @@ import { gutterWidth } from '../../styles';
 export default StyleSheet.create({
   masterPassword: {
     paddingHorizontal: gutterWidth,
-    marginTop: gutterWidth,
+    marginBottom: 3 * gutterWidth,
   },
 });

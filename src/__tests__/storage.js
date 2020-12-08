@@ -7,7 +7,9 @@ import {
   setItemAsync,
   splitIntoChunks,
   stringLimit,
+  deleteItemAsync,
 } from '../storage';
+
 
 jest.mock('expo-secure-store');
 
@@ -95,6 +97,43 @@ describe('storage', () => {
   });
 
 
+  describe('deleteItemAsync', () => {
+
+    beforeEach(() => {
+      SecureStore.deleteItemAsync.mockResolvedValue();
+    });
+
+    afterEach(() => {
+      SecureStore.deleteItemAsync.mockReset();
+    });
+
+    it('should delete multiple entries when data has been chunked', async () => {
+      const key = 'pretend this key points to a chunk signifier';
+      SecureStore.getItemAsync.mockResolvedValueOnce(`[${chunkIdentifier},2]`);
+
+      await deleteItemAsync(key);
+
+      expect(SecureStore.deleteItemAsync).toHaveBeenCalledTimes(3);
+      expect(SecureStore.deleteItemAsync)
+        .toHaveBeenNthCalledWith(1, safeKey(key));
+      expect(SecureStore.deleteItemAsync)
+        .toHaveBeenNthCalledWith(2, safeKey(key + '-' + chunkIdentifier + '[0]'));
+      expect(SecureStore.deleteItemAsync)
+        .toHaveBeenNthCalledWith(3, safeKey(key + '-' + chunkIdentifier + '[1]'));
+    });
+
+    it('should delete single entry when data has not been chunked', async () => {
+      const key = 'pretend this key points to a string value';
+      SecureStore.getItemAsync.mockResolvedValueOnce('"not chunked"');
+
+      await deleteItemAsync(key);
+
+      expect(SecureStore.deleteItemAsync).toHaveBeenCalledTimes(1);
+      expect(SecureStore.deleteItemAsync).toHaveBeenNthCalledWith(1, safeKey(key));
+    });
+  });
+
+
   describe('basic functionality', () => {
 
     beforeEach(() => {
@@ -102,18 +141,27 @@ describe('storage', () => {
       SecureStore.setItemAsync.mockImplementation(
         (key, value) => Promise.resolve(void (mockDataStore[key] = value)));
       SecureStore.getItemAsync.mockImplementation(key => Promise.resolve(mockDataStore[key]));
+      SecureStore.deleteItemAsync.mockImplementation(key => Promise.resolve(delete mockDataStore[key]))
     });
 
-    it('should be able to store and retrive small value', async () => {
+    it('should be able to store, retrieve, and delete small value', async () => {
       const key = 'basic set and get';
       const expectedValue = ['foo', 'bar'];
       expect(await getItemAsync(key)).toBeNull();
+
+      // Store
       await setItemAsync(key, expectedValue);
+
+      // Retrieve
       const value = await getItemAsync(key);
       expect(value).toEqual(expectedValue);
+
+      // Delete
+      await deleteItemAsync(key);
+      expect(await getItemAsync(key)).toBeNull();
     });
 
-    it('should be able to store and retrieve large value', async () => {
+    it('should be able to store, retrieve, and delete large value', async () => {
       const key = 'oversized set and get';
       const siteTagGenerator = function* (base, max) {
         let index = 0;
@@ -123,8 +171,17 @@ describe('storage', () => {
       };
       const siteTagList = Array.from(siteTagGenerator('example.com', 500));
       expect(await getItemAsync(key)).toBeNull();
+
+      // Store
       await setItemAsync(key, siteTagList);
-      expect(await getItemAsync(key)).toEqual(siteTagList);
+
+      // Retrieve
+      const value = await getItemAsync(key);
+      expect(value).toEqual(siteTagList);
+
+      // Delete
+      await deleteItemAsync(key);
+      expect(await getItemAsync(key)).toBeNull();
     });
   });
 });

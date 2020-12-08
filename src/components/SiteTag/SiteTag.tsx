@@ -6,36 +6,33 @@ import styles from './styles';
 
 export default function SiteTag(props) {
   const { value, onPress } = props;
+
   return (
     <View style={styles.container}>
       <TouchableHighlight
         underlayColor="#aaa"
         onPress={onPress}
       >
-        <View
-          // pointerEvents="none" is a workaround to get Touchable and Input to work together:
-          // https://github.com/facebook/react-native/issues/14958#issuecomment-324237317
+        {/*
+          This "input" isn't actually used for input.
+          It just opens search, and then displays the result from search.
+         */}
+        <Input
           pointerEvents="none"
-        >
-          {/*
-                  This "input" isn't actually used for input.
-                  It just opens search, and then displays the result from search.
-                */}
-          <Input
-            placeholder="Site tag"
-            value={value}
-            autoCapitalize="none"
-            autoCompleteType="off"
-            keyboardType="url"
-            textContentType="URL"
-            disabled={true}
-            disabledInputStyle={{
-              opacity: 1,
-            }}
-            containerStyle={styles.inputContainer}
-          />
-        </View>
+          placeholder={SiteTag.placeholder}
+          value={value}
+          disabled={true}
+          disabledInputStyle={{
+            opacity: 1,
+          }}
+          containerStyle={{
+            paddingHorizontal: 0,
+          }}
+          renderErrorMessage={false}
+        />
       </TouchableHighlight>
-    </View >
+    </View>
   );
 }
+
+SiteTag.placeholder = 'Site tag';
