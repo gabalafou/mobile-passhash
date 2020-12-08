@@ -6,7 +6,7 @@ import {
   StatusBar,
   ScrollView,
   Text,
-  TouchableOpacity,
+  TouchableHighlight,
   View,
 } from 'react-native';
 import { shallowEqual, useSelector, useDispatch } from 'react-redux'
@@ -227,15 +227,17 @@ function HomeScreen(props) {
         </Text>
         <View style={rowStyles.section}>
           <View style={rowStyles.rowGroup}>
-            <View style={rowStyles.lastRow}>
-              <TouchableOpacity
-                onPress={() => {
-                  navigation.navigate('ImportSiteTags');
-                }}
-              >
-                <Text style={rowStyles.text}>Import site tags...</Text>
-              </TouchableOpacity>
-            </View>
+            <TouchableHighlight
+              onPress={() => {
+                navigation.navigate('ImportSiteTags');
+              }}
+            >
+              <View style={{flex: 1, backgroundColor: '#fff'}}>
+                <View style={rowStyles.lastRow}>
+                  <Text style={rowStyles.text}>Import site tags...</Text>
+                </View>
+              </View>
+            </TouchableHighlight>
           </View>
         </View>
 

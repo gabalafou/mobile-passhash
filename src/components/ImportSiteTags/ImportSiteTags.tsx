@@ -13,7 +13,7 @@ import parser from './parser';
 import styles from './styles';
 
 // TODO: fix this circular import
-import { saveOptions, saveNewSiteTagsToList } from '../../app';
+import { saveOptions, saveNewSiteTagsToList } from '../../App';
 
 
 export default function ImportSiteTags(props) {
