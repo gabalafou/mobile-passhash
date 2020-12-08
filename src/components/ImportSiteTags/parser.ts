@@ -1,6 +1,6 @@
 import { updateOptions } from '../PasswordOptions';
 import type { Options } from '../PasswordOptions';
-import defaultPasswordOptions from '../../default-password-options';
+import { defaultPasswordOptions } from '../../constants';
 
 
 // Exported site tags look like this in the source code of the
