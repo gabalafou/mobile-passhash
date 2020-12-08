@@ -2,11 +2,11 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import store from './redux/store';
 import {
+  Pressable,
   SafeAreaView,
   StatusBar,
   ScrollView,
   Text,
-  TouchableHighlight,
   View,
 } from 'react-native';
 import { shallowEqual, useSelector, useDispatch } from 'react-redux'
@@ -227,17 +227,21 @@ function HomeScreen(props) {
         </Text>
         <View style={rowStyles.section}>
           <View style={rowStyles.rowGroup}>
-            <TouchableHighlight
+            <Pressable
               onPress={() => {
                 navigation.navigate('ImportSiteTags');
               }}
+              style={({pressed}) => ({
+                flex: 1,
+                backgroundColor: pressed ? '#ccc' : 'white',
+              })}
             >
-              <View style={{flex: 1, backgroundColor: '#fff'}}>
-                <View style={rowStyles.lastRow}>
+              {({pressed}) =>
+                <View style={[rowStyles.lastRow, pressed && {backgroundColor: '#ccc'}]}>
                   <Text style={rowStyles.text}>Import site tags...</Text>
                 </View>
-              </View>
-            </TouchableHighlight>
+              }
+            </Pressable>
           </View>
         </View>
 
