@@ -204,7 +204,7 @@ function HomeScreen(props) {
           password={generatedPassword}
           masterPassword={masterPassword}
           onClick={() => {
-            saveOptions(options, siteTag, dispatch);
+            saveOptions(options, siteTag);
             saveNewSiteTagsToList([siteTag], siteTagList, setSiteTagList, dispatch);
           }}
         />
@@ -216,7 +216,7 @@ function HomeScreen(props) {
           options={options}
           onChangeOptions={options => {
             dispatch(setPasswordOptions(options));
-            saveOptions(options, siteTag, dispatch);
+            saveOptions(options, siteTag);
             saveNewSiteTagsToList([siteTag], siteTagList, setSiteTagList, dispatch);
           }}
           setBottomOverlayChildren={setBottomOverlayChildren}
