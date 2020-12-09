@@ -1,5 +1,5 @@
 import React from 'react';
-import { Clipboard, View } from 'react-native';
+import { Clipboard, Text, View } from 'react-native';
 import { Button } from 'react-native-elements';
 import useTimedResetState from '../../use-timed-reset-state';
 import { passwordRevealTimeLimit } from '../../constants';
@@ -21,7 +21,8 @@ export default function GeneratedPassword(props: Props) {
     onChangeShouldReveal(!shouldReveal);
   };
 
-  let displayValue = '';
+  const defaultDisplayValue = ''
+  let displayValue = defaultDisplayValue;
   if (masterPassword.length) {
     if (shouldReveal) {
       displayValue = password;
@@ -31,25 +32,37 @@ export default function GeneratedPassword(props: Props) {
   }
 
   return (
-    <View
-      style={styles.generatedPassword}
-    >
-      <Button
-        buttonStyle={styles.buttonStyle}
-        containerStyle={styles.buttonContainerStyle}
-        disabled={!masterPassword.length}
-        onPress={() => {
-          Clipboard.setString(password);
-          onClick();
-        }}
-        title={displayValue}
-        titleStyle={styles.buttonTitleStyle}
-      />
-      <Button
-        icon={<RevealPasswordIcon shouldReveal={shouldReveal} />}
-        onPress={toggleShouldReveal}
-        type="clear"
-      />
-    </View>
-  )
+    <>
+      <Text style={styles.generatedPasswordLabel}>
+        {masterPassword ?
+          'Tap to copy generated password'
+          : 'Generated password'
+        }
+      </Text>
+      <View
+        style={styles.generatedPassword}
+      >
+        <Button
+          buttonStyle={styles.buttonStyle}
+          containerStyle={styles.buttonContainerStyle}
+          disabled={!masterPassword}
+          disabledStyle={[styles.buttonStyle, {opacity: 1}]}
+          onPress={() => {
+            Clipboard.setString(password);
+            onClick();
+          }}
+          title={displayValue}
+          titleStyle={displayValue === defaultDisplayValue ? null : styles.buttonTitleStyle}
+          raised={true}
+        />
+        <Button
+          icon={<RevealPasswordIcon shouldReveal={shouldReveal} />}
+          onPress={toggleShouldReveal}
+          disabled={!masterPassword}
+          type="clear"
+          style={styles.revealButton}
+        />
+      </View>
+    </>
+  );
 }

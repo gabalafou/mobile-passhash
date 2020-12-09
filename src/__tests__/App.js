@@ -5,6 +5,7 @@ import App from '../App.tsx';
 // Note: test renderer must be required after react-native.
 import { act, create } from 'react-test-renderer';
 
+
 it('renders correctly', async () => {
   await act(async () => {
     create(<App />);

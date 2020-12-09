@@ -13,6 +13,7 @@ const rowStyles: ViewStyle = {
   borderBottomColor: '#ccc',
   borderBottomWidth: 0.5,
   paddingRight: gutterWidth,
+  marginLeft: gutterWidth,
   minHeight: 40,
 };
 
@@ -39,7 +40,6 @@ export default StyleSheet.create({
     borderBottomColor: '#ccc',
     borderBottomWidth: 0.5,
     backgroundColor: 'white',
-    paddingLeft: gutterWidth,
   },
   row: {
     ...rowStyles,

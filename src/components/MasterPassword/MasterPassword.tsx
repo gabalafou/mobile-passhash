@@ -65,6 +65,7 @@ function MasterPassword(props: Props, forwardedRef: React.RefObject<Input>) {
           type="clear"
         />
       }
+      renderErrorMessage={false}
     />
   );
 }
