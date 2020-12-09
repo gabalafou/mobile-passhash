@@ -1,3 +1,5 @@
+export const passwordRevealTimeLimit = 10 * 1000;
+
 // Note: these are the same defaults as the old Firefox
 // extension, except for size (old default was 8)
 export const defaultPasswordOptions = Object.freeze({
