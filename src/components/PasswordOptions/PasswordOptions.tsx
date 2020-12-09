@@ -10,7 +10,7 @@ import { Picker } from '@react-native-picker/picker';
 import styles, { pickerItemColor } from './styles';
 
 
-type Options = {
+export type Options = {
   newPasswordBumper: number,
   requireDigit: boolean,
   requirePunctuation: boolean,

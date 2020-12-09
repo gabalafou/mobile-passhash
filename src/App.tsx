@@ -2,6 +2,7 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import store from './redux/store';
 import {
+  Pressable,
   SafeAreaView,
   StatusBar,
   ScrollView,
@@ -10,6 +11,7 @@ import {
 } from 'react-native';
 import { shallowEqual, useSelector, useDispatch } from 'react-redux'
 import { getSiteTagList, getSiteTag, getPasswordOptions } from './redux/selectors';
+import { setSiteTagList, setPasswordOptions, removeSiteTag, setSiteTag } from './redux/actions';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import * as fuzzy from 'fuzzy';
@@ -18,12 +20,13 @@ import GeneratedPassword from './components/GeneratedPassword';
 import MasterPassword from './components/MasterPassword';
 import PasswordOptions from './components/PasswordOptions';
 import SearchView from './components/SearchView';
+import ImportSiteTags from './components/ImportSiteTags';
 import SiteTag from './components/SiteTag';
 import PassHashCommon from './lib/wijjo/passhash-common';
+import { defaultPasswordOptions } from './constants';
 import * as Storage from './storage';
 import styles from './styles';
-import { defaultPasswordOptions } from './constants';
-import { setSiteTagList, setPasswordOptions, removeSiteTag, setSiteTag } from './redux/actions';
+import rowStyles from './components/PasswordOptions/styles';
 
 
 const RootStack = createStackNavigator();
@@ -36,6 +39,7 @@ export default function App() {
         <RootStack.Navigator mode="modal" headerMode="none">
           <RootStack.Screen name="Main" component={MainStackScreen} />
           <RootStack.Screen name="SearchSiteTags" component={SearchSiteTags} />
+          <RootStack.Screen name="ImportSiteTags" component={ImportSiteTags} />
         </RootStack.Navigator>
       </NavigationContainer>
     </Provider>
@@ -199,20 +203,47 @@ function HomeScreen(props) {
         <GeneratedPassword
           password={generatedPassword}
           masterPassword={masterPassword}
-          onClick={() => saveOptions(options, siteTag, siteTagList, dispatch)}
+          onClick={() => {
+            saveOptions(options, siteTag);
+            saveNewSiteTagsToList([siteTag], siteTagList, setSiteTagList, dispatch);
+          }}
         />
 
-        <Text style={styles.passwordOptionsHeader}>
+        <Text style={styles.header}>
           Password Options
         </Text>
         <PasswordOptions
           options={options}
           onChangeOptions={options => {
             dispatch(setPasswordOptions(options));
-            saveOptions(options, siteTag, siteTagList, dispatch);
+            saveOptions(options, siteTag);
+            saveNewSiteTagsToList([siteTag], siteTagList, setSiteTagList, dispatch);
           }}
           setBottomOverlayChildren={setBottomOverlayChildren}
         />
+
+        <Text style={styles.header}>
+          Import Site Tags
+        </Text>
+        <View style={rowStyles.section}>
+          <View style={rowStyles.rowGroup}>
+            <Pressable
+              onPress={() => {
+                navigation.navigate('ImportSiteTags');
+              }}
+              style={({pressed}) => ({
+                flex: 1,
+                backgroundColor: pressed ? '#ccc' : 'white',
+              })}
+            >
+              {({pressed}) =>
+                <View style={[rowStyles.lastRow, pressed && {backgroundColor: '#ccc'}]}>
+                  <Text style={rowStyles.text}>Import site tags...</Text>
+                </View>
+              }
+            </Pressable>
+          </View>
+        </View>
 
       </ScrollView>
 
@@ -256,18 +287,19 @@ function loadOptions(siteTag, siteTagList, options, dispatch) {
   });
 }
 
-// Save options for site tag and save site tag to list if not already saved
-function saveOptions(options, siteTag, siteTagList, dispatch) {
+export function saveOptions(options, siteTag) {
   if (!siteTag) {
     return;
   }
 
   // Save options for site tag
   Storage.setItemAsync('options__' + siteTag, options);
+}
 
-  // Save site tag to list if not already saved
-  if (!siteTagList.includes(siteTag)) {
-    const nextSiteTagList = [...siteTagList, siteTag];
+export function saveNewSiteTagsToList(siteTags, siteTagList, setSiteTagList, dispatch) {
+  const newSiteTags = siteTags.filter(siteTag => !siteTagList.includes(siteTag));
+  if (newSiteTags.length) {
+    const nextSiteTagList = [...siteTagList, ...newSiteTags];
     dispatch(setSiteTagList(nextSiteTagList));
     Storage.setItemAsync('siteTagList', nextSiteTagList);
   }

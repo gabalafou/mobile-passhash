@@ -20,7 +20,7 @@ export default StyleSheet.create({
     fontWeight: 'bold',
     margin: gutterWidth,
   },
-  passwordOptionsHeader: {
+  header: {
     fontSize: 28,
     marginTop: 44,
     marginBottom: 10,
