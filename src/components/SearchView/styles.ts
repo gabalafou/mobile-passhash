@@ -3,6 +3,7 @@ import Constants from 'expo-constants';
 import { backgroundColor, gutterWidth } from '../../styles';
 
 export const resultItemHeight = 50;
+export const separatorHeight = 1;
 
 export default StyleSheet.create({
   container: {
@@ -25,7 +26,7 @@ export default StyleSheet.create({
   },
   separator: {
     backgroundColor: '#ccc',
-    height: 1,
+    height: separatorHeight,
   },
   resultItem: {
     height: resultItemHeight,

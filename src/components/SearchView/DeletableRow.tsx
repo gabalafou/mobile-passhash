@@ -51,8 +51,12 @@ export default class DeleteableRow extends Component<Props> {
     this.props.onDelete();
     this._swipeableRow.current?.render();
   };
+  handleSwipeableOpen = () => {
+    const { onSwipeableOpen } = this.props;
+    onSwipeableOpen(this._swipeableRow);
+  };
   render() {
-    const { children, onSwipeableOpen } = this.props;
+    const { children } = this.props;
     return (
       <Swipeable
         ref={this._swipeableRow}
@@ -60,7 +64,7 @@ export default class DeleteableRow extends Component<Props> {
         rightThreshold={40}
         renderRightActions={this.renderRightActions}
         enableTrackpadTwoFingerGesture={true}
-        onSwipeableOpen={() => onSwipeableOpen(this._swipeableRow)}>
+        onSwipeableOpen={this.handleSwipeableOpen}>
         {children}
       </Swipeable>
     );

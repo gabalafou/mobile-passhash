@@ -1,5 +1,4 @@
 export const SET_SITE_TAG_LIST = 'SET_SITE_TAG_LIST';
-export const ADD_SITE_TAG = 'ADD_SITE_TAG';
 export const REMOVE_SITE_TAG = 'REMOVE_SITE_TAG';
 export const SET_SITE_TAG = 'SET_SITE_TAG';
 export const SET_PASSWORD_OPTIONS = 'SET_PASSWORD_OPTIONS';
