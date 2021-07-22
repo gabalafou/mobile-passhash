@@ -21,10 +21,10 @@ export default function(state = createInitialState(), action) {
       return state.siteTag === siteTag ? createInitialState() : state;
     }
     case SET_SITE_TAG: {
-      const { siteTag, passwordOptions } = action.payload;
+      const siteTag = action.payload;
       return {
+        ...state,
         siteTag,
-        passwordOptions: passwordOptions || { ...defaultPasswordOptions },
       };
     }
     default: {

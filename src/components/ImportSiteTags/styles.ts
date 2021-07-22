@@ -35,4 +35,7 @@ export default StyleSheet.create({
     marginVertical: 10,
     padding: 10,
   },
+  submitButton: {
+    marginBottom: 28,
+  }
 });

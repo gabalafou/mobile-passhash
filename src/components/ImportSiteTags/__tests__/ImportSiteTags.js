@@ -18,10 +18,10 @@ describe('ImportSiteTags', () => {
       parser.parseSiteTagsAndOptions.mockImplementationOnce(() => {
         throw 'mock error';
       });
-      const { getByPlaceholderText, queryByTestId } = render(
+      const { getByTestId, queryByTestId } = render(
         <ImportSiteTags onCancel={noop} onSubmit={noop} siteTagList={[]} />
       );
-      const textInput = getByPlaceholderText('Paste HTML');
+      const textInput = getByTestId('text-input');
       fireEvent.changeText(textInput, formattedSiteTags);
 
       expect(queryByTestId('error-container')).not.toBeNull();
@@ -34,11 +34,11 @@ describe('ImportSiteTags', () => {
       parser.parseSiteTagsAndOptions.mockImplementationOnce(() => {
         return {};
       });
-      const { getByPlaceholderText, queryByTestId } = render(
+      const { getByTestId, queryByTestId } = render(
         <ImportSiteTags onCancel={noop} onSubmit={noop} siteTagList={[]} />
       );
-      const textInput = getByPlaceholderText('Paste HTML');
-      fireEvent.changeText(textInput, '');
+      const textInput = getByTestId('text-input');
+      fireEvent.changeText(textInput, formattedSiteTags);
 
       expect(queryByTestId('error-container')).not.toBeNull();
       expect(queryByTestId('submit-button')).toBeNull();
@@ -52,11 +52,11 @@ describe('ImportSiteTags', () => {
           existingSiteTag: { /* password options */ },
         };
       });
-      const { getByPlaceholderText, queryByTestId } = render(
+      const { getByTestId, queryByTestId } = render(
         <ImportSiteTags onCancel={noop} onSubmit={noop} siteTagList={['existingSiteTag']} />
       );
-      const textInput = getByPlaceholderText('Paste HTML');
-      fireEvent.changeText(textInput, '');
+      const textInput = getByTestId('text-input');
+      fireEvent.changeText(textInput, formattedSiteTags);
 
       expect(queryByTestId('error-container')).not.toBeNull();
       expect(queryByTestId('submit-button')).toBeNull();
@@ -74,11 +74,11 @@ describe('ImportSiteTags', () => {
     });
 
     it('should display error and show submit button', () => {
-      const { getByPlaceholderText, queryByTestId, queryByText } = render(
+      const { getByTestId, queryByTestId, queryByText } = render(
         <ImportSiteTags onCancel={noop} onSubmit={noop} siteTagList={['existingSiteTag']} />
       );
-      const textInput = getByPlaceholderText('Paste HTML');
-      fireEvent.changeText(textInput, '');
+      const textInput = getByTestId('text-input');
+      fireEvent.changeText(textInput, formattedSiteTags);
       expect(queryByTestId('error-container')).not.toBeNull();
       expect(queryByText('Import 1 site tag')).not.toBeNull();
     });
@@ -86,18 +86,16 @@ describe('ImportSiteTags', () => {
     describe('and user hits submit', () => {
       it('should submit only new site tags', () => {
         const onSubmit = jest.fn();
-        const { getByPlaceholderText, queryByTestId } = render(
+        const { getByTestId, queryByTestId } = render(
           <ImportSiteTags onCancel={noop} onSubmit={onSubmit} siteTagList={['existingSiteTag']} />
         );
-        const textInput = getByPlaceholderText('Paste HTML');
-        fireEvent.changeText(textInput, '');
+        const textInput = getByTestId('text-input');
+        fireEvent.changeText(textInput, formattedSiteTags);
         fireEvent.press(queryByTestId('submit-button'));
 
-        const receivedObject = onSubmit.mock.calls[0][0];
-        const expectedObject = {
+        expect(onSubmit).toHaveBeenCalledWith({
           newSiteTag: expect.anything(),
-        };
-        expect(receivedObject).toEqual(expectedObject);
+        });
       });
     })
   });
@@ -113,11 +111,11 @@ describe('ImportSiteTags', () => {
     });
 
     it('should display no error and show submit button', () => {
-      const { getByPlaceholderText, queryByTestId, queryByText } = render(
+      const { getByTestId, queryByTestId, queryByText } = render(
         <ImportSiteTags onCancel={noop} onSubmit={noop} siteTagList={['existingSiteTag']} />
       );
-      const textInput = getByPlaceholderText('Paste HTML');
-      fireEvent.changeText(textInput, '');
+      const textInput = getByTestId('text-input');
+      fireEvent.changeText(textInput, formattedSiteTags);
       expect(queryByTestId('error-container')).toBeNull();
       expect(queryByText('Import 2 site tags')).not.toBeNull();
     });
@@ -125,19 +123,17 @@ describe('ImportSiteTags', () => {
     describe('and user hits submit', () => {
       it('should pass site tag options', () => {
         const onSubmit = jest.fn();
-        const { getByPlaceholderText, queryByTestId } = render(
+        const { getByTestId, queryByTestId } = render(
           <ImportSiteTags onCancel={noop} onSubmit={onSubmit} siteTagList={['existingSiteTag']} />
         );
-        const textInput = getByPlaceholderText('Paste HTML');
-        fireEvent.changeText(textInput, '');
+        const textInput = getByTestId('text-input');
+        fireEvent.changeText(textInput, formattedSiteTags);
         fireEvent.press(queryByTestId('submit-button'));
 
-        const receivedObject = onSubmit.mock.calls[0][0];
-        const expectedObject = {
+        expect(onSubmit).toHaveBeenCalledWith({
           foo: { a: 'z' },
           bar: { size: 16 },
-        };
-        expect(receivedObject).toEqual(expectedObject);
+        });
       });
     });
   });
