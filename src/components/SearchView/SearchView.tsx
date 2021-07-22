@@ -76,12 +76,10 @@ export default function SearchView(props: Props) {
   const [ activeItemIndex, setActiveItemIndex ] = React.useState(null);
 
   const onSwipeOpen = (ref, index) => {
-    console.log('onswipeopen', {index});
     setActiveItemIndex(index);
     setActiveItemRef(ref);
   };
   const onPressIn = index => {
-    console.log('onpressin', {index});
     if (activeItemRef && index !== activeItemIndex) {
       activeItemRef.close();
     }
