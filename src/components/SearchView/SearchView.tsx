@@ -68,21 +68,23 @@ export default function SearchView(props: Props) {
   }
 
   // Keep track of which item in the list is being swiped on
+  const emptyRef: React.RefObject<Swipeable> = React.createRef();
   const [activeItemRef, setActiveItemRef]: [
-    Swipeable,
-    (ref: Swipeable) => void
-  ] = React.useState(null);
-  const [activeItemIndex, setActiveItemIndex] = React.useState(null);
+    React.RefObject<Swipeable>,
+    (ref: React.RefObject<Swipeable>) => void
+  ] = React.useState(emptyRef);
 
-  const onSwipeOpen = (ref, index) => {
-    setActiveItemIndex(index);
+  const onSwipeOpen = (ref) => {
+    activeItemRef.current?.close();
     setActiveItemRef(ref);
   };
-  const onPressIn = (index) => {
-    // Keyboard.dismiss();
-    if (activeItemRef && index !== activeItemIndex) {
-      activeItemRef.close();
-    }
+  const onPressIn = () => {
+    searchBarRef.current?.blur();
+    activeItemRef.current?.close();
+    setActiveItemRef(emptyRef);
+  };
+  const onSwipeClose = () => {
+    setActiveItemRef(emptyRef);
   };
 
   const searchBarRef = React.useRef(null);
@@ -105,7 +107,7 @@ export default function SearchView(props: Props) {
         platform={Platform.OS === 'ios' ? 'ios' : 'android'}
         showCancel={true}
       />
-      <Pressable
+      <View
         style={[
           styles.resultListContainer,
           {
@@ -114,10 +116,6 @@ export default function SearchView(props: Props) {
         ]}
         onLayout={(event) => {
           setResultListTopY(event.nativeEvent.layout.y);
-        }}
-        onPressIn={() => {
-          console.log('Enclosing Pressable.onPressIn');
-          searchBarRef.current?.blur();
         }}
       >
         <FlatList
@@ -137,18 +135,18 @@ export default function SearchView(props: Props) {
           renderItem={({ item, index }) => (
             <Item
               item={item}
-              index={index}
               isNew={query === item && queryNotInResults}
               // Note: not all items can be submitted, deleted, pressed, swiped open
               onSubmit={onSubmit}
               onDelete={onDelete}
               onSwipeOpen={onSwipeOpen}
+              onSwipeClose={onSwipeClose}
               onPressIn={onPressIn}
             />
           )}
           keyboardShouldPersistTaps="handled"
         />
-      </Pressable>
+      </View>
     </View>
   );
 }
@@ -159,12 +157,12 @@ function Separator() {
 
 type ItemProps = {
   item: string;
-  index: number;
   isNew: boolean;
   onSubmit: (item: string) => void;
   onDelete: (item: string) => void;
-  onSwipeOpen: (ref: Swipeable, index: number) => void;
-  onPressIn: (index: number) => void;
+  onSwipeOpen: (ref: React.RefObject<Swipeable>) => void;
+  onSwipeClose: () => void;
+  onPressIn: () => void;
 };
 class Item extends React.PureComponent<ItemProps> {
   deleteItem = () => {
@@ -173,8 +171,10 @@ class Item extends React.PureComponent<ItemProps> {
   };
 
   markActive = (ref) => {
-    const { onSwipeOpen, index } = this.props;
-    onSwipeOpen(ref.current, index);
+    if (!this.isOpen) {
+      this.props.onSwipeOpen(ref);
+    }
+    this.isOpen = true;
   };
 
   submit = () => {
@@ -183,9 +183,19 @@ class Item extends React.PureComponent<ItemProps> {
   };
 
   handlePressIn = () => {
-    const { onPressIn, index } = this.props;
-    onPressIn(index);
+    if (!this.isOpen) {
+      this.props.onPressIn();
+    }
   };
+
+  handleClose = () => {
+    if (this.isOpen) {
+      this.props.onSwipeClose();
+    }
+    this.isOpen = false;
+  };
+
+  isOpen = false;
 
   render() {
     const { item, isNew } = this.props;
@@ -205,6 +215,7 @@ class Item extends React.PureComponent<ItemProps> {
         <DeletableRow
           onDelete={this.deleteItem}
           onSwipeableOpen={this.markActive}
+          onSwipeableClose={this.handleClose}
         >
           {this.renderSubmittable()}
         </DeletableRow>
