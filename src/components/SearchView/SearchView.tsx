@@ -5,10 +5,9 @@ import {
   FlatList,
   Platform,
   Pressable,
-  Keyboard,
   Text,
   View,
-  useWindowDimensions,
+  useWindowDimensions
 } from 'react-native';
 import { SearchBar } from 'react-native-elements';
 import Constants from 'expo-constants';
@@ -17,21 +16,28 @@ import styles, { resultItemHeight, separatorHeight } from './styles';
 import DeletableRow from './DeletableRow';
 import { RectButton } from 'react-native-gesture-handler';
 
+
 type Props = {
-  query: string;
-  results: string[];
-  placeholder: string;
-  onChangeQuery: (query: string) => void;
-  onCancel: () => void;
-  onSubmit: (query: string) => void;
-  onDelete: (siteTag: string) => void;
+  query: string,
+  results: string[],
+  placeholder: string,
+  onChangeQuery: (query: string) => void,
+  onCancel: () => void,
+  onSubmit: (query: string) => void,
+  onDelete: (siteTag: string) => void,
 };
 
 const BLANK = {};
 
 export default function SearchView(props: Props) {
-  const { query, placeholder, onChangeQuery, onCancel, onSubmit, onDelete } =
-    props;
+  const {
+    query,
+    placeholder,
+    onChangeQuery,
+    onCancel,
+    onSubmit,
+    onDelete,
+  } = props;
 
   const paddedResults = [...props.results];
   const queryNotInResults = query && !props.results.includes(query);
@@ -57,34 +63,26 @@ export default function SearchView(props: Props) {
   // the results list look like a ruled page, with lines going all
   // the way down to the top edge of the onscreen keyboard
   const windowHeight = useWindowDimensions().height;
-  const availableHeightForResults =
-    windowHeight - resultListTopY - keyboardHeight;
-  const numResultsThatCover = Math.ceil(
-    availableHeightForResults / resultItemHeight
-  );
+  const availableHeightForResults = (windowHeight - resultListTopY) - keyboardHeight;
+  const numResultsThatCover = Math.ceil(availableHeightForResults / resultItemHeight);
   const gap = numResultsThatCover - paddedResults.length;
   if (gap > 0) {
     paddedResults.push(...new Array(gap).fill(BLANK));
   }
 
   // Keep track of which item in the list is being swiped on
-  const emptyRef: React.RefObject<Swipeable> = React.createRef();
-  const [activeItemRef, setActiveItemRef]: [
-    React.RefObject<Swipeable>,
-    (ref: React.RefObject<Swipeable>) => void
-  ] = React.useState(emptyRef);
+  const [ activeItemRef, setActiveItemRef ]:
+    [Swipeable, (ref: Swipeable) => void] = React.useState(null);
+  const [ activeItemIndex, setActiveItemIndex ] = React.useState(null);
 
-  const onSwipeOpen = (ref) => {
-    activeItemRef.current?.close();
+  const onSwipeOpen = (ref, index) => {
+    setActiveItemIndex(index);
     setActiveItemRef(ref);
   };
-  const onPressIn = () => {
-    searchBarRef.current?.blur();
-    activeItemRef.current?.close();
-    setActiveItemRef(emptyRef);
-  };
-  const onSwipeClose = () => {
-    setActiveItemRef(emptyRef);
+  const onPressIn = index => {
+    if (activeItemRef && index !== activeItemIndex) {
+      activeItemRef.close();
+    }
   };
 
   const searchBarRef = React.useRef(null);
@@ -107,16 +105,14 @@ export default function SearchView(props: Props) {
         platform={Platform.OS === 'ios' ? 'ios' : 'android'}
         showCancel={true}
       />
-      <View
-        style={[
-          styles.resultListContainer,
-          {
-            paddingBottom: Platform.OS === 'ios' ? keyboardHeight : 0,
-          },
-        ]}
-        onLayout={(event) => {
+      <Pressable
+        style={[styles.resultListContainer, {
+          paddingBottom: Platform.OS === 'ios' ? keyboardHeight : 0,
+        }]}
+        onLayout={event => {
           setResultListTopY(event.nativeEvent.layout.y);
         }}
+        onPressIn={() => searchBarRef.current?.blur()}
       >
         <FlatList
           style={styles.resultList}
@@ -127,42 +123,44 @@ export default function SearchView(props: Props) {
             length: resultItemHeight,
             offset: (resultItemHeight + separatorHeight) * index,
           })}
-          keyExtractor={
-            (item, index) => (item === BLANK ? String(index) : '$' + item) // add character in case `item` is a numeral
+          keyExtractor={(item, index) => item === BLANK ?
+            String(index)
+            : '$' + item // add character in case `item` is a numeral
           }
           ref={resultListRef}
           ItemSeparatorComponent={Separator}
-          renderItem={({ item, index }) => (
+          renderItem={({ item, index }) =>
             <Item
               item={item}
+              index={index}
               isNew={query === item && queryNotInResults}
               // Note: not all items can be submitted, deleted, pressed, swiped open
               onSubmit={onSubmit}
               onDelete={onDelete}
               onSwipeOpen={onSwipeOpen}
-              onSwipeClose={onSwipeClose}
               onPressIn={onPressIn}
             />
-          )}
-          keyboardShouldPersistTaps="handled"
+          }
         />
-      </View>
+      </Pressable>
     </View>
   );
-}
+};
+
 
 function Separator() {
   return <View style={styles.separator} />;
 }
 
+
 type ItemProps = {
-  item: string;
-  isNew: boolean;
-  onSubmit: (item: string) => void;
-  onDelete: (item: string) => void;
-  onSwipeOpen: (ref: React.RefObject<Swipeable>) => void;
-  onSwipeClose: () => void;
-  onPressIn: () => void;
+  item: string,
+  index: number,
+  isNew: boolean,
+  onSubmit: (item: string) => void,
+  onDelete: (item: string) => void,
+  onSwipeOpen: (ref: Swipeable, index: number) => void,
+  onPressIn: (index: number) => void,
 };
 class Item extends React.PureComponent<ItemProps> {
   deleteItem = () => {
@@ -171,10 +169,8 @@ class Item extends React.PureComponent<ItemProps> {
   };
 
   markActive = (ref) => {
-    if (!this.isOpen) {
-      this.props.onSwipeOpen(ref);
-    }
-    this.isOpen = true;
+    const { onSwipeOpen, index } = this.props;
+    onSwipeOpen(ref.current, index);
   };
 
   submit = () => {
@@ -183,19 +179,9 @@ class Item extends React.PureComponent<ItemProps> {
   };
 
   handlePressIn = () => {
-    if (!this.isOpen) {
-      this.props.onPressIn();
-    }
+    const { onPressIn, index } = this.props;
+    onPressIn(index);
   };
-
-  handleClose = () => {
-    if (this.isOpen) {
-      this.props.onSwipeClose();
-    }
-    this.isOpen = false;
-  };
-
-  isOpen = false;
 
   render() {
     const { item, isNew } = this.props;
@@ -214,27 +200,35 @@ class Item extends React.PureComponent<ItemProps> {
       inner = (
         <DeletableRow
           onDelete={this.deleteItem}
-          onSwipeableOpen={this.markActive}
-          onSwipeableClose={this.handleClose}
-        >
+          onSwipeableOpen={this.markActive}>
           {this.renderSubmittable()}
         </DeletableRow>
       );
     }
 
-    return <Pressable onPressIn={this.handlePressIn}>{inner}</Pressable>;
+    return (
+      <Pressable
+        onPressIn={this.handlePressIn}>
+        {inner}
+      </Pressable>
+    );
   }
 
   renderSubmittable() {
     const { item } = this.props;
     return (
-      <RectButton onPress={this.submit} style={styles.resultItem}>
+      <RectButton
+        onPress={this.submit}
+        style={styles.resultItem}
+      >
         <Text style={styles.resultItemText}>{item}</Text>
       </RectButton>
     );
   }
 
   renderBlank() {
-    return <View style={styles.resultItem} />;
-  }
+    return (
+      <View style={styles.resultItem} />
+    );
+  };
 }

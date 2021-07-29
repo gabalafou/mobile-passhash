@@ -69,3 +69,6 @@ web-report/
 # React Native ?
 android/
 ios/
+
+# VS Code workspace settings
+.vscode/
