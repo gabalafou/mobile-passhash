@@ -1,3 +1,14 @@
+(function (root, factory) {
+  if (typeof module === 'object' && module.exports) {
+    // Node. Does not work with strict CommonJS, but
+    // only CommonJS-like environments that support module.exports,
+    // like Node.
+    module.exports = factory();
+  } else {
+    // Browser globals
+    Object.assign(root, factory());
+  }
+})(typeof self !== 'undefined' ? self : this, function () {
 /*
  * A JavaScript implementation of the Secure Hash Algorithm, SHA-1, as defined
  * in FIPS PUB 180-1
@@ -23,7 +34,7 @@ function hex_sha1(s){return binb2hex(core_sha1(str2binb(s),s.length * chrsz));}
 function b64_sha1(s){return binb2b64(core_sha1(str2binb(s),s.length * chrsz));}
 function str_sha1(s){return binb2str(core_sha1(str2binb(s),s.length * chrsz));}
 function hex_hmac_sha1(key, data){ return binb2hex(core_hmac_sha1(key, data));}
-export function b64_hmac_sha1(key, data){ return binb2b64(core_hmac_sha1(key, data));}
+function b64_hmac_sha1(key, data){ return binb2b64(core_hmac_sha1(key, data));}
 function str_hmac_sha1(key, data){ return binb2str(core_hmac_sha1(key, data));}
 
 /*
@@ -223,3 +234,9 @@ function binb2b64(binarray)
   }
   return str;
 }
+
+return {
+  b64_hmac_sha1: b64_hmac_sha1
+};
+
+});

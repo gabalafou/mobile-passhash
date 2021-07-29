@@ -33,9 +33,17 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-
-import { b64_hmac_sha1 } from '../paj/sha1';
-
+(function (root, factory) {
+  if (typeof module === 'object' && module.exports) {
+    // Node. Does not work with strict CommonJS, but
+    // only CommonJS-like environments that support module.exports,
+    // like Node.
+    module.exports = factory(require('../paj/sha1').b64_hmac_sha1);
+  } else {
+    // Browser globals
+    root.PassHashCommon = factory(root.b64_hmac_sha1)
+  }
+})(typeof self !== 'undefined' ? self : this, function (b64_hmac_sha1) {
 var PassHashCommon =
 {
     // IMPORTANT: This function should be changed carefully.  It must be
@@ -170,6 +178,22 @@ var PassHashCommon =
             s += sInput.substring(i);
         return s;
     },
+
+    bumpSiteTag: function(siteTag)
+    {
+        var tag = siteTag.replace(/^[ \t]*(.*)[ \t]*$/, "$1");    // redundant
+        if (tag)
+        {
+            var splitTag = tag.match(/^(.*):([0-9]+)?$/);
+            if (splitTag == null || splitTag.length < 3)
+                tag += ":1";
+            else
+                tag = splitTag[1] + ":" + (parseInt(splitTag[2]) + 1);
+        }
+        return tag;
+    }
 };
 
-export default PassHashCommon;
+return PassHashCommon;
+
+});
