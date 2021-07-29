@@ -1,29 +1,35 @@
 import React, { Component } from 'react';
-import { Animated, StyleSheet, Text, View, I18nManager, Platform } from 'react-native';
+import {
+  Animated,
+  StyleSheet,
+  Text,
+  View,
+  I18nManager,
+  Platform,
+} from 'react-native';
 
 import { RectButton } from 'react-native-gesture-handler';
 import Swipeable from 'react-native-gesture-handler/Swipeable';
 
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
-
 type Props = {
-  onDelete: () => void,
-  onSwipeableOpen: (ref: React.RefObject<Swipeable>) => void,
+  onDelete: () => void;
+  onSwipeableOpen: (ref: React.RefObject<Swipeable>) => void;
+  onSwipeableClose: () => void;
 };
 export default class DeleteableRow extends Component<Props> {
   _swipeableRow: React.RefObject<Swipeable> = React.createRef();
 
-  renderRightAction = progress => {
+  renderRightAction = (progress) => {
     const trans = progress.interpolate({
       inputRange: [0, 1],
       outputRange: [64, 0],
+      extrapolate: 'clamp',
     });
     return (
       <Animated.View style={{ flex: 1, transform: [{ translateX: trans }] }}>
-        <RectButton
-          style={styles.deleteAction}
-          onPress={this.handlePress}>
+        <RectButton style={styles.deleteAction} onPress={this.handlePress}>
           {Platform.OS === 'ios' ? (
             <Text style={styles.actionText}>Delete</Text>
           ) : (
@@ -38,12 +44,13 @@ export default class DeleteableRow extends Component<Props> {
       </Animated.View>
     );
   };
-  renderRightActions = progress => (
+  renderRightActions = (progress) => (
     <View
       style={{
         width: 64,
         flexDirection: I18nManager.isRTL ? 'row-reverse' : 'row',
-      }}>
+      }}
+    >
       {this.renderRightAction(progress)}
     </View>
   );
@@ -64,7 +71,9 @@ export default class DeleteableRow extends Component<Props> {
         rightThreshold={40}
         renderRightActions={this.renderRightActions}
         enableTrackpadTwoFingerGesture={true}
-        onSwipeableOpen={this.handleSwipeableOpen}>
+        onSwipeableOpen={this.handleSwipeableOpen}
+        onSwipeableClose={this.props.onSwipeableClose}
+      >
         {children}
       </Swipeable>
     );
@@ -86,6 +95,6 @@ const styles = StyleSheet.create({
   },
   actionIcon: {
     width: 30,
-    marginHorizontal: 10
+    marginHorizontal: 10,
   },
 });
