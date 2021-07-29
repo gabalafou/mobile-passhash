@@ -7,8 +7,12 @@ import {
   Text,
   View,
 } from 'react-native';
-import { shallowEqual, useSelector, useDispatch } from 'react-redux'
-import { getSiteTagList, getSiteTag, getPasswordOptions } from './redux/selectors';
+import { shallowEqual, useSelector, useDispatch } from 'react-redux';
+import {
+  getSiteTagList,
+  getSiteTag,
+  getPasswordOptions,
+} from './redux/selectors';
 import { setPasswordOptions } from './redux/actions';
 import { loadSiteTags, loadOptions, saveSiteTag } from './helpers';
 import GeneratedPassword from './components/GeneratedPassword';
@@ -18,7 +22,6 @@ import SiteTag from './components/SiteTag';
 import PassHashCommon from './lib/wijjo/passhash-common';
 import styles from './styles';
 import rowStyles from './components/PasswordOptions/styles';
-
 
 export default function HomeScreen(props) {
   const { navigation, route } = props;
@@ -31,7 +34,8 @@ export default function HomeScreen(props) {
   const options = useSelector(getPasswordOptions, shallowEqual);
 
   const [masterPassword, setMasterPassword] = React.useState('');
-  const [bottomOverlayChildren, setBottomOverlayChildren] = React.useState(null);
+  const [bottomOverlayChildren, setBottomOverlayChildren] =
+    React.useState(null);
 
   // Refs
   const scrollView = React.useRef(null);
@@ -44,7 +48,7 @@ export default function HomeScreen(props) {
         masterPasswordInput.current?.focus();
       }
     }, 10);
-  }, [siteTag])
+  }, [siteTag]);
 
   // Load all site tags from storage
   React.useEffect(
@@ -60,16 +64,21 @@ export default function HomeScreen(props) {
   // When the user has entered a site tag and master password, we
   // use the hashing function to generate a password.
   const generatedPassword = React.useMemo(
-    () => siteTag && masterPassword && PassHashCommon.generateHashWord(
-      options.newPasswordBumper ? `${siteTag}:${options.newPasswordBumper}` : siteTag,
-      masterPassword,
-      options.size,
-      options.requireDigit,
-      options.requirePunctuation,
-      options.requireMixedCase,
-      options.noSpecial,
-      options.digitsOnly,
-    ),
+    () =>
+      siteTag &&
+      masterPassword &&
+      PassHashCommon.generateHashWord(
+        options.newPasswordBumper
+          ? `${siteTag}:${options.newPasswordBumper}`
+          : siteTag,
+        masterPassword,
+        options.size,
+        options.requireDigit,
+        options.requirePunctuation,
+        options.requireMixedCase,
+        options.noSpecial,
+        options.digitsOnly
+      ),
     [siteTag, masterPassword, options]
   );
 
@@ -89,7 +98,6 @@ export default function HomeScreen(props) {
 
   return (
     <SafeAreaView style={styles.container}>
-
       <StatusBar barStyle="dark-content" />
 
       <ScrollView
@@ -107,10 +115,7 @@ export default function HomeScreen(props) {
           }
         }}
       >
-
-
         <Text style={styles.title}>Password Generator</Text>
-
 
         <SiteTag
           onPress={() => {
@@ -135,51 +140,72 @@ export default function HomeScreen(props) {
           }}
         />
 
-        <Text style={styles.header}>
-          Password Options
-        </Text>
+        <Text style={styles.header}>Password Options</Text>
         <PasswordOptions
           options={options}
-          onChangeOptions={options => {
+          onChangeOptions={(options) => {
             dispatch(setPasswordOptions(options));
             saveSiteTag(siteTag, options, siteTagList)(dispatch);
           }}
           setBottomOverlayChildren={setBottomOverlayChildren}
         />
 
-        <Text style={styles.header}>
-          Import Site Tags
-        </Text>
+        <Text style={styles.header}>Import Site Tags</Text>
         <View style={rowStyles.section}>
           <View style={rowStyles.rowGroup}>
             <Pressable
               onPress={() => {
                 navigation.navigate('Import');
               }}
-              style={({pressed}) => ({
+              style={({ pressed }) => ({
                 flex: 1,
                 backgroundColor: pressed ? '#ccc' : 'white',
               })}
             >
-              {({pressed}) =>
-                <View style={[rowStyles.lastRow, pressed && {backgroundColor: '#ccc'}]}>
+              {({ pressed }) => (
+                <View
+                  style={[
+                    rowStyles.lastRow,
+                    pressed && { backgroundColor: '#ccc' },
+                  ]}
+                >
                   <Text style={rowStyles.text}>Import site tags...</Text>
                 </View>
-              }
+              )}
             </Pressable>
           </View>
         </View>
 
+        <Text style={styles.header}>Export Site Tags</Text>
+        <View style={rowStyles.section}>
+          <View style={rowStyles.rowGroup}>
+            <Pressable
+              onPress={() => {
+                navigation.navigate('Export');
+              }}
+              style={({ pressed }) => ({
+                flex: 1,
+                backgroundColor: pressed ? '#ccc' : 'white',
+              })}
+            >
+              {({ pressed }) => (
+                <View
+                  style={[
+                    rowStyles.lastRow,
+                    pressed && { backgroundColor: '#ccc' },
+                  ]}
+                >
+                  <Text style={rowStyles.text}>Export site tags...</Text>
+                </View>
+              )}
+            </Pressable>
+          </View>
+        </View>
       </ScrollView>
 
-      {bottomOverlayChildren &&
-        <View
-          style={styles.bottomOverlay}
-        >
-          {bottomOverlayChildren}
-        </View>
-      }
-
+      {bottomOverlayChildren && (
+        <View style={styles.bottomOverlay}>{bottomOverlayChildren}</View>
+      )}
     </SafeAreaView>
   );
 }

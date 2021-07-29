@@ -1,4 +1,5 @@
 import ejs from 'ejs';
+import { readFile } from 'fs/promises';
 import strings from './portable-html-template/strings.json';
 
 function optionsToString(options) {
@@ -17,8 +18,12 @@ function siteTagToString(siteTag, { newPasswordBumper }) {
 }
 
 export async function createPortableHtml(siteTagOptions) {
-  return await ejs.renderFile(
+  const template = await readFile(
     __dirname + '/portable-html-template/index.ejs',
+    { encoding: 'utf8' }
+  );
+  return await ejs.renderFile(
+    template,
     {
       ...strings,
       siteTagsAndOptions: Object.entries(siteTagOptions).map(
@@ -31,3 +36,72 @@ export async function createPortableHtml(siteTagOptions) {
     { async: true }
   );
 }
+
+// import ejs from 'ejs';
+// import strings from './passhash-portable-strings.json';
+// import { writeFileSync } from 'fs';
+
+// const siteTagOptions = {
+//   '1&1.com': {
+//     requireDigit: true,
+//     requirePunctuation: false,
+//     requireMixedCase: true,
+//     noSpecial: false,
+//     digitsOnly: false,
+//     size: 16,
+//     newPasswordBumper: 0,
+//   },
+//   'abc.com': {
+//     requireDigit: true,
+//     requirePunctuation: true,
+//     requireMixedCase: true,
+//     noSpecial: false,
+//     digitsOnly: false,
+//     size: 8,
+//     newPasswordBumper: 0,
+//   },
+//   'llamablues.com': {
+//     requireDigit: true,
+//     requirePunctuation: false,
+//     requireMixedCase: false,
+//     noSpecial: false,
+//     digitsOnly: false,
+//     size: 16,
+//     newPasswordBumper: 3,
+//   },
+//   'helpforum.net:90': {
+//     requireDigit: true,
+//     requirePunctuation: true,
+//     requireMixedCase: true,
+//     noSpecial: true,
+//     digitsOnly: false,
+//     size: 24,
+//     newPasswordBumper: 2,
+//   },
+// };
+
+// function getSiteTagString(siteTag, { newPasswordBumper }) {
+//   return newPasswordBumper > 0 ? `${siteTag}:${newPasswordBumper}` : siteTag;
+// }
+
+// ejs.renderFile(
+//   __dirname + '/passhash-portable.ejs',
+//   {
+//     ...strings,
+//     siteTagsAndOptions: Object.entries(siteTagOptions).map(
+//       ([siteTag, options]) => [
+//         getSiteTagString(siteTag, options),
+//         getOptionString(options),
+//       ]
+//     ),
+//   },
+//   {},
+//   (err, str) => {
+//     if (err) {
+//       console.log(err);
+//       return;
+//     }
+//     console.log(str);
+//     writeFileSync(__dirname + '/out.html', str);
+//   }
+// );
