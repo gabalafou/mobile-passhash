@@ -14,10 +14,7 @@ let compiledTemplates: {
   // placeholder
   main: (_) => '',
 };
-codegen.require(
-  './portable-html-template/template-codegen.js',
-  'compiledTemplates'
-);
+codegen.require('./portable-html-template-codegen.js', 'compiledTemplates');
 
 const portableHtmlTemplateFn = (data) => {
   const templateFn = compiledTemplates.main;

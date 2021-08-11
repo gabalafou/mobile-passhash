@@ -7,7 +7,9 @@ const { readFileSync } = require('fs');
 const { escapeXML } = ejs;
 
 const read = (path) =>
-  readFileSync(require.resolve(path), { encoding: 'utf8' });
+  readFileSync(require.resolve('./portable-html-template/' + path), {
+    encoding: 'utf8',
+  });
 
 const mainTemplatePath = './index.html.ejs';
 const templatePaths = [
