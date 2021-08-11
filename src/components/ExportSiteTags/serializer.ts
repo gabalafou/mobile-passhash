@@ -1,6 +1,34 @@
-import ejs from 'ejs';
-import { readFile } from 'fs/promises';
+import type { Options } from '../PasswordOptions';
 import strings from './portable-html-template/strings.json';
+import codegen from 'codegen.macro';
+
+type TemplateFunction = (
+  data: Object,
+  escapeFn?: (markup: any) => string,
+  includeFn?: (path: string, data: Object) => string | void
+) => string;
+
+let compiledTemplates: {
+  [path: string]: TemplateFunction;
+} = {
+  // placeholder
+  main: (_) => '',
+};
+codegen.require(
+  './portable-html-template/template-codegen.js',
+  'compiledTemplates'
+);
+
+const portableHtmlTemplateFn = (data) => {
+  const templateFn = compiledTemplates.main;
+  const includeFn = (path, data) => {
+    const subTemplateFn = compiledTemplates[path];
+    if (subTemplateFn) {
+      return subTemplateFn(data);
+    }
+  };
+  return templateFn(data, null, includeFn);
+};
 
 function optionsToString(options) {
   let str = '';
@@ -17,91 +45,22 @@ function siteTagToString(siteTag, { newPasswordBumper }) {
   return newPasswordBumper > 0 ? `${siteTag}:${newPasswordBumper}` : siteTag;
 }
 
-export async function createPortableHtml(siteTagOptions) {
-  const template = await readFile(
-    __dirname + '/portable-html-template/index.ejs',
-    { encoding: 'utf8' }
+type SiteTagOptions = {
+  [siteTag: string]: Options;
+};
+
+export function createPortableHtml(
+  siteTagOptions: SiteTagOptions,
+  _strings = strings
+) {
+  const siteTagsAndOptions = Object.entries(siteTagOptions).map(
+    ([siteTag, options]) => [
+      siteTagToString(siteTag, options),
+      optionsToString(options),
+    ]
   );
-  return await ejs.renderFile(
-    template,
-    {
-      ...strings,
-      siteTagsAndOptions: Object.entries(siteTagOptions).map(
-        ([siteTag, options]) => [
-          siteTagToString(siteTag, options as any),
-          optionsToString(options),
-        ]
-      ),
-    },
-    { async: true }
-  );
+  return portableHtmlTemplateFn({
+    ..._strings,
+    siteTagsAndOptions,
+  });
 }
-
-// import ejs from 'ejs';
-// import strings from './passhash-portable-strings.json';
-// import { writeFileSync } from 'fs';
-
-// const siteTagOptions = {
-//   '1&1.com': {
-//     requireDigit: true,
-//     requirePunctuation: false,
-//     requireMixedCase: true,
-//     noSpecial: false,
-//     digitsOnly: false,
-//     size: 16,
-//     newPasswordBumper: 0,
-//   },
-//   'abc.com': {
-//     requireDigit: true,
-//     requirePunctuation: true,
-//     requireMixedCase: true,
-//     noSpecial: false,
-//     digitsOnly: false,
-//     size: 8,
-//     newPasswordBumper: 0,
-//   },
-//   'llamablues.com': {
-//     requireDigit: true,
-//     requirePunctuation: false,
-//     requireMixedCase: false,
-//     noSpecial: false,
-//     digitsOnly: false,
-//     size: 16,
-//     newPasswordBumper: 3,
-//   },
-//   'helpforum.net:90': {
-//     requireDigit: true,
-//     requirePunctuation: true,
-//     requireMixedCase: true,
-//     noSpecial: true,
-//     digitsOnly: false,
-//     size: 24,
-//     newPasswordBumper: 2,
-//   },
-// };
-
-// function getSiteTagString(siteTag, { newPasswordBumper }) {
-//   return newPasswordBumper > 0 ? `${siteTag}:${newPasswordBumper}` : siteTag;
-// }
-
-// ejs.renderFile(
-//   __dirname + '/passhash-portable.ejs',
-//   {
-//     ...strings,
-//     siteTagsAndOptions: Object.entries(siteTagOptions).map(
-//       ([siteTag, options]) => [
-//         getSiteTagString(siteTag, options),
-//         getOptionString(options),
-//       ]
-//     ),
-//   },
-//   {},
-//   (err, str) => {
-//     if (err) {
-//       console.log(err);
-//       return;
-//     }
-//     console.log(str);
-//     writeFileSync(__dirname + '/out.html', str);
-//   }
-// );

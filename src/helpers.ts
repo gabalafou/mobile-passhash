@@ -95,17 +95,18 @@ export function deleteSiteTag(siteTag, siteTagList) {
   };
 }
 
-// Instead of getting the options for a single site tag
-// this helper gets an options object for all the site tags
-// passed in.
+// Instead of getting the options for a single site tag this helper gets the
+// options object for each of the site tags passed in.
 //
-// Returns an object mapping site tags to the options for that site tag.
+// Returns promise for an object that maps each site tag to its corresponding
+// options
 export async function mapSiteTagsToOptions(siteTags) {
   const siteTagOptions = {};
-  siteTags.forEach(async (siteTag) => {
-    siteTagOptions[siteTag] = await getOptions(siteTag);
-  });
-  console.log('siteTagOptions');
-  console.log(siteTagOptions);
+  // use Promise.all to lookup options for each site tag in parallel
+  await Promise.all(
+    siteTags.map(async (siteTag) => {
+      siteTagOptions[siteTag] = await getOptions(siteTag);
+    })
+  );
   return siteTagOptions;
 }

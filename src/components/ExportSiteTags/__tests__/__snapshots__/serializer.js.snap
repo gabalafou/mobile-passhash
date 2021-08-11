@@ -1,0 +1,1173 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`createPortableHtml should render correctly 1`] = `
+"<!DOCTYPE html PUBLIC \\"-//W3C//DTD HTML 4.0 Transitional//EN\\">
+<html>
+  <head>
+    <title>Password Hasher</title>
+    <meta http-equiv=\\"content-type\\" content=\\"text-html; charset=utf-8\\" />
+
+    <style>
+      body {
+    background-color: #eeffee;
+    font-family: arial;
+}
+
+ul {
+    margin-left: 10px;
+    padding-left: 0px;
+    margin-top:0em;
+}
+
+li {
+    font-size: 10pt;
+    font-family: arial;
+    padding-top: .25em;
+    margin-top:0em;
+}
+
+.formfield {
+    font-size: 10pt;
+    font-family: serif;
+    width: 160px;
+}
+
+.formtable {
+    border: thin green solid;
+    padding: .3em;
+}
+
+.title {
+    font-size: 10pt;
+    font-family: arial;
+    font-weight: bold;
+    color: #6060a0;
+    text-align: center;
+}
+
+.result {
+    font-family: serif;
+    background-color: #d0d0f0;
+}
+
+.formlabel {
+    font-size: 9pt;
+    font-family: arial;
+    font-weight: bold;
+    color: #607888;
+    text-align: left;
+    width: 78px;
+}
+
+.optionbox {
+    border: thin silver solid;
+}
+
+.optionlabel {
+    font-size: 9pt;
+    font-family: arial;
+    font-weight: bold;
+    color: #607888;
+    text-align: left;
+}
+
+.optiontable {
+}
+
+.option {
+    font-size: 10pt;
+    font-family: arial;
+}
+
+.noteshead {
+    font-size: 10pt;
+    font-family: arial;
+    font-weight: bold;
+    padding-top: .5em;
+    color: #336633;
+}
+
+.prompt {
+    font-size: 10pt;
+    font-family: arial;
+    font-weight: normal;
+    color: #222288;
+    height: 40px;
+}
+
+.button {
+    width: 70px;
+}
+
+.password {
+    font-size: 10pt;
+    width: 160px;
+}
+
+    </style>
+
+    <script language=\\"JavaScript\\" type=\\"text/javascript\\">
+      var browser = new Object();
+browser.version = parseInt(navigator.appVersion);
+browser.isNetscape = false;
+browser.isMicrosoft = false;
+if (navigator.appName.indexOf(\\"Netscape\\") != -1) 
+    browser.isNetscape = true;
+else if (navigator.appName.indexOf(\\"Microsoft\\") != -1)
+    browser.isMicrosoft = true;
+
+var siteTagLast = '';
+var masterKeyLast = '';
+
+function onLoad()
+{
+    if (browser.isMicrosoft)
+    {
+        document.getElementById('reveal').disabled = true;
+        document.getElementById('reveal-text').disabled = true;
+    }
+    document.getElementById('site-tag').focus();
+    setTimeout('checkChange()',1000);
+}
+
+function validate(form) 
+{
+    var siteTag   = document.getElementById('site-tag');
+    var masterKey = document.getElementById('master-key');
+    if (!siteTag.value)
+    {
+        siteTag.focus();
+        return false;
+    }
+    if (!masterKey.value)
+    {
+        masterKey.focus();
+        return false;
+    }
+    return true;
+}
+
+function update() 
+{
+    var siteTag   = document.getElementById('site-tag');
+    var masterKey = document.getElementById('master-key');
+    var hashWord  = document.getElementById('hash-word');
+    var submit    = document.getElementById('submit');
+    if (submit.value == 'Another')
+    {
+        siteTag.focus();
+        submit.value = 'OK';
+        hashWord.value = '';
+    }
+    else
+    {
+        //var hashapass = b64_hmac_sha1(masterKey.value, siteTag.value).substr(0,8);
+        var hashWordSize       = 8;
+        var requireDigit       = document.getElementById(\\"digit\\").checked;
+        var requirePunctuation = document.getElementById(\\"punctuation\\").checked;
+        var requireMixedCase   = document.getElementById(\\"mixedCase\\").checked;
+        var restrictSpecial    = document.getElementById(\\"noSpecial\\").checked;
+        var restrictDigits     = document.getElementById(\\"digitsOnly\\").checked;
+        if      (document.getElementById(\\"s6\\" ).checked) hashWordSize = 6;
+        else if (document.getElementById(\\"s8\\" ).checked) hashWordSize = 8;
+        else if (document.getElementById(\\"s10\\").checked) hashWordSize = 10;
+        else if (document.getElementById(\\"s12\\").checked) hashWordSize = 12;
+        else if (document.getElementById(\\"s14\\").checked) hashWordSize = 14;
+        else if (document.getElementById(\\"s16\\").checked) hashWordSize = 16;
+        else if (document.getElementById(\\"s18\\").checked) hashWordSize = 18;
+        else if (document.getElementById(\\"s20\\").checked) hashWordSize = 20;
+        else if (document.getElementById(\\"s22\\").checked) hashWordSize = 22;
+        else if (document.getElementById(\\"s24\\").checked) hashWordSize = 24;
+        else if (document.getElementById(\\"s26\\").checked) hashWordSize = 26;
+        hashWord.value = PassHashCommon.generateHashWord(
+                siteTag.value,
+                masterKey.value,
+                hashWordSize,
+                requireDigit,
+                requirePunctuation,
+                requireMixedCase,
+                restrictSpecial,
+                restrictDigits);
+        hashWord.focus();
+        submit.value = 'Another';
+    }
+    siteTagLast = siteTag.value;
+    masterKeyLast = masterKey.value;
+}
+
+function onEnterField(fld, msg)
+{
+    // Select the field
+    try
+    {
+        fld.select();
+    }
+    catch (ex) {}
+    // Set the prompt
+    document.getElementById('prompt').innerHTML = msg;
+}
+
+function checkChange()
+{
+    var siteTag   = document.getElementById('site-tag');
+    var masterKey = document.getElementById('master-key');
+    var hashWord  = document.getElementById('hash-word');
+    if (siteTag.value != siteTagLast || masterKey.value != masterKeyLast)
+    {
+        hashWord.value = '';
+        siteTagLast = siteTag.value;
+        masterKeyLast = masterKey.value;
+    }
+    setTimeout('checkChange()', 1000);
+}
+
+function onEnterSubmitButton(fld)
+{
+    if (fld.value == 'Another')
+        onEnterField(fld, 'Start another hashword');
+    else
+        onEnterField(fld, 'Generate hashword');
+}
+
+function onLeaveField(fld)
+{
+    // Remove the selection (is this the best way?)
+    var v = fld.value;
+    fld.value = '';
+    fld.value = v;
+    // Remove the prompt
+    document.getElementById('prompt').innerHTML = '';
+}
+
+function onLeaveResultField(hashWord)
+{
+    var submit = document.getElementById('submit');
+    submit.value = 'OK';
+//    hashWord.value = '';
+    document.getElementById('prompt').innerHTML = '';
+}
+
+function onReveal(fld)
+{
+    var masterKey = document.getElementById('master-key');
+    try
+    {
+        if (fld.checked)
+            masterKey.setAttribute(\\"type\\", \\"\\");
+        else
+            masterKey.setAttribute(\\"type\\", \\"password\\");
+    } catch (ex) {}
+    document.getElementById('master-key').focus();
+}
+
+function onNoSpecial(fld)
+{
+    document.getElementById('punctuation').disabled = fld.checked;
+    update();
+}
+
+function onDigitsOnly(fld)
+{
+    document.getElementById('punctuation').disabled = fld.checked;
+    document.getElementById(\\"digit\\"      ).disabled = fld.checked;
+    document.getElementById(\\"punctuation\\").disabled = fld.checked;
+    document.getElementById(\\"mixedCase\\"  ).disabled = fld.checked;
+    document.getElementById(\\"noSpecial\\"  ).disabled = fld.checked;
+    update();
+}
+
+function onBump()
+{
+    var siteTag = document.getElementById(\\"site-tag\\");
+    siteTag.value = PassHashCommon.bumpSiteTag(siteTag.value);
+    update();
+}
+
+function onSelectSiteTag(fld)
+{
+    var siteTag = document.getElementById('site-tag');
+    siteTag.value = fld[fld.selectedIndex].text;
+    var options = fld[fld.selectedIndex].value;
+    document.getElementById(\\"digit\\"      ).checked  = (options.search(/d/i) >= 0);
+    document.getElementById(\\"punctuation\\").checked  = (options.search(/p/i) >= 0);
+    document.getElementById(\\"mixedCase\\"  ).checked  = (options.search(/m/i) >= 0);
+    document.getElementById(\\"noSpecial\\"  ).checked  = (options.search(/r/i) >= 0);
+    document.getElementById(\\"digitsOnly\\" ).checked  = (options.search(/g/i) >= 0);
+    document.getElementById('punctuation').disabled = (options.search(/[rg]/i) >= 0);
+    document.getElementById(\\"digit\\"      ).disabled = (options.search(/g/i) >= 0);
+    document.getElementById(\\"punctuation\\").disabled = (options.search(/g/i) >= 0);
+    document.getElementById(\\"mixedCase\\"  ).disabled = (options.search(/g/i) >= 0);
+    document.getElementById(\\"noSpecial\\"  ).disabled = (options.search(/g/i) >= 0);
+    var sizeMatch = options.match(/[0-9]+/);
+    var hashWordSize = (sizeMatch != null && sizeMatch.length > 0
+                                ? parseInt(sizeMatch[0])
+                                : 8);
+    document.getElementById(\\"s6\\" ).checked = (hashWordSize == 6 );
+    document.getElementById(\\"s8\\" ).checked = (hashWordSize == 8 );
+    document.getElementById(\\"s10\\").checked = (hashWordSize == 10);
+    document.getElementById(\\"s12\\").checked = (hashWordSize == 12);
+    document.getElementById(\\"s14\\").checked = (hashWordSize == 14);
+    document.getElementById(\\"s16\\").checked = (hashWordSize == 16);
+    document.getElementById(\\"s18\\").checked = (hashWordSize == 18);
+    document.getElementById(\\"s20\\").checked = (hashWordSize == 20);
+    document.getElementById(\\"s22\\").checked = (hashWordSize == 22);
+    document.getElementById(\\"s24\\").checked = (hashWordSize == 24);
+    document.getElementById(\\"s26\\").checked = (hashWordSize == 26);
+    if (validate())
+        update();
+}
+
+function onLeaveSelectSiteTag(fld)
+{
+    // Remove the prompt
+    document.getElementById('prompt').innerHTML = '';
+}
+
+    </script>
+
+    <script language=\\"JavaScript\\" type=\\"text/javascript\\">
+      (function (root, factory) {
+  if (typeof module === 'object' && module.exports) {
+    // Node. Does not work with strict CommonJS, but
+    // only CommonJS-like environments that support module.exports,
+    // like Node.
+    module.exports = factory();
+  } else {
+    // Browser globals
+    Object.assign(root, factory());
+  }
+})(typeof self !== 'undefined' ? self : this, function () {
+/*
+ * A JavaScript implementation of the Secure Hash Algorithm, SHA-1, as defined
+ * in FIPS PUB 180-1
+ * Version 2.1a Copyright Paul Johnston 2000 - 2002.
+ * Other contributors: Greg Holt, Andrew Kepert, Ydnar, Lostinet
+ * Distributed under the BSD License
+ * See http://pajhome.org.uk/crypt/md5 for details.
+ */
+
+/*
+ * Configurable variables. You may need to tweak these to be compatible with
+ * the server-side, but the defaults work in most cases.
+ */
+var hexcase = 0;  /* hex output format. 0 - lowercase; 1 - uppercase        */
+var b64pad  = \\"\\"; /* base-64 pad character. \\"=\\" for strict RFC compliance   */
+var chrsz   = 8;  /* bits per input character. 8 - ASCII; 16 - Unicode      */
+
+/*
+ * These are the functions you'll usually want to call
+ * They take string arguments and return either hex or base-64 encoded strings
+ */
+function hex_sha1(s){return binb2hex(core_sha1(str2binb(s),s.length * chrsz));}
+function b64_sha1(s){return binb2b64(core_sha1(str2binb(s),s.length * chrsz));}
+function str_sha1(s){return binb2str(core_sha1(str2binb(s),s.length * chrsz));}
+function hex_hmac_sha1(key, data){ return binb2hex(core_hmac_sha1(key, data));}
+function b64_hmac_sha1(key, data){ return binb2b64(core_hmac_sha1(key, data));}
+function str_hmac_sha1(key, data){ return binb2str(core_hmac_sha1(key, data));}
+
+/*
+ * Perform a simple self-test to see if the VM is working
+ */
+function sha1_vm_test()
+{
+  return hex_sha1(\\"abc\\") == \\"a9993e364706816aba3e25717850c26c9cd0d89d\\";
+}
+
+/*
+ * Calculate the SHA-1 of an array of big-endian words, and a bit length
+ */
+function core_sha1(x, len)
+{
+  /* append padding */
+  /* SC - Get rid of warning */
+  var i = (len >> 5);
+  if (x[i] == undefined)
+      x[i]  = 0x80 << (24 - len % 32);
+  else
+      x[i] |= 0x80 << (24 - len % 32);
+  /*x[len >> 5] |= 0x80 << (24 - len % 32);*/
+  x[((len + 64 >> 9) << 4) + 15] = len;
+
+  var w = Array(80);
+  var a =  1732584193;
+  var b = -271733879;
+  var c = -1732584194;
+  var d =  271733878;
+  var e = -1009589776;
+
+  for(var i = 0; i < x.length; i += 16)
+  {
+    var olda = a;
+    var oldb = b;
+    var oldc = c;
+    var oldd = d;
+    var olde = e;
+
+    for(var j = 0; j < 80; j++)
+    {
+      if(j < 16) w[j] = x[i + j];
+      else w[j] = rol(w[j-3] ^ w[j-8] ^ w[j-14] ^ w[j-16], 1);
+      var t = safe_add(safe_add(rol(a, 5), sha1_ft(j, b, c, d)),
+                       safe_add(safe_add(e, w[j]), sha1_kt(j)));
+      e = d;
+      d = c;
+      c = rol(b, 30);
+      b = a;
+      a = t;
+    }
+
+    a = safe_add(a, olda);
+    b = safe_add(b, oldb);
+    c = safe_add(c, oldc);
+    d = safe_add(d, oldd);
+    e = safe_add(e, olde);
+  }
+  return Array(a, b, c, d, e);
+
+}
+
+/*
+ * Perform the appropriate triplet combination function for the current
+ * iteration
+ */
+function sha1_ft(t, b, c, d)
+{
+  if(t < 20) return (b & c) | ((~b) & d);
+  if(t < 40) return b ^ c ^ d;
+  if(t < 60) return (b & c) | (b & d) | (c & d);
+  return b ^ c ^ d;
+}
+
+/*
+ * Determine the appropriate additive constant for the current iteration
+ */
+function sha1_kt(t)
+{
+  return (t < 20) ?  1518500249 : (t < 40) ?  1859775393 :
+         (t < 60) ? -1894007588 : -899497514;
+}
+
+/*
+ * Calculate the HMAC-SHA1 of a key and some data
+ */
+function core_hmac_sha1(key, data)
+{
+  var bkey = str2binb(key);
+  if(bkey.length > 16) bkey = core_sha1(bkey, key.length * chrsz);
+
+  var ipad = Array(16), opad = Array(16);
+  for(var i = 0; i < 16; i++)
+  {
+    /* SC - Get rid of warning */
+    var k = (bkey[i] != undefined ? bkey[i] : 0);
+    ipad[i] = k ^ 0x36363636;
+    opad[i] = k ^ 0x5C5C5C5C;
+/*  ipad[i] = bkey[i] ^ 0x36363636;
+    opad[i] = bkey[i] ^ 0x5C5C5C5C;*/
+  }
+
+  var hash = core_sha1(ipad.concat(str2binb(data)), 512 + data.length * chrsz);
+  return core_sha1(opad.concat(hash), 512 + 160);
+}
+
+/*
+ * Add integers, wrapping at 2^32. This uses 16-bit operations internally
+ * to work around bugs in some JS interpreters.
+ */
+function safe_add(x, y)
+{
+  var lsw = (x & 0xFFFF) + (y & 0xFFFF);
+  var msw = (x >> 16) + (y >> 16) + (lsw >> 16);
+  return (msw << 16) | (lsw & 0xFFFF);
+}
+
+/*
+ * Bitwise rotate a 32-bit number to the left.
+ */
+function rol(num, cnt)
+{
+  return (num << cnt) | (num >>> (32 - cnt));
+}
+
+/*
+ * Convert an 8-bit or 16-bit string to an array of big-endian words
+ * In 8-bit function, characters >255 have their hi-byte silently ignored.
+ */
+function str2binb(str)
+{
+  var bin = Array();
+  var mask = (1 << chrsz) - 1;
+  /* SC - Get rid of warnings */
+  for(var i = 0; i < str.length * chrsz; i += chrsz)
+  {
+    if (bin[i>>5] != undefined)
+      bin[i>>5] |= (str.charCodeAt(i / chrsz) & mask) << (32 - chrsz - i%32);
+    else
+      bin[i>>5]  = (str.charCodeAt(i / chrsz) & mask) << (32 - chrsz - i%32);
+  }
+  /*for(var i = 0; i < str.length * chrsz; i += chrsz)
+      bin[i>>5] |= (str.charCodeAt(i / chrsz) & mask) << (32 - chrsz - i%32);*/
+  return bin;
+}
+
+/*
+ * Convert an array of big-endian words to a string
+ */
+function binb2str(bin)
+{
+  var str = \\"\\";
+  var mask = (1 << chrsz) - 1;
+  for(var i = 0; i < bin.length * 32; i += chrsz)
+    str += String.fromCharCode((bin[i>>5] >>> (32 - chrsz - i%32)) & mask);
+  return str;
+}
+
+/*
+ * Convert an array of big-endian words to a hex string.
+ */
+function binb2hex(binarray)
+{
+  var hex_tab = hexcase ? \\"0123456789ABCDEF\\" : \\"0123456789abcdef\\";
+  var str = \\"\\";
+  for(var i = 0; i < binarray.length * 4; i++)
+  {
+    str += hex_tab.charAt((binarray[i>>2] >> ((3 - i%4)*8+4)) & 0xF) +
+           hex_tab.charAt((binarray[i>>2] >> ((3 - i%4)*8  )) & 0xF);
+  }
+  return str;
+}
+
+/*
+ * Convert an array of big-endian words to a base-64 string
+ */
+function binb2b64(binarray)
+{
+  var tab = \\"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/\\";
+  var str = \\"\\";
+  for(var i = 0; i < binarray.length * 4; i += 3)
+  {
+    /* SC - Get rid of warning */
+    var b1 = binarray[i   >> 2] != undefined ? ((binarray[i   >> 2] >> 8 * (3 -  i   %4)) & 0xFF) << 16 : 0;
+    var b2 = binarray[i+1 >> 2] != undefined ? ((binarray[i+1 >> 2] >> 8 * (3 - (i+1)%4)) & 0xFF) << 8  : 0;
+    var b3 = binarray[i+2 >> 2] != undefined ? ((binarray[i+2 >> 2] >> 8 * (3 - (i+2)%4)) & 0xFF)       : 0;
+    var triplet = b1 | b2 | b3;
+    /*var triplet = (((binarray[i   >> 2] >> 8 * (3 -  i   %4)) & 0xFF) << 16)
+                | (((binarray[i+1 >> 2] >> 8 * (3 - (i+1)%4)) & 0xFF) << 8 )
+                |  ((binarray[i+2 >> 2] >> 8 * (3 - (i+2)%4)) & 0xFF);*/
+    for(var j = 0; j < 4; j++)
+    {
+      if(i * 8 + j * 6 > binarray.length * 32) str += b64pad;
+      else str += tab.charAt((triplet >> 6*(3-j)) & 0x3F);
+    }
+  }
+  return str;
+}
+
+return {
+  b64_hmac_sha1: b64_hmac_sha1
+};
+
+});
+
+    </script>
+
+    <script language=\\"JavaScript\\" type=\\"text/javascript\\">
+      /* ***** BEGIN LICENSE BLOCK *****
+ * Version: MPL 1.1/GPL 2.0/LGPL 2.1
+ *
+ * The contents of this file are subject to the Mozilla Public License Version
+ * 1.1 (the \\"License\\"); you may not use this file except in compliance with
+ * the License. You may obtain a copy of the License at
+ * http://www.mozilla.org/MPL/
+ *
+ * Software distributed under the License is distributed on an \\"AS IS\\" basis,
+ * WITHOUT WARRANTY OF ANY KIND, either express or implied. See the License
+ * for the specific language governing rights and limitations under the
+ * License.
+ *
+ * The Original Code is Password Hasher
+ *
+ * The Initial Developer of the Original Code is Steve Cooper.
+ * Portions created by the Initial Developer are Copyright (C) 2006
+ * the Initial Developer. All Rights Reserved.
+ *
+ * Contributor(s): (none)
+ *
+ * Alternatively, the contents of this file may be used under the terms of
+ * either the GNU General Public License Version 2 or later (the \\"GPL\\"), or
+ * the GNU Lesser General Public License Version 2.1 or later (the \\"LGPL\\"),
+ * in which case the provisions of the GPL or the LGPL are applicable instead
+ * of those above. If you wish to allow use of your version of this file only
+ * under the terms of either the GPL or the LGPL, and not to allow others to
+ * use your version of this file under the terms of the MPL, indicate your
+ * decision by deleting the provisions above and replace them with the notice
+ * and other provisions required by the GPL or the LGPL. If you do not delete
+ * the provisions above, a recipient may use your version of this file under
+ * the terms of any one of the MPL, the GPL or the LGPL.
+ *
+ * ***** END LICENSE BLOCK ***** */
+
+(function (root, factory) {
+  if (typeof module === 'object' && module.exports) {
+    // Node. Does not work with strict CommonJS, but
+    // only CommonJS-like environments that support module.exports,
+    // like Node.
+    module.exports = factory(require('../paj/sha1').b64_hmac_sha1);
+  } else {
+    // Browser globals
+    root.PassHashCommon = factory(root.b64_hmac_sha1)
+  }
+})(typeof self !== 'undefined' ? self : this, function (b64_hmac_sha1) {
+var PassHashCommon =
+{
+    // IMPORTANT: This function should be changed carefully.  It must be
+    // completely deterministic and consistent between releases.  Otherwise
+    // users would be forced to update their passwords.  In other words, the
+    // algorithm must always be backward-compatible.  It's only acceptable to
+    // violate backward compatibility when new options are used.
+    // SECURITY: The optional adjustments are positioned and calculated based
+    // on the sum of all character codes in the raw hash string.  So it becomes
+    // far more difficult to guess the injected special characters without
+    // knowing the master key.
+    // TODO: Is it ok to assume ASCII is ok for adjustments?
+    generateHashWord: function(
+                siteTag,
+                masterKey,
+                hashWordSize,
+                requireDigit,
+                requirePunctuation,
+                requireMixedCase,
+                restrictSpecial,
+                restrictDigits)
+    {
+        // Start with the SHA1-encrypted master key/site tag.
+        var s = b64_hmac_sha1(masterKey, siteTag);
+        // Use the checksum of all characters as a pseudo-randomizing seed to
+        // avoid making the injected characters easy to guess.  Note that it
+        // isn't random in the sense of not being deterministic (i.e.
+        // repeatable).  Must share the same seed between all injected
+        // characters so that they are guaranteed unique positions based on
+        // their offsets.
+        var sum = 0;
+        for (var i = 0; i < s.length; i++)
+            sum += s.charCodeAt(i);
+        // Restrict digits just does a mod 10 of all the characters
+        if (restrictDigits)
+            s = PassHashCommon.convertToDigits(s, sum, hashWordSize);
+        else
+        {
+            // Inject digit, punctuation, and mixed case as needed.
+            if (requireDigit)
+                s = PassHashCommon.injectSpecialCharacter(s, 0, 4, sum, hashWordSize, 48, 10);
+            if (requirePunctuation && !restrictSpecial)
+                s = PassHashCommon.injectSpecialCharacter(s, 1, 4, sum, hashWordSize, 33, 15);
+            if (requireMixedCase)
+            {
+                s = PassHashCommon.injectSpecialCharacter(s, 2, 4, sum, hashWordSize, 65, 26);
+                s = PassHashCommon.injectSpecialCharacter(s, 3, 4, sum, hashWordSize, 97, 26);
+            }
+            // Strip out special characters as needed.
+            if (restrictSpecial)
+                s = PassHashCommon.removeSpecialCharacters(s, sum, hashWordSize);
+        }
+        // Trim it to size.
+        return s.substr(0, hashWordSize);
+    },
+
+    // This is a very specialized method to inject a character chosen from a
+    // range of character codes into a block at the front of a string if one of
+    // those characters is not already present.
+    // Parameters:
+    //  sInput   = input string
+    //  offset   = offset for position of injected character
+    //  reserved = # of offsets reserved for special characters
+    //  seed     = seed for pseudo-randomizing the position and injected character
+    //  lenOut   = length of head of string that will eventually survive truncation.
+    //  cStart   = character code for first valid injected character.
+    //  cNum     = number of valid character codes starting from cStart.
+    injectSpecialCharacter: function(sInput, offset, reserved, seed, lenOut, cStart, cNum)
+    {
+        var pos0 = seed % lenOut;
+        var pos = (pos0 + offset) % lenOut;
+        // Check if a qualified character is already present
+        // Write the loop so that the reserved block is ignored.
+        for (var i = 0; i < lenOut - reserved; i++)
+        {
+            var i2 = (pos0 + reserved + i) % lenOut
+            var c = sInput.charCodeAt(i2);
+            if (c >= cStart && c < cStart + cNum)
+                return sInput;  // Already present - nothing to do
+        }
+        var sHead   = (pos > 0 ? sInput.substring(0, pos) : \\"\\");
+        var sInject = String.fromCharCode(((seed + sInput.charCodeAt(pos)) % cNum) + cStart);
+        var sTail   = (pos + 1 < sInput.length ? sInput.substring(pos+1, sInput.length) : \\"\\");
+        return (sHead + sInject + sTail);
+    },
+
+    // Another specialized method to replace a class of character, e.g.
+    // punctuation, with plain letters and numbers.
+    // Parameters:
+    //  sInput = input string
+    //  seed   = seed for pseudo-randomizing the position and injected character
+    //  lenOut = length of head of string that will eventually survive truncation.
+    removeSpecialCharacters: function(sInput, seed, lenOut)
+    {
+        var s = '';
+        var i = 0;
+        while (i < lenOut)
+        {
+            var j = sInput.substring(i).search(/[^a-z0-9]/i);
+            if (j < 0)
+                break;
+            if (j > 0)
+                s += sInput.substring(i, i + j);
+            s += String.fromCharCode((seed + i) % 26 + 65);
+            i += (j + 1);
+        }
+        if (i < sInput.length)
+            s += sInput.substring(i);
+        return s;
+    },
+
+    // Convert input string to digits-only.
+    // Parameters:
+    //  sInput = input string
+    //  seed   = seed for pseudo-randomizing the position and injected character
+    //  lenOut = length of head of string that will eventually survive truncation.
+    convertToDigits: function(sInput, seed, lenOut)
+    {
+        var s = '';
+        var i = 0;
+        while (i < lenOut)
+        {
+            var j = sInput.substring(i).search(/[^0-9]/i);
+            if (j < 0)
+                break;
+            if (j > 0)
+                s += sInput.substring(i, i + j);
+            s += String.fromCharCode((seed + sInput.charCodeAt(i)) % 10 + 48);
+            i += (j + 1);
+        }
+        if (i < sInput.length)
+            s += sInput.substring(i);
+        return s;
+    },
+
+    bumpSiteTag: function(siteTag)
+    {
+        var tag = siteTag.replace(/^[ \\\\t]*(.*)[ \\\\t]*$/, \\"$1\\");    // redundant
+        if (tag)
+        {
+            var splitTag = tag.match(/^(.*):([0-9]+)?$/);
+            if (splitTag == null || splitTag.length < 3)
+                tag += \\":1\\";
+            else
+                tag = splitTag[1] + \\":\\" + (parseInt(splitTag[2]) + 1);
+        }
+        return tag;
+    }
+};
+
+return PassHashCommon;
+
+});
+
+    </script>
+  </head>
+
+  <body onload=\\"onLoad();\\">
+    <form
+      name=\\"form\\"
+      onsubmit=\\"return validate(this)\\"
+      action=\\"javascript:update()\\"
+    >
+      <table class=\\"formtable\\">
+        <tbody>
+          <tr>
+            <td class=\\"title\\" colspan=\\"2\\">Password Hasher</td>
+          </tr>
+          <tr>
+            <td class=\\"formlabel\\" colspan=\\"2\\">
+              Site Tag
+            </td>
+          </tr>
+          <tr>
+            <td colspan=\\"2\\">
+              <select
+                id=\\"site-tag-list\\"
+                class=\\"formfield\\"
+                onFocus=\\"onEnterField(this, 'Select from your previously-used site tags');\\"
+                onBlur=\\"onLeaveSelectSiteTag(this);\\"
+                onChange=\\"onSelectSiteTag(this);\\"
+              >
+                <option selected=\\"\\"></option>
+                
+                <option value=\\"dm16\\">1&amp;1.com</option>
+                
+                <option value=\\"dpm8\\">abc.com</option>
+                
+                <option value=\\"d16\\">llamablues.com:3</option>
+                
+                <option value=\\"dpmr24\\">helpforum.net:90:2</option>
+                
+              </select>
+            </td>
+          </tr>
+          <tr>
+            <td colspan=\\"2\\">
+              <input
+                id=\\"site-tag\\"
+                class=\\"formfield\\"
+                onFocus=\\"onEnterField(this, 'Site or other name, e.g. google');\\"
+                onBlur=\\"onLeaveField(this);\\"
+              />
+            </td>
+          </tr>
+          <tr>
+            <td class=\\"formlabel\\" colspan=\\"2\\">
+              Master Key
+            </td>
+          </tr>
+          <tr>
+            <td colspan=\\"2\\">
+              <input
+                id=\\"master-key\\"
+                type=\\"password\\"
+                class=\\"password\\"
+                phNoMarkers
+                onFocus=\\"onEnterField(this, 'Master key');\\"
+                onBlur=\\"onLeaveField(this);\\"
+              />
+            </td>
+          </tr>
+          <tr>
+            <td class=\\"formlabel\\" colspan=\\"2\\">
+              Hash Word
+            </td>
+          </tr>
+          <tr>
+            <td colspan=\\"2\\">
+              <input
+                id=\\"hash-word\\"
+                readonly=\\"true\\"
+                class=\\"formfield result\\"
+                onFocus=\\"onEnterField(this, '&lt;b&gt;Ctrl-C&lt;/b&gt; to copy, &lt;b&gt;Enter&lt;/b&gt; to start another');\\"
+                onBlur=\\"onLeaveResultField(this);\\"
+              />
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <input
+                id=\\"submit\\"
+                type=\\"submit\\"
+                value=\\"OK\\"
+                class=\\"button\\"
+                onFocus=\\"onEnterSubmitButton(this);\\"
+                onBlur=\\"onLeaveField(this);\\"
+              />
+            </td>
+            <td>
+              <input
+                id=\\"bump\\"
+                type=\\"button\\"
+                value=\\"Bump\\"
+                class=\\"button\\"
+                onClick=\\"onBump(this);\\"
+              />
+            </td>
+          </tr>
+          <tr>
+            <td colspan=\\"2\\">
+              <input
+                id=\\"reveal\\"
+                type=\\"checkbox\\"
+                class=\\"option\\"
+                onClick=\\"onReveal(this);\\"
+              />
+              <span id=\\"reveal-text\\" class=\\"option\\">
+                Unmask
+              </span>
+            </td>
+          </tr>
+          <tr>
+            <td colspan=\\"2\\">
+              <table class=\\"optiontable\\">
+                <tr>
+                  <td>
+                    <div class=\\"optionlabel\\">
+                      Requirements
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <input
+                      id=\\"digit\\"
+                      type=\\"checkbox\\"
+                      class=\\"option\\"
+                      checked
+                      onClick=\\"update();\\"
+                    />
+                    <span class=\\"option\\">
+                      Digit
+                    </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <input
+                      id=\\"punctuation\\"
+                      type=\\"checkbox\\"
+                      class=\\"option\\"
+                      checked
+                      onClick=\\"update();\\"
+                    />
+                    <span class=\\"option\\">
+                      Punctuation
+                    </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <input
+                      id=\\"mixedCase\\"
+                      type=\\"checkbox\\"
+                      class=\\"option\\"
+                      checked
+                      onClick=\\"update();\\"
+                    />
+                    <span class=\\"option\\">
+                      Mixed Case
+                    </span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td colspan=\\"2\\">
+              <table class=\\"optiontable\\">
+                <tr>
+                  <td>
+                    <div class=\\"optionlabel\\">
+                      Restrictions
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <input
+                      id=\\"noSpecial\\"
+                      type=\\"checkbox\\"
+                      class=\\"option\\"
+                      onClick=\\"onNoSpecial(this);\\"
+                    />
+                    <span class=\\"option\\">
+                      No Special
+                    </span>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <input
+                      id=\\"digitsOnly\\"
+                      type=\\"checkbox\\"
+                      class=\\"option\\"
+                      onClick=\\"onDigitsOnly(this);\\"
+                    />
+                    <span class=\\"option\\">
+                      Digits Only
+                    </span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td colspan=\\"2\\">
+              <table class=\\"optiontable\\">
+                <tr>
+                  <td>
+                    <div class=\\"optionlabel\\">
+                      Size
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <input
+                      id=\\"s4\\"
+                      name=\\"size\\"
+                      type=\\"radio\\"
+                      value=\\"4\\"
+                      class=\\"option\\"
+                      onClick=\\"update(this);\\"
+                    />
+                    <span class=\\"option\\">4</span>
+                  </td>
+                  <td>
+                    <input
+                      id=\\"s16\\"
+                      name=\\"size\\"
+                      type=\\"radio\\"
+                      value=\\"16\\"
+                      class=\\"option\\"
+                      onClick=\\"update(this);\\"
+                    />
+                    <span class=\\"option\\">16</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <input
+                      id=\\"s6\\"
+                      name=\\"size\\"
+                      type=\\"radio\\"
+                      value=\\"6\\"
+                      class=\\"option\\"
+                      onClick=\\"update(this);\\"
+                    />
+                    <span class=\\"option\\">6</span>
+                  </td>
+                  <td>
+                    <input
+                      id=\\"s18\\"
+                      name=\\"size\\"
+                      type=\\"radio\\"
+                      value=\\"18\\"
+                      class=\\"option\\"
+                      onClick=\\"update(this);\\"
+                    />
+                    <span class=\\"option\\">18</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <input
+                      id=\\"s8\\"
+                      name=\\"size\\"
+                      type=\\"radio\\"
+                      value=\\"8\\"
+                      class=\\"option\\"
+                      checked
+                      onClick=\\"update(this);\\"
+                    />
+                    <span class=\\"option\\">8</span>
+                  </td>
+                  <td>
+                    <input
+                      id=\\"s20\\"
+                      name=\\"size\\"
+                      type=\\"radio\\"
+                      value=\\"20\\"
+                      class=\\"option\\"
+                      onClick=\\"update(this);\\"
+                    />
+                    <span class=\\"option\\">20</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <input
+                      id=\\"s10\\"
+                      name=\\"size\\"
+                      type=\\"radio\\"
+                      value=\\"10\\"
+                      class=\\"option\\"
+                      onClick=\\"update(this);\\"
+                    />
+                    <span class=\\"option\\">10</span>
+                  </td>
+                  <td>
+                    <input
+                      id=\\"s22\\"
+                      name=\\"size\\"
+                      type=\\"radio\\"
+                      value=\\"22\\"
+                      class=\\"option\\"
+                      onClick=\\"update(this);\\"
+                    />
+                    <span class=\\"option\\">22</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <input
+                      id=\\"s12\\"
+                      name=\\"size\\"
+                      type=\\"radio\\"
+                      value=\\"12\\"
+                      class=\\"option\\"
+                      onClick=\\"update(this);\\"
+                    />
+                    <span class=\\"option\\">12</span>
+                  </td>
+                  <td>
+                    <input
+                      id=\\"s24\\"
+                      name=\\"size\\"
+                      type=\\"radio\\"
+                      value=\\"24\\"
+                      class=\\"option\\"
+                      onClick=\\"update(this);\\"
+                    />
+                    <span class=\\"option\\">24</span>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <input
+                      id=\\"s14\\"
+                      name=\\"size\\"
+                      type=\\"radio\\"
+                      value=\\"14\\"
+                      class=\\"option\\"
+                      onClick=\\"update(this);\\"
+                    />
+                    <span class=\\"option\\">14</span>
+                  </td>
+                  <td>
+                    <input
+                      id=\\"s26\\"
+                      name=\\"size\\"
+                      type=\\"radio\\"
+                      value=\\"26\\"
+                      class=\\"option\\"
+                      onClick=\\"update(this);\\"
+                    />
+                    <span class=\\"option\\">26</span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <div id=\\"prompt\\" class=\\"prompt\\"></div>
+      <div id=\\"blurb\\" class=\\"blurb\\">
+        <ul>
+  <li>
+    Generates hash words when the
+    <a href=\\"http://wijjo.com/passhash/\\">Password Hasher</a>
+    extension is unavailable.
+  </li>
+  <li>Backs up and uses saved site options.</li>
+  <li>For security, does not know your master key(s).</li>
+  <li>Completely self-contained.</li>
+  <li>Runs in any browser.</li>
+  <li>Works from a USB key.</li>
+  <li>Layout works well in a sidebar.</li>
+  <li>
+    Smart [Enter] key moves to next empty field, makes a hashword, or starts
+    over.
+  </li>
+  <li>Use copy/paste to apply the hash word to a password field.</li>
+</ul>
+
+      </div>
+    </form>
+  </body>
+</html>
+"
+`;

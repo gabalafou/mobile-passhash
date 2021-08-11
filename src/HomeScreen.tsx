@@ -150,7 +150,7 @@ export default function HomeScreen(props) {
           setBottomOverlayChildren={setBottomOverlayChildren}
         />
 
-        <Text style={styles.header}>Import Site Tags</Text>
+        <Text style={styles.header}>Import / Export</Text>
         <View style={rowStyles.section}>
           <View style={rowStyles.rowGroup}>
             <Pressable
@@ -165,7 +165,7 @@ export default function HomeScreen(props) {
               {({ pressed }) => (
                 <View
                   style={[
-                    rowStyles.lastRow,
+                    rowStyles.row,
                     pressed && { backgroundColor: '#ccc' },
                   ]}
                 >
@@ -173,12 +173,6 @@ export default function HomeScreen(props) {
                 </View>
               )}
             </Pressable>
-          </View>
-        </View>
-
-        <Text style={styles.header}>Export Site Tags</Text>
-        <View style={rowStyles.section}>
-          <View style={rowStyles.rowGroup}>
             <Pressable
               onPress={() => {
                 navigation.navigate('Export');
