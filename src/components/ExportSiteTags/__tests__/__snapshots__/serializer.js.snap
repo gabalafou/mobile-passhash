@@ -1,14 +1,16 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`createPortableHtml should render correctly 1`] = `
-"<!DOCTYPE html PUBLIC \\"-//W3C//DTD HTML 4.0 Transitional//EN\\">
+"<!DOCTYPE HTML PUBLIC \\"-//W3C//DTD HTML 4.0 Transitional//EN\\">
 <html>
-  <head>
-    <title>Password Hasher</title>
-    <meta http-equiv=\\"content-type\\" content=\\"text-html; charset=utf-8\\" />
 
-    <style>
-      body {
+<head>
+
+<title>Password Hasher</title>
+<meta http-equiv=\\"content-type\\" content=\\"text-html; charset=utf-8\\">
+
+<style>
+body {
     background-color: #eeffee;
     font-family: arial;
 }
@@ -104,10 +106,10 @@ li {
     width: 160px;
 }
 
-    </style>
+</style>
 
-    <script language=\\"JavaScript\\" type=\\"text/javascript\\">
-      var browser = new Object();
+<script language=\\"JavaScript\\" type=\\"text/javascript\\">
+var browser = new Object();
 browser.version = parseInt(navigator.appVersion);
 browser.isNetscape = false;
 browser.isMicrosoft = false;
@@ -323,10 +325,10 @@ function onLeaveSelectSiteTag(fld)
     document.getElementById('prompt').innerHTML = '';
 }
 
-    </script>
+</script>
 
-    <script language=\\"JavaScript\\" type=\\"text/javascript\\">
-      (function (root, factory) {
+<script language=\\"JavaScript\\" type=\\"text/javascript\\">
+(function (root, factory) {
   if (typeof module === 'object' && module.exports) {
     // Node. Does not work with strict CommonJS, but
     // only CommonJS-like environments that support module.exports,
@@ -569,10 +571,10 @@ return {
 
 });
 
-    </script>
+</script>
 
-    <script language=\\"JavaScript\\" type=\\"text/javascript\\">
-      /* ***** BEGIN LICENSE BLOCK *****
+<script language=\\"JavaScript\\" type=\\"text/javascript\\">
+/* ***** BEGIN LICENSE BLOCK *****
  * Version: MPL 1.1/GPL 2.0/LGPL 2.1
  *
  * The contents of this file are subject to the Mozilla Public License Version
@@ -772,402 +774,307 @@ return PassHashCommon;
 
 });
 
-    </script>
-  </head>
+</script>
 
-  <body onload=\\"onLoad();\\">
-    <form
-      name=\\"form\\"
-      onsubmit=\\"return validate(this)\\"
-      action=\\"javascript:update()\\"
-    >
-      <table class=\\"formtable\\">
-        <tbody>
-          <tr>
-            <td class=\\"title\\" colspan=\\"2\\">Password Hasher</td>
-          </tr>
-          <tr>
-            <td class=\\"formlabel\\" colspan=\\"2\\">
-              Site Tag
-            </td>
-          </tr>
-          <tr>
-            <td colspan=\\"2\\">
-              <select
-                id=\\"site-tag-list\\"
-                class=\\"formfield\\"
-                onFocus=\\"onEnterField(this, 'Select from your previously-used site tags');\\"
-                onBlur=\\"onLeaveSelectSiteTag(this);\\"
-                onChange=\\"onSelectSiteTag(this);\\"
-              >
-                <option selected=\\"\\"></option>
-                
-                <option value=\\"dm16\\">1&amp;1.com</option>
-                
-                <option value=\\"dpm8\\">abc.com</option>
-                
-                <option value=\\"d16\\">llamablues.com:3</option>
-                
-                <option value=\\"dpmr24\\">helpforum.net:90:2</option>
-                
-              </select>
-            </td>
-          </tr>
-          <tr>
-            <td colspan=\\"2\\">
-              <input
-                id=\\"site-tag\\"
-                class=\\"formfield\\"
-                onFocus=\\"onEnterField(this, 'Site or other name, e.g. google');\\"
-                onBlur=\\"onLeaveField(this);\\"
-              />
-            </td>
-          </tr>
-          <tr>
-            <td class=\\"formlabel\\" colspan=\\"2\\">
-              Master Key
-            </td>
-          </tr>
-          <tr>
-            <td colspan=\\"2\\">
-              <input
-                id=\\"master-key\\"
-                type=\\"password\\"
-                class=\\"password\\"
-                phNoMarkers
-                onFocus=\\"onEnterField(this, 'Master key');\\"
-                onBlur=\\"onLeaveField(this);\\"
-              />
-            </td>
-          </tr>
-          <tr>
-            <td class=\\"formlabel\\" colspan=\\"2\\">
-              Hash Word
-            </td>
-          </tr>
-          <tr>
-            <td colspan=\\"2\\">
-              <input
-                id=\\"hash-word\\"
-                readonly=\\"true\\"
-                class=\\"formfield result\\"
-                onFocus=\\"onEnterField(this, '&lt;b&gt;Ctrl-C&lt;/b&gt; to copy, &lt;b&gt;Enter&lt;/b&gt; to start another');\\"
-                onBlur=\\"onLeaveResultField(this);\\"
-              />
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <input
-                id=\\"submit\\"
-                type=\\"submit\\"
-                value=\\"OK\\"
-                class=\\"button\\"
-                onFocus=\\"onEnterSubmitButton(this);\\"
-                onBlur=\\"onLeaveField(this);\\"
-              />
-            </td>
-            <td>
-              <input
-                id=\\"bump\\"
-                type=\\"button\\"
-                value=\\"Bump\\"
-                class=\\"button\\"
-                onClick=\\"onBump(this);\\"
-              />
-            </td>
-          </tr>
-          <tr>
-            <td colspan=\\"2\\">
-              <input
-                id=\\"reveal\\"
-                type=\\"checkbox\\"
-                class=\\"option\\"
-                onClick=\\"onReveal(this);\\"
-              />
-              <span id=\\"reveal-text\\" class=\\"option\\">
-                Unmask
-              </span>
-            </td>
-          </tr>
-          <tr>
-            <td colspan=\\"2\\">
-              <table class=\\"optiontable\\">
+</head>
+
+<body onload=\\"onLoad();\\">
+
+    <form name=\\"form\\" onsubmit=\\"return validate(this)\\" action=\\"javascript:update()\\">
+        <table class=\\"formtable\\">
+            <tbody>
                 <tr>
-                  <td>
-                    <div class=\\"optionlabel\\">
-                      Requirements
-                    </div>
-                  </td>
+                    <td class=\\"title\\" colspan=\\"2\\">Password Hasher</td>
                 </tr>
                 <tr>
-                  <td>
-                    <input
-                      id=\\"digit\\"
-                      type=\\"checkbox\\"
-                      class=\\"option\\"
-                      checked
-                      onClick=\\"update();\\"
-                    />
-                    <span class=\\"option\\">
-                      Digit
-                    </span>
-                  </td>
+                    <td class=\\"formlabel\\" colspan=\\"2\\">Site Tag</td>
                 </tr>
                 <tr>
-                  <td>
-                    <input
-                      id=\\"punctuation\\"
-                      type=\\"checkbox\\"
-                      class=\\"option\\"
-                      checked
-                      onClick=\\"update();\\"
-                    />
-                    <span class=\\"option\\">
-                      Punctuation
-                    </span>
-                  </td>
+                    <td colspan=\\"2\\">
+                        <select id=\\"site-tag-list\\" class=\\"formfield\\"
+                        onFocus=\\"onEnterField(this, 'Select from your previously-used site tags');\\"
+                        onBlur=\\"onLeaveSelectSiteTag(this);\\"
+                        onChange=\\"onSelectSiteTag(this);\\"
+                        >
+                          <option selected=\\"\\"></option>
+                          
+                          <option value=\\"dm16\\">1&amp;1.com</option>
+                          
+                          <option value=\\"dpm8\\">abc.com</option>
+                          
+                          <option value=\\"d16\\">llamablues.com:3</option>
+                          
+                          <option value=\\"dpmr24\\">helpforum.net:90:2</option>
+                          
+                        </select>
+                    </td>
                 </tr>
                 <tr>
-                  <td>
-                    <input
-                      id=\\"mixedCase\\"
-                      type=\\"checkbox\\"
-                      class=\\"option\\"
-                      checked
-                      onClick=\\"update();\\"
-                    />
-                    <span class=\\"option\\">
-                      Mixed Case
-                    </span>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-          <tr>
-            <td colspan=\\"2\\">
-              <table class=\\"optiontable\\">
-                <tr>
-                  <td>
-                    <div class=\\"optionlabel\\">
-                      Restrictions
-                    </div>
-                  </td>
+                    <td colspan=\\"2\\">
+                        <input id=\\"site-tag\\" class=\\"formfield\\"
+                        onFocus=\\"onEnterField(this, 'Site or other name, e.g. google');\\"
+                        onBlur=\\"onLeaveField(this);\\"
+                        />
+                    </td>
                 </tr>
                 <tr>
-                  <td>
-                    <input
-                      id=\\"noSpecial\\"
-                      type=\\"checkbox\\"
-                      class=\\"option\\"
-                      onClick=\\"onNoSpecial(this);\\"
-                    />
-                    <span class=\\"option\\">
-                      No Special
-                    </span>
-                  </td>
+                    <td class=\\"formlabel\\" colspan=\\"2\\">Master Key</td>
                 </tr>
                 <tr>
-                  <td>
-                    <input
-                      id=\\"digitsOnly\\"
-                      type=\\"checkbox\\"
-                      class=\\"option\\"
-                      onClick=\\"onDigitsOnly(this);\\"
-                    />
-                    <span class=\\"option\\">
-                      Digits Only
-                    </span>
-                  </td>
-                </tr>
-              </table>
-            </td>
-          </tr>
-          <tr>
-            <td colspan=\\"2\\">
-              <table class=\\"optiontable\\">
-                <tr>
-                  <td>
-                    <div class=\\"optionlabel\\">
-                      Size
-                    </div>
-                  </td>
+                    <td colspan=\\"2\\">
+                        <input id=\\"master-key\\" type=\\"password\\" class=\\"password\\" phNoMarkers
+                        onFocus=\\"onEnterField(this, 'Master key');\\"
+                        onBlur=\\"onLeaveField(this);\\"
+                        />
+                    </td>
                 </tr>
                 <tr>
-                  <td>
-                    <input
-                      id=\\"s4\\"
-                      name=\\"size\\"
-                      type=\\"radio\\"
-                      value=\\"4\\"
-                      class=\\"option\\"
-                      onClick=\\"update(this);\\"
-                    />
-                    <span class=\\"option\\">4</span>
-                  </td>
-                  <td>
-                    <input
-                      id=\\"s16\\"
-                      name=\\"size\\"
-                      type=\\"radio\\"
-                      value=\\"16\\"
-                      class=\\"option\\"
-                      onClick=\\"update(this);\\"
-                    />
-                    <span class=\\"option\\">16</span>
-                  </td>
+                    <td class=\\"formlabel\\" colspan=\\"2\\">Hash Word</td>
                 </tr>
                 <tr>
-                  <td>
-                    <input
-                      id=\\"s6\\"
-                      name=\\"size\\"
-                      type=\\"radio\\"
-                      value=\\"6\\"
-                      class=\\"option\\"
-                      onClick=\\"update(this);\\"
-                    />
-                    <span class=\\"option\\">6</span>
-                  </td>
-                  <td>
-                    <input
-                      id=\\"s18\\"
-                      name=\\"size\\"
-                      type=\\"radio\\"
-                      value=\\"18\\"
-                      class=\\"option\\"
-                      onClick=\\"update(this);\\"
-                    />
-                    <span class=\\"option\\">18</span>
-                  </td>
+                    <td colspan=\\"2\\">
+                        <input id=\\"hash-word\\" readonly=\\"true\\" class=\\"formfield result\\"
+                        onFocus=\\"onEnterField(this, '&lt;b&gt;Ctrl-C&lt;/b&gt; to copy, &lt;b&gt;Enter&lt;/b&gt; to start another');\\"
+                        onBlur=\\"onLeaveResultField(this);\\"
+                        />
+                    </td>
                 </tr>
                 <tr>
-                  <td>
-                    <input
-                      id=\\"s8\\"
-                      name=\\"size\\"
-                      type=\\"radio\\"
-                      value=\\"8\\"
-                      class=\\"option\\"
-                      checked
-                      onClick=\\"update(this);\\"
-                    />
-                    <span class=\\"option\\">8</span>
-                  </td>
-                  <td>
-                    <input
-                      id=\\"s20\\"
-                      name=\\"size\\"
-                      type=\\"radio\\"
-                      value=\\"20\\"
-                      class=\\"option\\"
-                      onClick=\\"update(this);\\"
-                    />
-                    <span class=\\"option\\">20</span>
-                  </td>
+                    <td>
+                        <input id=\\"submit\\" type=\\"submit\\" value=\\"OK\\"
+                        class=\\"button\\"
+                        onFocus=\\"onEnterSubmitButton(this);\\"
+                        onBlur=\\"onLeaveField(this);\\"
+                        />
+                    </td>
+                    <td>
+                        <input id=\\"bump\\" type=\\"button\\" value=\\"Bump\\"
+                        class=\\"button\\"
+                        onClick=\\"onBump(this);\\"
+                        />
+                    </td>
                 </tr>
                 <tr>
-                  <td>
-                    <input
-                      id=\\"s10\\"
-                      name=\\"size\\"
-                      type=\\"radio\\"
-                      value=\\"10\\"
-                      class=\\"option\\"
-                      onClick=\\"update(this);\\"
-                    />
-                    <span class=\\"option\\">10</span>
-                  </td>
-                  <td>
-                    <input
-                      id=\\"s22\\"
-                      name=\\"size\\"
-                      type=\\"radio\\"
-                      value=\\"22\\"
-                      class=\\"option\\"
-                      onClick=\\"update(this);\\"
-                    />
-                    <span class=\\"option\\">22</span>
-                  </td>
+                    <td colspan=\\"2\\">
+                        <input id=\\"reveal\\" type=\\"checkbox\\" class=\\"option\\"
+                        onClick=\\"onReveal(this);\\"
+                        />
+                        <span id=\\"reveal-text\\" class=\\"option\\">
+                            Unmask
+                        </span>
+                    </td>
                 </tr>
                 <tr>
-                  <td>
-                    <input
-                      id=\\"s12\\"
-                      name=\\"size\\"
-                      type=\\"radio\\"
-                      value=\\"12\\"
-                      class=\\"option\\"
-                      onClick=\\"update(this);\\"
-                    />
-                    <span class=\\"option\\">12</span>
-                  </td>
-                  <td>
-                    <input
-                      id=\\"s24\\"
-                      name=\\"size\\"
-                      type=\\"radio\\"
-                      value=\\"24\\"
-                      class=\\"option\\"
-                      onClick=\\"update(this);\\"
-                    />
-                    <span class=\\"option\\">24</span>
-                  </td>
+                    <td colspan=\\"2\\">
+                        <table class=\\"optiontable\\">
+                            <tr>
+                                <td>
+                                    <div class=\\"optionlabel\\">
+                                        Requirements
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <input id=\\"digit\\" type=\\"checkbox\\" class=\\"option\\"
+                                    checked
+                                    onClick=\\"update();\\"
+                                    />
+                                    <span class=\\"option\\">
+                                        Digit
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <input id=\\"punctuation\\" type=\\"checkbox\\" class=\\"option\\"
+                                    checked
+                                    onClick=\\"update();\\"
+                                    />
+                                    <span class=\\"option\\">
+                                        Punctuation
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <input id=\\"mixedCase\\" type=\\"checkbox\\" class=\\"option\\"
+                                    checked
+                                    onClick=\\"update();\\"
+                                    />
+                                    <span class=\\"option\\">
+                                        Mixed Case
+                                    </span>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
                 </tr>
                 <tr>
-                  <td>
-                    <input
-                      id=\\"s14\\"
-                      name=\\"size\\"
-                      type=\\"radio\\"
-                      value=\\"14\\"
-                      class=\\"option\\"
-                      onClick=\\"update(this);\\"
-                    />
-                    <span class=\\"option\\">14</span>
-                  </td>
-                  <td>
-                    <input
-                      id=\\"s26\\"
-                      name=\\"size\\"
-                      type=\\"radio\\"
-                      value=\\"26\\"
-                      class=\\"option\\"
-                      onClick=\\"update(this);\\"
-                    />
-                    <span class=\\"option\\">26</span>
-                  </td>
+                    <td colspan=\\"2\\">
+                        <table class=\\"optiontable\\">
+                            <tr>
+                                <td>
+                                    <div class=\\"optionlabel\\">
+                                        Restrictions
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <input id=\\"noSpecial\\" type=\\"checkbox\\" class=\\"option\\"
+                                    onClick=\\"onNoSpecial(this);\\"
+                                    />
+                                    <span class=\\"option\\">
+                                        No Special
+                                    </span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <input id=\\"digitsOnly\\" type=\\"checkbox\\" class=\\"option\\"
+                                    onClick=\\"onDigitsOnly(this);\\"
+                                    />
+                                    <span class=\\"option\\">
+                                        Digits Only
+                                    </span>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
                 </tr>
-              </table>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-      <div id=\\"prompt\\" class=\\"prompt\\"></div>
-      <div id=\\"blurb\\" class=\\"blurb\\">
-        <ul>
-  <li>
-    Generates hash words when the
+                <tr>
+                    <td colspan=\\"2\\">
+                        <table class=\\"optiontable\\">
+                            <tr>
+                                <td>
+                                    <div class=\\"optionlabel\\">
+                                        Size
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <input id=\\"s4\\" name=\\"size\\" type=\\"radio\\" value=\\"4\\"
+                                    class=\\"option\\"
+                                    onClick=\\"update(this);\\"
+                                    />
+                                    <span class=\\"option\\">4</span>
+                                </td>
+                                <td>
+                                    <input id=\\"s16\\" name=\\"size\\" type=\\"radio\\" value=\\"16\\"
+                                    class=\\"option\\"
+                                    onClick=\\"update(this);\\"
+                                    />
+                                    <span class=\\"option\\">16</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <input id=\\"s6\\" name=\\"size\\" type=\\"radio\\" value=\\"6\\"
+                                    class=\\"option\\"
+                                    onClick=\\"update(this);\\"
+                                    />
+                                    <span class=\\"option\\">6</span>
+                                </td>
+                                <td>
+                                    <input id=\\"s18\\" name=\\"size\\" type=\\"radio\\" value=\\"18\\"
+                                    class=\\"option\\"
+                                    onClick=\\"update(this);\\"
+                                    />
+                                    <span class=\\"option\\">18</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <input id=\\"s8\\" name=\\"size\\" type=\\"radio\\" value=\\"8\\"
+                                    class=\\"option\\" checked
+                                    onClick=\\"update(this);\\"
+                                    />
+                                    <span class=\\"option\\">8</span>
+                                </td>
+                                <td>
+                                    <input id=\\"s20\\" name=\\"size\\" type=\\"radio\\" value=\\"20\\"
+                                    class=\\"option\\"
+                                    onClick=\\"update(this);\\"
+                                    />
+                                    <span class=\\"option\\">20</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <input id=\\"s10\\" name=\\"size\\" type=\\"radio\\" value=\\"10\\"
+                                    class=\\"option\\"
+                                    onClick=\\"update(this);\\"
+                                    />
+                                    <span class=\\"option\\">10</span>
+                                </td>
+                                <td>
+                                    <input id=\\"s22\\" name=\\"size\\" type=\\"radio\\" value=\\"22\\"
+                                    class=\\"option\\"
+                                    onClick=\\"update(this);\\"
+                                    />
+                                    <span class=\\"option\\">22</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <input id=\\"s12\\" name=\\"size\\" type=\\"radio\\" value=\\"12\\"
+                                    class=\\"option\\"
+                                    onClick=\\"update(this);\\"
+                                    />
+                                    <span class=\\"option\\">12</span>
+                                </td>
+                                <td>
+                                    <input id=\\"s24\\" name=\\"size\\" type=\\"radio\\" value=\\"24\\"
+                                    class=\\"option\\"
+                                    onClick=\\"update(this);\\"
+                                    />
+                                    <span class=\\"option\\">24</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <input id=\\"s14\\" name=\\"size\\" type=\\"radio\\" value=\\"14\\"
+                                    class=\\"option\\"
+                                    onClick=\\"update(this);\\"
+                                    />
+                                    <span class=\\"option\\">14</span>
+                                </td>
+                                <td>
+                                    <input id=\\"s26\\" name=\\"size\\" type=\\"radio\\" value=\\"26\\"
+                                    class=\\"option\\"
+                                    onClick=\\"update(this);\\"
+                                    />
+                                    <span class=\\"option\\">26</span>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div id=\\"prompt\\" class=\\"prompt\\">
+        </div>
+        <div id=\\"blurb\\" class=\\"blurb\\">
+<ul>
+    <li>Generates hash words when the
     <a href=\\"http://wijjo.com/passhash/\\">Password Hasher</a>
-    extension is unavailable.
-  </li>
-  <li>Backs up and uses saved site options.</li>
-  <li>For security, does not know your master key(s).</li>
-  <li>Completely self-contained.</li>
-  <li>Runs in any browser.</li>
-  <li>Works from a USB key.</li>
-  <li>Layout works well in a sidebar.</li>
-  <li>
-    Smart [Enter] key moves to next empty field, makes a hashword, or starts
-    over.
-  </li>
-  <li>Use copy/paste to apply the hash word to a password field.</li>
+    extension is unavailable.</li>
+    <li>Backs up and uses saved site options.</li>
+    <li>For security, does not know your master key(s).</li>
+    <li>Completely self-contained.</li>
+    <li>Runs in any browser.</li>
+    <li>Works from a USB key.</li>
+    <li>Layout works well in a sidebar.</li>
+    <li>Smart [Enter] key moves to next empty field, makes a hashword, or starts over.</li>
+    <li>Use copy/paste to apply the hash word to a password field.</li>
 </ul>
 
-      </div>
+        </div>
     </form>
-  </body>
+</body>
+
 </html>
 "
 `;
