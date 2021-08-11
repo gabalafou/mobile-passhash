@@ -1,6 +1,6 @@
---- passhash/content/passhash-common.js	2019-12-26 13:05:48.000000000 -0500
-+++ mobile-passhash/src/lib/wijjo/passhash-common.js	2020-04-15 18:59:38.000000000 -0500
-@@ -1,791 +1,175 @@
+--- wijjo/passhash/content/passhash-common.js	2019-12-26 12:05:48.000000000 -0600
++++ mobile-passhash/src/lib/wijjo/passhash-common.js	2021-08-05 16:48:00.000000000 -0500
+@@ -1,791 +1,199 @@
  /* ***** BEGIN LICENSE BLOCK *****
   * Version: MPL 1.1/GPL 2.0/LGPL 2.1
   *
@@ -36,8 +36,19 @@
   *
   * ***** END LICENSE BLOCK ***** */
  
--var PassHashCommon =
--{
++(function (root, factory) {
++  if (typeof module === 'object' && module.exports) {
++    // Node. Does not work with strict CommonJS, but
++    // only CommonJS-like environments that support module.exports,
++    // like Node.
++    module.exports = factory(require('../paj/sha1').b64_hmac_sha1);
++  } else {
++    // Browser globals
++    root.PassHashCommon = factory(root.b64_hmac_sha1)
++  }
++})(typeof self !== 'undefined' ? self : this, function (b64_hmac_sha1) {
+ var PassHashCommon =
+ {
 -    // Artificial host name used for for saving to the password database
 -    host: "passhash.passhash",
 -
@@ -223,7 +234,7 @@
 -
 -        var newLogin = Components.classes["@mozilla.org/login-manager/loginInfo;1"].
 -                                createInstance(Components.interfaces.nsILoginInfo);
- 
+-
 -        newLogin.init(this.host, 'passhash', null, user, valueSave, "", "");
 -
 -        var currentLogin = this.findLoginManagerUserLogin(user);
@@ -287,10 +298,7 @@
 -            return h[h.length-3] + '.' + h[h.length-2] + '.' + h[h.length-1];
 -        return h[h.length-2] + '.' + h[h.length-1];
 -    },
-+import { b64_hmac_sha1 } from '../paj/sha1';
- 
-+var PassHashCommon =
-+{
+-
      // IMPORTANT: This function should be changed carefully.  It must be
      // completely deterministic and consistent between releases.  Otherwise
      // users would be forced to update their passwords.  In other words, the
@@ -423,20 +431,19 @@
              s += sInput.substring(i);
          return s;
      },
-+};
  
--    bumpSiteTag: function(siteTag)
--    {
--        var tag = siteTag.replace(/^[ \t]*(.*)[ \t]*$/, "$1");    // redundant
--        if (tag)
--        {
--            var splitTag = tag.match(/^(.*):([0-9]+)?$/);
--            if (splitTag == null || splitTag.length < 3)
--                tag += ":1";
--            else
--                tag = splitTag[1] + ":" + (parseInt(splitTag[2]) + 1);
--        }
--        return tag;
+     bumpSiteTag: function(siteTag)
+     {
+         var tag = siteTag.replace(/^[ \t]*(.*)[ \t]*$/, "$1");    // redundant
+         if (tag)
+         {
+             var splitTag = tag.match(/^(.*):([0-9]+)?$/);
+             if (splitTag == null || splitTag.length < 3)
+                 tag += ":1";
+             else
+                 tag = splitTag[1] + ":" + (parseInt(splitTag[2]) + 1);
+         }
+         return tag;
 -    },
 -
 -    // Returns true if an HTML node is some kind of text field.
@@ -792,8 +799,11 @@
 -        }
 -        while (file.exists() && (action == 0));
 -        return file;
--    }
--
+     }
++};
++
++return PassHashCommon;
+ 
 -    //NB: Make sure not to add a comma after the last function for older IE compatibility.
 -}
-+export default PassHashCommon;
++});

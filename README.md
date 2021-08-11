@@ -97,6 +97,23 @@ Solution: I pretty much always have my mobile phone with me. For some sites, I e
 
 ## Legal and Licenses
 
-I am required by the Mozilla license from [the original Passhash project](https://github.com/wijjo/PassHash) to disclose the changes I made to source code from that project. I copied one file, `passhash-common.js`, from that project. I deleted all lines from that file that my project didn't need, and I added ES6 import/export statements. I have included [a diff file](passhash-diff.patch) in this repo to show more precisely the modifications I made.
+I am required by the Mozilla license from [the original Passhash
+project](https://github.com/wijjo/PassHash) to disclose the changes I made to
+source code from that project. The high level summary is that I altered none of
+the actual functionality of the source code that I copied. All I did was delete
+code and I made a few small changes to make the code work with the environment
+in this repo.
+
+There were primarily two things copied from the original project:
+
+- the code that generates a hard-to-guess password given three inputs: a
+  non-secret string (the site tag), a secret string (the master password), and
+  some options
+- the code that generates a portable html file
+
+I have included a folder called [diffs-wijjo-passhash](diffs-wijjo-passhash)
+that contains a patch file corresponding to each file that I copied from the
+original project. The patch file shows precisely the modifications I made. An
+empty patch file in that directory means no changes were made.
 
 The code for this project is licensed under the MIT license.

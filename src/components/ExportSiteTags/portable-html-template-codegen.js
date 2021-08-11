@@ -11,16 +11,16 @@ const read = (path) =>
     encoding: 'utf8',
   });
 
-const mainTemplatePath = './index.html.ejs';
+const mainTemplatePath = 'passhash-portable.html';
 const templatePaths = [
   mainTemplatePath,
   // None of the following are actually EJS templates but they are included by
   // the main template, so they have to be compiled too
-  './passhash-portable.css',
-  './passhash-portable.js',
-  './portable-blurb.html',
-  './../../../lib/paj/sha1.js',
-  './../../../lib/wijjo/passhash-common.js',
+  'passhash-portable.css',
+  'passhash-portable.js',
+  'portable-blurb.html',
+  '../../../lib/paj/sha1.js',
+  '../../../lib/wijjo/passhash-common.js',
 ];
 
 const compiledTemplates = {};
