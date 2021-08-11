@@ -1,6 +1,5 @@
 import { Platform, StyleSheet } from 'react-native';
 
-
 export const borderColor = 'rgb(200, 200, 200)';
 
 export default StyleSheet.create({
@@ -12,6 +11,13 @@ export default StyleSheet.create({
   main: {
     marginHorizontal: 28,
     marginTop: 10,
+    marginBottom: 50,
+  },
+  scrollView: {
+    height: '100%',
+  },
+  text: {
+    fontSize: 16,
   },
   textInput: {
     height: 120,
@@ -37,5 +43,9 @@ export default StyleSheet.create({
   },
   submitButton: {
     marginBottom: 28,
-  }
+  },
+  shareButton: {
+    flexDirection: 'row',
+    marginBottom: 28,
+  },
 });

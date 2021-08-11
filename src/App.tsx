@@ -6,6 +6,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import HomeScreen from './HomeScreen';
 import SearchScreen from './SearchScreen';
 import ImportScreen from './ImportScreen';
+import ExportScreen from './ExportScreen';
 
 const RootStack = createStackNavigator();
 const MainStack = createStackNavigator();
@@ -18,6 +19,7 @@ export default function App() {
           <RootStack.Screen name="Main" component={MainStackScreen} />
           <RootStack.Screen name="Search" component={SearchScreen} />
           <RootStack.Screen name="Import" component={ImportScreen} />
+          <RootStack.Screen name="Export" component={ExportScreen} />
         </RootStack.Navigator>
       </NavigationContainer>
     </Provider>
