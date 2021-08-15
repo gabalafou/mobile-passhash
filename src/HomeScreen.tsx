@@ -1,12 +1,6 @@
 import React from 'react';
-import {
-  Pressable,
-  SafeAreaView,
-  StatusBar,
-  ScrollView,
-  Text,
-  View,
-} from 'react-native';
+import { StatusBar } from 'expo-status-bar';
+import { Pressable, SafeAreaView, ScrollView, Text, View } from 'react-native';
 import { shallowEqual, useSelector, useDispatch } from 'react-redux';
 import {
   getSiteTagList,
@@ -98,7 +92,7 @@ export default function HomeScreen(props) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="dark-content" />
+      <StatusBar style="dark" />
 
       <ScrollView
         style={styles.scrollView}
