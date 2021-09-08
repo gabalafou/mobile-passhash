@@ -7,11 +7,13 @@ import HomeScreen from './HomeScreen';
 import SearchScreen from './SearchScreen';
 import ImportScreen from './ImportScreen';
 import ExportScreen from './ExportScreen';
+import debugLog from './debug-log';
 
 const RootStack = createStackNavigator();
 const MainStack = createStackNavigator();
 
 export default function App() {
+  debugLog('Rendering App');
   return (
     <Provider store={store}>
       <NavigationContainer>
@@ -27,6 +29,7 @@ export default function App() {
 }
 
 function MainStackScreen() {
+  debugLog('Rendering MainStackScreen');
   return (
     <MainStack.Navigator headerMode="none">
       <MainStack.Screen name="Home" component={HomeScreen} />

@@ -15,6 +15,7 @@ import useKeyboardHeight from '../../use-keyboard-height';
 import styles, { resultItemHeight, separatorHeight } from './styles';
 import DeletableRow from './DeletableRow';
 import { RectButton } from 'react-native-gesture-handler';
+import debugLog from '../../debug-log';
 
 type Props = {
   query: string;
@@ -29,6 +30,8 @@ type Props = {
 const BLANK = {};
 
 export default function SearchView(props: Props) {
+  debugLog('Rendering SearchView');
+
   const { query, placeholder, onChangeQuery, onCancel, onSubmit, onDelete } =
     props;
 
@@ -74,7 +77,9 @@ export default function SearchView(props: Props) {
   const [activeItemIndex, setActiveItemIndex] = React.useState(null);
 
   const onSwipeOpen = (ref, index) => {
+    debugLog('Setting active item index', index);
     setActiveItemIndex(index);
+    debugLog('Setting active item ref');
     setActiveItemRef(ref);
   };
   const onPressIn = (index) => {
@@ -111,6 +116,7 @@ export default function SearchView(props: Props) {
           },
         ]}
         onLayout={(event) => {
+          debugLog('Getting and setting top y');
           setResultListTopY(event.nativeEvent.layout.y);
         }}
         onPressIn={() => searchBarRef.current?.blur()}

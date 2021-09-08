@@ -16,8 +16,11 @@ import SiteTag from './components/SiteTag';
 import PassHashCommon from './lib/wijjo/passhash-common';
 import styles from './styles';
 import rowStyles from './components/PasswordOptions/styles';
+import debugLog from './debug-log';
 
 export default function HomeScreen(props) {
+  debugLog('Rendering HomeScreen');
+
   const { navigation, route } = props;
   const { shouldScrollToTop = false } = route.params || {};
 

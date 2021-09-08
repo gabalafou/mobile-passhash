@@ -7,11 +7,7 @@
     "privacy": "unlisted",
     "version": "1.0.0",
     "entryPoint": "node_modules/expo/AppEntry.js",
-    "platforms": [
-      "ios",
-      "android",
-      "web"
-    ],
+    "platforms": ["ios", "android", "web"],
     "ios": {
       "bundleIdentifier": "com.gabalafou.mobilepasshash",
       "buildNumber": "1.2.1"
@@ -19,6 +15,9 @@
     "android": {
       "package": "com.gabalafou.mobilepasshash",
       "versionCode": 1
+    },
+    "extra": {
+      "debugLogging": true
     }
   }
 }
