@@ -32,9 +32,8 @@ export default StyleSheet.create({
     height: resultItemHeight,
     justifyContent: 'center',
     padding: gutterWidth,
-    zIndex: 20,
   },
   resultItemText: {
     fontSize: 18,
-  }
+  },
 });
