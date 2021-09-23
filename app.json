@@ -2,9 +2,10 @@
   "expo": {
     "name": "Mobile Passhash",
     "description": "Simple, effective password security",
+    "githubUrl": "https://github.com/gabalafou/mobile-passhash",
     "icon": "src/icon.png",
     "slug": "mobile-passhash",
-    "privacy": "unlisted",
+    "privacy": "public",
     "version": "1.1.0",
     "entryPoint": "node_modules/expo/AppEntry.js",
     "splash": {
