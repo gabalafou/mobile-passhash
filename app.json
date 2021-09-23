@@ -20,7 +20,7 @@
       "versionCode": 1
     },
     "extra": {
-      "debugLogging": true
+      "debugLogging": false
     }
   }
 }
