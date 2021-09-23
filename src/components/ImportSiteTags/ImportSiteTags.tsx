@@ -4,8 +4,11 @@ import { Button } from 'react-native-elements';
 import keyboardDismissProp from '../shared/keyboardDismissProp';
 import parser from './parser';
 import styles from '../shared/import-export-styles';
+import debugLog from '../../debug-log';
 
 export default function ImportSiteTags(props) {
+  debugLog('Rendering ImportSiteTags');
+
   const { siteTagList, onCancel, onSubmit } = props;
 
   const [siteTagOptions, setSiteTagOptions] = React.useState({});

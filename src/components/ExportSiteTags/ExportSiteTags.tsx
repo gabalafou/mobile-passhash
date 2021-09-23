@@ -8,8 +8,11 @@ import styles from '../shared/import-export-styles';
 import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import * as Linking from 'expo-linking';
+import debugLog from '../../debug-log';
 
 export default function ExportSiteTags(props) {
+  debugLog('Rendering ExportSiteTags');
+
   const { siteTagList, onCancel } = props;
 
   const [portableHtml, setPortableHtml] = React.useState();

@@ -9,8 +9,11 @@ import naturalSort from 'natural-sort';
 import SearchView from './components/SearchView';
 import SiteTag from './components/SiteTag';
 import styles from './styles';
+import debugLog from './debug-log';
 
 export default function SearchSiteTags(props) {
+  debugLog('Rendering SearchScreen');
+
   const { navigation, route } = props;
   const { siteTag = '' } = route.params || {};
 

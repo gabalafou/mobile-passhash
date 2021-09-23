@@ -13,6 +13,7 @@ import Constants from 'expo-constants';
 import useKeyboardHeight from '../../use-keyboard-height';
 import styles, { resultItemHeight, separatorHeight } from './styles';
 import DeletableRow from './DeletableRow';
+import debugLog from '../../debug-log';
 
 type Props = {
   query: string;
@@ -27,6 +28,8 @@ type Props = {
 const BLANK = {};
 
 export default function SearchView(props: Props) {
+  debugLog('Rendering SearchView');
+
   const { query, placeholder, onChangeQuery, onCancel, onSubmit, onDelete } =
     props;
 
@@ -122,6 +125,7 @@ export default function SearchView(props: Props) {
       </View>
       <FlatList
         onLayout={(event) => {
+          debugLog('Getting and setting top y', event.nativeEvent.layout.y);
           setResultListTopY(event.nativeEvent.layout.y);
         }}
         contentContainerStyle={{

@@ -6,6 +6,7 @@ import {
   removeSiteTag,
 } from './redux/actions';
 import { defaultPasswordOptions } from './constants';
+import debugLog from './debug-log';
 
 function getSiteTags() {
   return Storage.getItemAsync('siteTagList');
@@ -13,8 +14,10 @@ function getSiteTags() {
 
 export function loadSiteTags() {
   return (dispatch) => {
+    debugLog('Loading site tags');
     const siteTagListPromise = getSiteTags();
     siteTagListPromise.then((siteTagList) => {
+      debugLog('Site tags loaded');
       if (siteTagList) {
         dispatch(setSiteTagList(siteTagList));
       }
