@@ -1,4 +1,5 @@
 import React from 'react';
+import { SafeAreaView } from 'react-native';
 import { shallowEqual, useSelector, useDispatch } from 'react-redux';
 import { getSiteTagList } from './redux/selectors';
 import { setSiteTag } from './redux/actions';
@@ -7,6 +8,7 @@ import * as fuzzy from 'fuzzy';
 import naturalSort from 'natural-sort';
 import SearchView from './components/SearchView';
 import SiteTag from './components/SiteTag';
+import styles from './styles';
 import debugLog from './debug-log';
 
 export default function SearchSiteTags(props) {
@@ -52,17 +54,19 @@ export default function SearchSiteTags(props) {
   );
 
   return (
-    <SearchView
-      query={query}
-      onChangeQuery={setQuery}
-      results={siteTagMatches}
-      // Note (gab): I think the SearchView should have the same placeholder
-      // as SiteTag as a way to reenforce the connection between the two
-      // fields in the UI
-      placeholder={SiteTag.placeholder}
-      onCancel={onCancel}
-      onSubmit={onSubmit}
-      onDelete={onDelete}
-    />
+    <SafeAreaView style={styles.container}>
+      <SearchView
+        query={query}
+        onChangeQuery={setQuery}
+        results={siteTagMatches}
+        // Note (gab): I think the SearchView should have the same placeholder
+        // as SiteTag as a way to reenforce the connection between the two
+        // fields in the UI
+        placeholder={SiteTag.placeholder}
+        onCancel={onCancel}
+        onSubmit={onSubmit}
+        onDelete={onDelete}
+      />
+    </SafeAreaView>
   );
 }

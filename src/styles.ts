@@ -1,7 +1,6 @@
 import { StyleSheet } from 'react-native';
 import Constants from 'expo-constants';
 
-
 export const backgroundColor = 'rgb(242, 242, 247)';
 export const gutterWidth = 12;
 

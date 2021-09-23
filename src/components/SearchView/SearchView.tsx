@@ -1,8 +1,7 @@
-import type Swipeable from 'react-native-gesture-handler/Swipeable';
-
-import React from 'react';
+import React, { useCallback, useEffect, useState, useRef } from 'react';
 import {
   FlatList,
+  Keyboard,
   Platform,
   Pressable,
   Text,
@@ -14,7 +13,6 @@ import Constants from 'expo-constants';
 import useKeyboardHeight from '../../use-keyboard-height';
 import styles, { resultItemHeight, separatorHeight } from './styles';
 import DeletableRow from './DeletableRow';
-import { RectButton } from 'react-native-gesture-handler';
 import debugLog from '../../debug-log';
 
 type Props = {
@@ -43,14 +41,14 @@ export default function SearchView(props: Props) {
   }
 
   // Whenever the search query changes, scroll to the top
-  const resultListRef: React.RefObject<FlatList<string>> = React.createRef();
-  React.useEffect(() => {
+  const resultListRef: React.RefObject<FlatList<string>> = useRef();
+  useEffect(() => {
     if (resultListRef.current) {
       resultListRef.current.scrollToOffset({ offset: 0 });
     }
   }, [query]);
 
-  const [resultListTopY, setResultListTopY] = React.useState(
+  const [resultListTopY, setResultListTopY] = useState(
     Constants.statusBarHeight + 40 // search bar height is 40
   );
   const keyboardHeight = useKeyboardHeight();
@@ -69,89 +67,118 @@ export default function SearchView(props: Props) {
     paddedResults.push(...new Array(gap).fill(BLANK));
   }
 
-  // Keep track of which item in the list is being swiped on
-  const [activeItemRef, setActiveItemRef]: [
-    Swipeable,
-    (ref: Swipeable) => void
-  ] = React.useState(null);
-  const [activeItemIndex, setActiveItemIndex] = React.useState(null);
+  // Keep track of which item in the list is active (swiped open)
+  const activeItemRef: React.MutableRefObject<DeletableRow> = useRef();
+  const onSwipeOpen = useCallback((deletableRow) => {
+    activeItemRef.current = deletableRow;
+  }, []);
 
-  const onSwipeOpen = (ref, index) => {
-    debugLog('Setting active item index', index);
-    setActiveItemIndex(index);
-    debugLog('Setting active item ref');
-    setActiveItemRef(ref);
-  };
-  const onPressIn = (index) => {
-    if (activeItemRef && index !== activeItemIndex) {
-      activeItemRef.close();
+  // When the user is swiping left/rigt on a row in the list, prevent the list
+  // from scrolling up/down.
+  const enableScroll = useCallback(() => {
+    resultListRef.current.setNativeProps({
+      scrollEnabled: true,
+    });
+  }, []);
+  const disableScroll = useCallback(() => {
+    resultListRef.current.setNativeProps({
+      scrollEnabled: false,
+    });
+  }, []);
+
+  // Provides a function to close an open row when the user taps anywhere in the
+  // app screen that is not the open row.
+  const closeOpenRow = useCallback((deletableRow?: DeletableRow) => {
+    if (
+      activeItemRef.current?.closeRow &&
+      activeItemRef.current !== deletableRow
+    ) {
+      activeItemRef.current.closeRow();
     }
-  };
-
-  const searchBarRef = React.useRef(null);
+  }, []);
 
   return (
-    <View style={styles.container}>
-      <SearchBar
-        ref={searchBarRef}
-        placeholder={placeholder}
-        value={query}
-        onChangeText={onChangeQuery}
-        containerStyle={styles.searchBarContainer}
-        autoCapitalize="none"
-        autoCompleteType="off"
-        autoCorrect={false}
-        autoFocus={true}
-        keyboardType="url"
-        onCancel={onCancel}
-        onSubmitEditing={() => onSubmit(query)}
-        platform={Platform.OS === 'ios' ? 'ios' : 'android'}
-        showCancel={true}
-      />
-      <Pressable
-        style={[
-          styles.resultListContainer,
-          {
-            paddingBottom: Platform.OS === 'ios' ? keyboardHeight : 0,
-          },
-        ]}
+    <>
+      <View
+        // For some reason putting this on the SearchBar component below does
+        // not work (i.e., when I would press-hold on the Cancel button, it
+        // would not close the open row)
+        onTouchStart={() => {
+          closeOpenRow();
+        }}
+      >
+        <SearchBar
+          placeholder={placeholder}
+          value={query}
+          onChangeText={onChangeQuery}
+          containerStyle={styles.searchBarContainer}
+          autoCapitalize="none"
+          autoCompleteType="off"
+          autoCorrect={false}
+          autoFocus={true}
+          keyboardType="url"
+          onCancel={onCancel}
+          onSubmitEditing={() => onSubmit(query)}
+          platform={Platform.OS === 'ios' ? 'ios' : 'android'}
+          showCancel={true}
+        />
+      </View>
+      <FlatList
         onLayout={(event) => {
-          debugLog('Getting and setting top y');
+          debugLog('Getting and setting top y', event.nativeEvent.layout.y);
           setResultListTopY(event.nativeEvent.layout.y);
         }}
-        onPressIn={() => searchBarRef.current?.blur()}
-      >
-        <FlatList
-          style={styles.resultList}
-          data={paddedResults}
-          initialNumToRender={numResultsThatCover + 10}
-          getItemLayout={(_, index) => ({
-            index,
-            length: resultItemHeight,
-            offset: (resultItemHeight + separatorHeight) * index,
-          })}
-          keyExtractor={
-            (item, index) => (item === BLANK ? String(index) : '$' + item) // add character in case `item` is a numeral
-          }
-          ref={resultListRef}
-          ItemSeparatorComponent={Separator}
-          renderItem={({ item, index }) => (
-            <Item
-              item={item}
-              index={index}
-              isNew={query === item && queryNotInResults}
-              // Note: not all items can be submitted, deleted, pressed, swiped open
-              onSubmit={onSubmit}
-              onDelete={onDelete}
-              onSwipeOpen={onSwipeOpen}
-              onPressIn={onPressIn}
-            />
-          )}
-          keyboardShouldPersistTaps="handled"
-          keyboardDismissMode="on-drag"
-        />
-      </Pressable>
-    </View>
+        contentContainerStyle={{
+          // Little tweak to push up the bottom row so the bottom
+          // border/separator is visible (ios)
+          paddingBottom: 2,
+        }}
+        style={styles.resultList}
+        data={paddedResults}
+        initialNumToRender={numResultsThatCover + 10}
+        getItemLayout={(_, index) => ({
+          index,
+          length: resultItemHeight,
+          offset: (resultItemHeight + separatorHeight) * index,
+        })}
+        keyExtractor={(item, index) =>
+          item === BLANK
+            ? String(index)
+            : // add $ character in case `item` is a numeral,
+              // in which case it could collide with String(index)
+              '$' + item
+        }
+        ref={resultListRef}
+        ItemSeparatorComponent={Separator}
+        renderItem={({ item, index }) => (
+          <Item
+            item={item}
+            index={index}
+            isNew={query === item && queryNotInResults}
+            // Note: not all items can be submitted, deleted, pressed, swiped open
+            onSubmit={onSubmit}
+            onDelete={onDelete}
+            onSwipeOpen={onSwipeOpen}
+            onResponderGrant={disableScroll}
+            onResponderRelease={enableScroll}
+            onTouchStart={closeOpenRow}
+          />
+        )}
+        // Why not use the following pair?
+        //
+        //    keyboardShouldPersistTaps="handled"
+        //    keyboardDismissMode="on-drag"
+        //
+        // Because it prevents the user from directly dragging a row when the
+        // keyboard is open. When the keyboard is open, the first touch on the
+        // row gets used to dismiss the keyboard, so it ends up requiring two
+        // touches: one to dismiss the keyboard, another to swipe the row
+        keyboardShouldPersistTaps="always"
+        onScrollBeginDrag={() => {
+          Keyboard.dismiss();
+        }}
+      />
+    </>
   );
 }
 
@@ -165,8 +192,10 @@ type ItemProps = {
   isNew: boolean;
   onSubmit: (item: string) => void;
   onDelete: (item: string) => void;
-  onSwipeOpen: (ref: Swipeable, index: number) => void;
-  onPressIn: (index: number) => void;
+  onSwipeOpen: (deletableRow: DeletableRow) => void;
+  onResponderGrant: () => void;
+  onResponderRelease: () => void;
+  onTouchStart: (deletableRow?: DeletableRow) => void;
 };
 class Item extends React.PureComponent<ItemProps> {
   deleteItem = () => {
@@ -174,9 +203,9 @@ class Item extends React.PureComponent<ItemProps> {
     onDelete(item);
   };
 
-  markActive = (ref) => {
-    const { onSwipeOpen, index } = this.props;
-    onSwipeOpen(ref.current, index);
+  markActive = (self) => {
+    const { onSwipeOpen } = this.props;
+    onSwipeOpen(self);
   };
 
   submit = () => {
@@ -184,44 +213,65 @@ class Item extends React.PureComponent<ItemProps> {
     onSubmit(item);
   };
 
-  handlePressIn = () => {
-    const { onPressIn, index } = this.props;
-    onPressIn(index);
-  };
-
   render() {
-    const { item, isNew } = this.props;
+    const {
+      item,
+      isNew,
+      index,
+      onResponderGrant,
+      onResponderRelease,
+      onTouchStart,
+    } = this.props;
 
     let inner;
     if (isNew) {
       // This is the first row when there is an
       // active query
-      inner = this.renderSubmittable();
+      inner = (
+        <View onTouchStart={() => onTouchStart()}>
+          {this.renderSubmittable()}
+        </View>
+      );
     } else if (item === BLANK) {
       // These are blank rows to fill out the
       // list if it's too short to fill the screen
       inner = this.renderBlank();
     } else {
       // These are site tags that already exist
+      // inner = this.renderSubmittable();
       inner = (
         <DeletableRow
           onDelete={this.deleteItem}
           onSwipeableOpen={this.markActive}
+          index={index}
+          onResponderGrant={onResponderGrant}
+          onResponderRelease={onResponderRelease}
+          onTouchStart={onTouchStart}
+          onPress={this.submit}
         >
           {this.renderSubmittable()}
         </DeletableRow>
       );
     }
 
-    return <Pressable onPressIn={this.handlePressIn}>{inner}</Pressable>;
+    return inner;
   }
 
   renderSubmittable() {
     const { item } = this.props;
     return (
-      <RectButton onPress={this.submit} style={styles.resultItem}>
-        <Text style={styles.resultItemText}>{item}</Text>
-      </RectButton>
+      <Pressable
+        onPress={this.submit}
+        style={({ pressed }) => [
+          {
+            backgroundColor: pressed ? '#eee' : 'white',
+          },
+        ]}
+      >
+        <View style={styles.resultItem}>
+          <Text style={styles.resultItemText}>{item}</Text>
+        </View>
+      </Pressable>
     );
   }
 
