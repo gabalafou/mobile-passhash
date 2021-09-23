@@ -7,6 +7,9 @@
     "privacy": "unlisted",
     "version": "1.0.0",
     "entryPoint": "node_modules/expo/AppEntry.js",
+    "splash": {
+      "image": "src/assets/splash.png"
+    },
     "platforms": ["ios", "android", "web"],
     "ios": {
       "bundleIdentifier": "com.gabalafou.mobilepasshash",
