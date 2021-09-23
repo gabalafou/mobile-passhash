@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { Animated, StyleSheet } from 'react-native';
+import debugLog from '../debug-log';
 
 const styles = StyleSheet.create({
   bottomOverlay: {
@@ -57,6 +58,10 @@ export default function SlidingBottomOverlay({
       onLayout={(event) => {
         if (children) {
           if (!height) {
+            debugLog(
+              'Internally setting height of overlay',
+              event.nativeEvent.layout.height
+            );
             setHeight(event.nativeEvent.layout.height);
           }
           onLayoutWithChildren(event);

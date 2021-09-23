@@ -28,7 +28,8 @@
     "react-native-web": "~0.13.12",
     "react-redux": "^7.2.2",
     "redux": "^4.0.5",
-    "expo-clipboard": "~1.1.0"
+    "expo-clipboard": "~1.1.0",
+    "@react-native-picker/picker": "1.16.1"
   },
   "devDependencies": {
     "@babel/core": "~7.9.0",

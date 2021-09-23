@@ -1,5 +1,6 @@
-import React, { useCallback, useState } from 'react';
-import { Picker, Platform, Pressable, Switch, Text, View } from 'react-native';
+import React, { useState } from 'react';
+import { Platform, Pressable, Switch, Text, View } from 'react-native';
+import { Picker } from '@react-native-picker/picker';
 import styles, { pickerItemColor } from './styles';
 
 export type Options = {
