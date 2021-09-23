@@ -1,6 +1,13 @@
-import React from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { Pressable, SafeAreaView, ScrollView, Text, View } from 'react-native';
+import {
+  Dimensions,
+  Pressable,
+  SafeAreaView,
+  ScrollView,
+  Text,
+  View,
+} from 'react-native';
 import { shallowEqual, useSelector, useDispatch } from 'react-redux';
 import {
   getSiteTagList,
@@ -14,6 +21,7 @@ import MasterPassword from './components/MasterPassword';
 import PasswordOptions from './components/PasswordOptions';
 import SiteTag from './components/SiteTag';
 import PassHashCommon from './lib/wijjo/passhash-common';
+import SlidingBottomOverlay from './components/SlidingBottomOverlay';
 import styles from './styles';
 import rowStyles from './components/PasswordOptions/styles';
 import debugLog from './debug-log';
@@ -30,15 +38,28 @@ export default function HomeScreen(props) {
   const siteTagList = useSelector(getSiteTagList, shallowEqual);
   const options = useSelector(getPasswordOptions, shallowEqual);
 
-  const [masterPassword, setMasterPassword] = React.useState('');
-  const [bottomOverlayChildren, setBottomOverlayChildren] =
-    React.useState(null);
+  const [masterPassword, setMasterPassword] = useState('');
+  const [bottomOverlayChildren, setBottomOverlayChildren] = useState(null);
+  const [bottomOverlayOpenerBottomY, setBottomOverlayOpenerBottomY] =
+    useState(null);
+  const [overlayHeight, setOverlayHeight] = useState(null);
+
+  // Naming is potentially confusing. This is the y-coordinate of the top edge
+  // of the bottom overlay.
+  const { height: windowHeight } = Dimensions.get('window');
+  const overlayY = useMemo(() => {
+    return windowHeight != null &&
+      overlayHeight != null &&
+      windowHeight > overlayHeight
+      ? windowHeight - overlayHeight
+      : null;
+  }, [windowHeight, overlayHeight]);
 
   // Refs
-  const scrollView = React.useRef(null);
-  const masterPasswordInput = React.useRef(null);
+  const scrollView = useRef(null);
+  const masterPasswordInput = useRef(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     // Whenever site tag changes, focus the next input field (password box)
     setTimeout(() => {
       if (siteTag) {
@@ -48,19 +69,19 @@ export default function HomeScreen(props) {
   }, [siteTag]);
 
   // Load all site tags from storage
-  React.useEffect(
+  useEffect(
     () => loadSiteTags()(dispatch),
     [] // Do this only once, when the App mounts
   );
 
   // Load options for current site tag
-  React.useEffect(() => {
+  useEffect(() => {
     loadOptions(siteTag)(dispatch);
   }, [siteTag]);
 
   // When the user has entered a site tag and master password, we
   // use the hashing function to generate a password.
-  const generatedPassword = React.useMemo(
+  const generatedPassword = useMemo(
     () =>
       siteTag &&
       masterPassword &&
@@ -79,19 +100,34 @@ export default function HomeScreen(props) {
     [siteTag, masterPassword, options]
   );
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (scrollView.current) {
       if (shouldScrollToTop) {
         scrollView.current.scrollTo({ y: 0 });
-      } else if (bottomOverlayChildren) {
-        // When user clicks "size" option, the Picker component renders
-        // in a bottom overlay. We scroll to the bottom so that the size option
-        // appears directly above the Picker.
-        // TODO: figure out some other way to do this
-        scrollView.current.scrollToEnd();
+      } else if (
+        bottomOverlayChildren &&
+        bottomOverlayOpenerBottomY !== null &&
+        overlayY !== null &&
+        bottomOverlayOpenerBottomY - overlayY > 0
+      ) {
+        // When user clicks the option for size and generate new password, the
+        // Picker component renders in a bottom overlay. We scroll to the bottom
+        // of that option so that it appears directly above the Picker.
+        scrollView.current.scrollTo({
+          y:
+            bottomOverlayOpenerBottomY -
+            overlayY -
+            // a little extra to cover the border
+            0.5,
+        });
       }
     }
-  }, [bottomOverlayChildren, shouldScrollToTop]);
+  }, [
+    bottomOverlayChildren,
+    shouldScrollToTop,
+    bottomOverlayOpenerBottomY,
+    overlayY,
+  ]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -145,6 +181,7 @@ export default function HomeScreen(props) {
             saveSiteTag(siteTag, options, siteTagList)(dispatch);
           }}
           setBottomOverlayChildren={setBottomOverlayChildren}
+          setBottomOverlayOpenerBottomY={setBottomOverlayOpenerBottomY}
         />
 
         <Text style={styles.header}>Import / Export</Text>
@@ -194,9 +231,15 @@ export default function HomeScreen(props) {
         </View>
       </ScrollView>
 
-      {bottomOverlayChildren && (
-        <View style={styles.bottomOverlay}>{bottomOverlayChildren}</View>
-      )}
+      {/* Bottom Overlay */}
+      <SlidingBottomOverlay
+        onLayoutWithChildren={({ nativeEvent: { layout } }) => {
+          debugLog('Setting height of bottom overlay', layout.height);
+          setOverlayHeight(layout.height);
+        }}
+      >
+        {bottomOverlayChildren}
+      </SlidingBottomOverlay>
     </SafeAreaView>
   );
 }

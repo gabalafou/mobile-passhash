@@ -1,69 +1,84 @@
-import React from 'react';
-import {
-  Picker,
-  Platform,
-  Pressable,
-  Switch,
-  Text,
-  View,
-} from 'react-native';
+import React, { useCallback, useState } from 'react';
+import { Picker, Platform, Pressable, Switch, Text, View } from 'react-native';
 import styles, { pickerItemColor } from './styles';
 
-
 export type Options = {
-  newPasswordBumper: number,
-  requireDigit: boolean,
-  requirePunctuation: boolean,
-  requireMixedCase: boolean,
-  noSpecial: boolean,
-  digitsOnly: boolean,
-  size: number,
+  newPasswordBumper: number;
+  requireDigit: boolean;
+  requirePunctuation: boolean;
+  requireMixedCase: boolean;
+  noSpecial: boolean;
+  digitsOnly: boolean;
+  size: number;
 };
 
 type Props = {
-  options: Options,
-  onChangeOptions: (options: Options) => void,
-  setBottomOverlayChildren: (children: any) => void,
+  options: Options;
+  onChangeOptions: (options: Options) => void;
+  setBottomOverlayChildren: (children: any) => void;
+  setBottomOverlayOpenerBottomY: (y: number) => void;
 };
 
 export default function PasswordOptions(props: Props) {
-  const { options, onChangeOptions, setBottomOverlayChildren } = props;
+  const {
+    options,
+    onChangeOptions,
+    setBottomOverlayChildren,
+    setBottomOverlayOpenerBottomY,
+  } = props;
+  const [bottomYGeneratePassword, setBottomYGeneratePassword] = useState(null);
+  const [bottomYLength, setBottomYLength] = useState(null);
 
-  const makeIndexPicker = (value, shouldUpdateOverlayOnChange, extraProps) =>
+  const makeIndexPicker = (value, shouldUpdateOverlayOnChange, extraProps) => (
     <IndexPicker
       value={value}
-      onChange={newPasswordBumper => {
+      onChange={(newPasswordBumper) => {
         const nextOptions = { ...options, newPasswordBumper };
         onChangeOptions(nextOptions);
         if (shouldUpdateOverlayOnChange) {
-          setBottomOverlayChildren(makeIndexPicker(newPasswordBumper, shouldUpdateOverlayOnChange, extraProps));
+          setBottomOverlayChildren(
+            makeIndexPicker(
+              newPasswordBumper,
+              shouldUpdateOverlayOnChange,
+              extraProps
+            )
+          );
         }
       }}
       {...extraProps}
-    />;
+    />
+  );
 
-  const makeSizePicker = (value, shouldUpdateOverlayOnChange, extraProps) =>
+  const makeSizePicker = (value, shouldUpdateOverlayOnChange, extraProps) => (
     <SizePicker
       value={value}
-      onChange={size => {
+      onChange={(size) => {
         const nextOptions = { ...options, size };
         onChangeOptions(nextOptions);
         if (shouldUpdateOverlayOnChange) {
-          setBottomOverlayChildren(makeSizePicker(size, shouldUpdateOverlayOnChange, extraProps));
+          setBottomOverlayChildren(
+            makeSizePicker(size, shouldUpdateOverlayOnChange, extraProps)
+          );
         }
       }}
       {...extraProps}
-    />;
-
+    />
+  );
 
   return (
     <>
       <View style={styles.section}>
         <View style={styles.rowGroup}>
-
           {/* Generate new password */}
-          <View style={styles.row}>
-            <Text style={styles.text}>Increment for new password</Text>
+          <View
+            style={styles.row}
+            onLayout={({ target }) => {
+              target.measure((x, y, width, height, pageX, pageY) => {
+                setBottomYGeneratePassword(pageY + height);
+              });
+            }}
+          >
+            <Text style={styles.text}>Password changer</Text>
             {Platform.OS === 'android' ? (
               makeIndexPicker(options.newPasswordBumper, false, {
                 style: styles.androidPicker,
@@ -73,43 +88,54 @@ export default function PasswordOptions(props: Props) {
                 onPress={() => {
                   setBottomOverlayChildren(
                     makeIndexPicker(options.newPasswordBumper, true, {
-                      style: styles.iosPicker
+                      style: styles.iosPicker,
                     })
                   );
+                  setBottomOverlayOpenerBottomY(bottomYGeneratePassword);
                 }}
               >
                 <View style={styles.clickableValue}>
-                  <Text style={styles.valueText}>{options.newPasswordBumper}</Text>
+                  <Text style={styles.valueText}>
+                    {options.newPasswordBumper}
+                  </Text>
                 </View>
               </Pressable>
             )}
           </View>
 
           {/* Length/size option */}
-          <View style={styles.lastRow}>
+          <View
+            style={styles.lastRow}
+            onLayout={({ target }) => {
+              target.measure((x, y, width, height, pageX, pageY) => {
+                setBottomYLength(pageY + height);
+              });
+            }}
+          >
             <Text style={styles.text}>Length</Text>
             {Platform.OS === 'android' ? (
               makeSizePicker(options.size, false, {
                 style: styles.androidPicker,
               })
             ) : (
-                <Pressable
-                  onPress={() => {
-                    setBottomOverlayChildren(
-                      makeSizePicker(options.size, true, {
-                        style: styles.iosPicker
-                      }));
-                  }}
-                >
-                  <View style={styles.clickableValue}>
-                    <Text style={styles.valueText}>{options.size}</Text>
-                  </View>
-                </Pressable>
-              )}
+              <Pressable
+                onPress={() => {
+                  setBottomOverlayChildren(
+                    makeSizePicker(options.size, true, {
+                      style: styles.iosPicker,
+                    })
+                  );
+                  setBottomOverlayOpenerBottomY(bottomYLength);
+                }}
+              >
+                <View style={styles.clickableValue}>
+                  <Text style={styles.valueText}>{options.size}</Text>
+                </View>
+              </Pressable>
+            )}
           </View>
         </View>
       </View>
-
 
       <View style={styles.section}>
         <Text style={styles.sectionLabel}>Requirements</Text>
@@ -117,8 +143,12 @@ export default function PasswordOptions(props: Props) {
           <View style={styles.row}>
             <Text style={styles.text}>Digit</Text>
             <Switch
-              onValueChange={requireDigit => {
-                const updatedOptions = updateOptions(options, 'requireDigit', requireDigit);
+              onValueChange={(requireDigit) => {
+                const updatedOptions = updateOptions(
+                  options,
+                  'requireDigit',
+                  requireDigit
+                );
                 onChangeOptions(updatedOptions);
               }}
               value={options.requireDigit}
@@ -128,8 +158,12 @@ export default function PasswordOptions(props: Props) {
           <View style={styles.row}>
             <Text style={styles.text}>Punctuation</Text>
             <Switch
-              onValueChange={requirePunctuation => {
-                const updatedOptions = updateOptions(options, 'requirePunctuation', requirePunctuation);
+              onValueChange={(requirePunctuation) => {
+                const updatedOptions = updateOptions(
+                  options,
+                  'requirePunctuation',
+                  requirePunctuation
+                );
                 onChangeOptions(updatedOptions);
               }}
               value={options.requirePunctuation}
@@ -139,8 +173,12 @@ export default function PasswordOptions(props: Props) {
           <View style={styles.lastRow}>
             <Text style={styles.text}>Mixed case</Text>
             <Switch
-              onValueChange={requireMixedCase => {
-                const updatedOptions = updateOptions(options, 'requireMixedCase', requireMixedCase);
+              onValueChange={(requireMixedCase) => {
+                const updatedOptions = updateOptions(
+                  options,
+                  'requireMixedCase',
+                  requireMixedCase
+                );
                 onChangeOptions(updatedOptions);
               }}
               value={options.requireMixedCase}
@@ -149,16 +187,19 @@ export default function PasswordOptions(props: Props) {
         </View>
       </View>
 
-
       <View style={styles.section}>
         <Text style={styles.sectionLabel}>Restrictions</Text>
         <View style={styles.rowGroup}>
           <View style={styles.row}>
             <Text style={styles.text}>No special</Text>
             <Switch
-              onValueChange={noSpecial => {
-                const updatedOptions = updateOptions(options, 'noSpecial', noSpecial);
-                onChangeOptions(updatedOptions)
+              onValueChange={(noSpecial) => {
+                const updatedOptions = updateOptions(
+                  options,
+                  'noSpecial',
+                  noSpecial
+                );
+                onChangeOptions(updatedOptions);
               }}
               value={options.noSpecial}
             />
@@ -167,8 +208,12 @@ export default function PasswordOptions(props: Props) {
           <View style={styles.lastRow}>
             <Text style={styles.text}>Digits only</Text>
             <Switch
-              onValueChange={digitsOnly => {
-                const updatedOptions = updateOptions(options, 'digitsOnly', digitsOnly)
+              onValueChange={(digitsOnly) => {
+                const updatedOptions = updateOptions(
+                  options,
+                  'digitsOnly',
+                  digitsOnly
+                );
                 onChangeOptions(updatedOptions);
               }}
               value={options.digitsOnly}
@@ -181,7 +226,11 @@ export default function PasswordOptions(props: Props) {
 }
 
 // Change the value of a single option and update the options object as a whole
-export function updateOptions(options: Options, optionName: string, value: boolean) {
+export function updateOptions(
+  options: Options,
+  optionName: string,
+  value: boolean
+) {
   const copy = { ...options };
   copy[optionName] = value;
   switch (optionName) {
@@ -230,27 +279,23 @@ export function updateOptions(options: Options, optionName: string, value: boole
 }
 
 function getPickerItemColor(selectedValue, value) {
-  return Platform.OS === 'android' && selectedValue === value ?
-    '#008275'
+  return Platform.OS === 'android' && selectedValue === value
+    ? '#008275'
     : pickerItemColor;
 }
 
 export function SizePicker(props) {
   const { value, onChange, ...rest } = props;
   return (
-    <Picker
-      selectedValue={value}
-      onValueChange={onChange}
-      {...rest}
-    >
-      {[2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26].map(size =>
+    <Picker selectedValue={value} onValueChange={onChange} {...rest}>
+      {[2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26].map((size) => (
         <Picker.Item
           key={size}
           label={String(size)}
           value={size}
           color={getPickerItemColor(size, value)}
         />
-      )}
+      ))}
     </Picker>
   );
 }
@@ -265,19 +310,15 @@ export function IndexPicker(props) {
   }
 
   return (
-    <Picker
-      selectedValue={value}
-      onValueChange={onChange}
-      {...rest}
-    >
-      {items.map(item =>
+    <Picker selectedValue={value} onValueChange={onChange} {...rest}>
+      {items.map((item) => (
         <Picker.Item
           key={item}
           label={String(item)}
           value={item}
           color={getPickerItemColor(item, value)}
         />
-      )}
+      ))}
     </Picker>
   );
 }
