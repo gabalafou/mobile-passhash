@@ -1,6 +1,5 @@
 import React from 'react';
 
-
 function debounce(fn, wait) {
   let timeoutId = null;
   return function (...args) {
@@ -25,10 +24,14 @@ export default function useTimedResetState(initialValue, wait) {
     debounce(() => setValue(initialValue), wait),
     []
   );
-  return [value, nextValue => {
-    if (nextValue !== initialValue) {
-      startResetTimer();
-    }
-    setValue(nextValue);
-  }];
+  const resettingSetter = React.useCallback(
+    (nextValue) => {
+      if (nextValue !== initialValue) {
+        startResetTimer();
+      }
+      setValue(nextValue);
+    },
+    [initialValue, startResetTimer, setValue]
+  );
+  return [value, resettingSetter];
 }

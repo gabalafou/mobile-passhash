@@ -2,23 +2,21 @@ import React from 'react';
 import { Platform } from 'react-native';
 import { Input, Button } from 'react-native-elements';
 import RevealPasswordIcon from '../RevealPasswordIcon';
-import useTimedResetState from '../../use-timed-reset-state';
-import { passwordRevealTimeLimit } from '../../constants';
+import usePasswordRevealer from '../../use-password-revealer';
 import styles from './styles';
 
-
 type Props = {
-  value: string,
-  onChange: (value: string) => void,
+  value: string;
+  onChange: (value: string) => void;
 };
 
 function MasterPassword(props: Props, forwardedRef: React.RefObject<Input>) {
   const ref = forwardedRef || React.useRef(null);
   const { value, onChange } = props;
-  const [shouldReveal, setShouldReveal] = useTimedResetState(false, passwordRevealTimeLimit);
+  const [shouldReveal, setLimitedTimeShouldReveal] = usePasswordRevealer();
 
   const toggleShouldReveal = () => {
-    setShouldReveal(!shouldReveal);
+    setLimitedTimeShouldReveal(!shouldReveal);
   };
 
   React.useEffect(() => {
@@ -26,7 +24,7 @@ function MasterPassword(props: Props, forwardedRef: React.RefObject<Input>) {
     // for why this hack is needed
     if (Platform.OS === 'android' && ref.current) {
       ref.current.setNativeProps({
-        style: { fontFamily: 'sans-serif' }
+        style: { fontFamily: 'sans-serif' },
       });
     }
   });
@@ -47,15 +45,18 @@ function MasterPassword(props: Props, forwardedRef: React.RefObject<Input>) {
       ref={ref}
       containerStyle={styles.masterPassword}
       placeholder="Master password"
-      onChangeText={text => onChange(text)}
+      onChangeText={(text) => onChange(text)}
       value={value}
       autoCapitalize="none"
       autoCompleteType="off"
       autoCorrect={false}
       secureTextEntry={!shouldReveal}
-      keyboardType={shouldReveal ?
-        (Platform.OS === 'android' ? 'visible-password' : 'ascii-capable')
-        : 'default'
+      keyboardType={
+        shouldReveal
+          ? Platform.OS === 'android'
+            ? 'visible-password'
+            : 'ascii-capable'
+          : 'default'
       }
       textContentType="password"
       rightIcon={
