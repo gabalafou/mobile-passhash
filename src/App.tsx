@@ -1,4 +1,5 @@
 import React from 'react';
+import { StatusBar } from 'expo-status-bar';
 import { Provider } from 'react-redux';
 import store from './redux/store';
 import { NavigationContainer } from '@react-navigation/native';
@@ -16,6 +17,8 @@ export default function App() {
   debugLog('Rendering App');
   return (
     <Provider store={store}>
+      {/* Use style="dark" because this app's background color is light */}
+      <StatusBar style="dark" />
       <NavigationContainer>
         <RootStack.Navigator mode="modal" headerMode="none">
           <RootStack.Screen name="Main" component={MainStackScreen} />

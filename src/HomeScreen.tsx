@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { StatusBar } from 'expo-status-bar';
 import {
   Dimensions,
   Pressable,
@@ -131,8 +130,6 @@ export default function HomeScreen(props) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar style="dark" />
-
       <ScrollView
         style={styles.scrollView}
         // "on-drag" - keyboard should disappear when user drags/scrolls

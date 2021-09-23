@@ -1,5 +1,4 @@
-import { Platform, StyleSheet } from 'react-native';
-import Constants from 'expo-constants';
+import { StyleSheet } from 'react-native';
 import { backgroundColor, gutterWidth } from '../../styles';
 
 export const resultItemHeight = 50;
@@ -9,7 +8,6 @@ export default StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor,
-    paddingTop: Platform.OS === 'ios' ? Constants.statusBarHeight : 0,
   },
   searchBarContainer: {
     backgroundColor,
