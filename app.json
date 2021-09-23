@@ -18,6 +18,9 @@
     "android": {
       "package": "com.gabalafou.mobilepasshash",
       "versionCode": 1
+    },
+    "extra": {
+      "debugLogging": false
     }
   }
 }

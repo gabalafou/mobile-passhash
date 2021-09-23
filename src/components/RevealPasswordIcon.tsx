@@ -1,7 +1,6 @@
 import React from 'react';
 import { Entypo } from '@expo/vector-icons';
 
-
 export default function RevealPasswordIcon(props) {
   return (
     <Entypo
