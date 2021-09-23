@@ -26,7 +26,7 @@ type Props = {
 export default class DeletableRow extends PureComponent<Props> {
   // This is similar to the CSS `right` property when using absolute
   // positioning. It keeps track how far from the right the row has moved after
-  // a pan gesture. Basically it goes from 0 to -rightTrayWidth.
+  // a pan gesture. It goes from -rightTrayWidth (row closed) to 0 (row open)
   right = new Animated.Value(0);
   // This property ONLY keeps track of how far the user has dragged their during
   // a touch and resets to zero at the end of the gesture.
@@ -206,6 +206,8 @@ const styles = StyleSheet.create({
   rightTray: {
     position: 'absolute',
     width: rightTrayWidth,
+    // tray closed is {right: -rightTrayWidth},
+    // tray open is {right: 0}
     right: -rightTrayWidth,
     top: 0,
     bottom: 0,
