@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import {
-  Animated,
   Dimensions,
   Pressable,
   SafeAreaView,
@@ -22,6 +21,7 @@ import MasterPassword from './components/MasterPassword';
 import PasswordOptions from './components/PasswordOptions';
 import SiteTag from './components/SiteTag';
 import PassHashCommon from './lib/wijjo/passhash-common';
+import SlidingBottomOverlay from './components/SlidingBottomOverlay';
 import styles from './styles';
 import rowStyles from './components/PasswordOptions/styles';
 import debugLog from './debug-log';
@@ -42,14 +42,18 @@ export default function HomeScreen(props) {
   const [bottomOverlayChildren, setBottomOverlayChildren] = useState(null);
   const [bottomOverlayOpenerBottomY, setBottomOverlayOpenerBottomY] =
     useState(null);
-  const [overlayHeight, setOverlayHeight] = useState(0);
+  const [overlayHeight, setOverlayHeight] = useState(null);
 
   // Naming is potentially confusing. This is the y-coordinate of the top edge
   // of the bottom overlay.
-  const overlayY = useMemo(
-    () => Dimensions.get('window').height - overlayHeight,
-    [overlayHeight]
-  );
+  const { height: windowHeight } = Dimensions.get('window');
+  const overlayY = useMemo(() => {
+    return windowHeight != null &&
+      overlayHeight != null &&
+      windowHeight > overlayHeight
+      ? windowHeight - overlayHeight
+      : null;
+  }, [windowHeight, overlayHeight]);
 
   // Refs
   const scrollView = useRef(null);
@@ -102,8 +106,8 @@ export default function HomeScreen(props) {
         scrollView.current.scrollTo({ y: 0 });
       } else if (
         bottomOverlayChildren &&
-        bottomOverlayOpenerBottomY > 0 &&
-        overlayY > 0 &&
+        bottomOverlayOpenerBottomY !== null &&
+        overlayY !== null &&
         bottomOverlayOpenerBottomY - overlayY > 0
       ) {
         // When user clicks the option for size and generate new password, the
@@ -237,60 +241,5 @@ export default function HomeScreen(props) {
         {bottomOverlayChildren}
       </SlidingBottomOverlay>
     </SafeAreaView>
-  );
-}
-
-function SlidingBottomOverlay({
-  children: nextChildren,
-  onLayoutWithChildren,
-}) {
-  const [children, setChildren] = useState(null);
-  const slideAnim = useMemo(() => new Animated.Value(200), []);
-  const ref = useRef();
-
-  if (!children && nextChildren) {
-    // On loading, we animate up
-    setChildren(nextChildren);
-    Animated.timing(slideAnim, {
-      toValue: 0,
-      useNativeDriver: true,
-      duration: 300,
-    }).start();
-  } else if (children && !nextChildren) {
-    // On unloading, we animate down
-    Animated.timing(slideAnim, {
-      toValue: 200,
-      useNativeDriver: true,
-      duration: 300,
-    }).start(({ finished }) => {
-      if (finished) {
-        setChildren(null);
-      }
-    });
-  } else if (nextChildren !== children) {
-    // Otherwise we load new children without animation
-    setChildren(nextChildren);
-  }
-
-  return (
-    <Animated.View
-      style={[
-        styles.bottomOverlay,
-        {
-          transform: [
-            {
-              translateY: slideAnim,
-            },
-          ],
-        },
-      ]}
-      onLayout={(event) => {
-        if (children) {
-          onLayoutWithChildren(event);
-        }
-      }}
-    >
-      {children}
-    </Animated.View>
   );
 }

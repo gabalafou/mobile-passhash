@@ -25,10 +25,4 @@ export default StyleSheet.create({
     marginBottom: 10,
     marginLeft: gutterWidth,
   },
-  bottomOverlay: {
-    position: 'absolute',
-    bottom: 0,
-    zIndex: 10,
-    width: '100%',
-  },
 });
