@@ -1,5 +1,6 @@
 import React from 'react';
-import { Clipboard, Text, View } from 'react-native';
+import * as Clipboard from 'expo-clipboard';
+import { Text, View } from 'react-native';
 import { Button } from 'react-native-elements';
 import usePasswordRevealer from '../../use-password-revealer';
 import RevealPasswordIcon from '../RevealPasswordIcon';
