@@ -73,7 +73,7 @@ export default function PasswordOptions(props: Props) {
           <View
             style={styles.row}
             onLayout={({ target }) => {
-              target.measure((_x, _y, _width, height, _pageX, pageY) => {
+              target.measure((x, y, width, height, pageX, pageY) => {
                 setBottomYGeneratePassword(pageY + height);
               });
             }}
@@ -107,7 +107,7 @@ export default function PasswordOptions(props: Props) {
           <View
             style={styles.lastRow}
             onLayout={({ target }) => {
-              target.measure((_x, _y, _width, height, _pageX, pageY) => {
+              target.measure((x, y, width, height, pageX, pageY) => {
                 setBottomYLength(pageY + height);
               });
             }}
