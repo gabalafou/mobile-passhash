@@ -14,7 +14,10 @@
     "platforms": ["ios", "android", "web"],
     "ios": {
       "bundleIdentifier": "com.gabalafou.mobilepasshash",
-      "buildNumber": "1.1.0.1"
+      "buildNumber": "1.1.0.2",
+      "config": {
+        "usesNonExemptEncryption": false
+      }
     },
     "android": {
       "package": "com.gabalafou.mobilepasshash",
